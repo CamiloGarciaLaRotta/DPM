@@ -1,2 +1,4 @@
 # DPM
-Final project, Group 15, sound.buzz( );
+
+**NB** keep the code, doc and commits clean and concise
+
