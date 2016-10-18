@@ -1,0 +1,7 @@
+#Basic Java stuff to ignore
+*.jar
+*.class
+
+#Compressed Files
+*.zip
+*.gz
