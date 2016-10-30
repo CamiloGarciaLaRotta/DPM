@@ -12,6 +12,7 @@ import utilities.Search;
 import utilities.Capture;
 import utilities.Util;
 
+
 public class Main {
 	//Constants (measurements, frequencies, etc)
 	private static final long ODOMETER_PERIOD = 25;
@@ -29,7 +30,7 @@ public class Main {
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
 	public static USSensor usSensor;
 	public static ColorSensor colorSensor;
-	public static LightIntensitySensor intensitySensor;
+	public static LightIntensitySensor gridLineDetector;
 	
 	public static RobotState state = RobotState.k_Disabled;
 	public static RobotState lastState = RobotState.k_Disabled;
@@ -54,7 +55,7 @@ public class Main {
 		//rightArmMotor.rotate(-RESTING_ARM_POSITION);
 		
 		colorSensor = new ColorSensor(colorPort);
-		intensitySensor = new IntensitySensor(intensityPort);
+		gridLineDetector = new LightIntensitySensor(intensityPort);
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor, ODOMETER_PERIOD, WHEEL_RADIUS, TRACK);
 		lcd = new LCDInfo(odo, textLCD, false);	//start on creation
