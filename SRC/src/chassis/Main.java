@@ -25,7 +25,11 @@ public class Main {
 	private static final EV3LargeRegulatedMotor rightArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
+	private static final Port intensityPort = LocalEV3.get().getPort("S3");
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
+	public static USSensor usSensor;
+	public static ColorSensor colorSensor;
+	public static LightIntensitySensor intensitySensor;
 	
 	public static RobotState state = RobotState.k_Disabled;
 	public static RobotState lastState = RobotState.k_Disabled;
@@ -34,26 +38,23 @@ public class Main {
 	public enum RobotState {k_Setup, k_Localization, k_Search, k_Capture, k_Disabled, k_Avoiding};
 	public enum DemoState {k_Part1, k_Part2, k_Default};
 	
-	public static USSensor usSensor;
-	
 	public static LCDInfo lcd;
 	
 	public static final int RESTING_ARM_POSITION	= 30;
 	
 	public static final double GRID_SIZE		= 30.48;
 	public static final double FIELD_BOUNDARY	= 58;
-	
+
 	public static void main(String[] args) {
 		state = RobotState.k_Setup;
 		//Setup sensors
 		usSensor = new USSensor(usPort);
-		Util.setUSSensor(usSensor);
 		
 		//leftArmMotor.rotate(-RESTING_ARM_POSITION);
 		//rightArmMotor.rotate(-RESTING_ARM_POSITION);
 		
-		ColorSensor colorSensor = new ColorSensor(colorPort);
-		Util.setColorSensor(colorSensor);
+		colorSensor = new ColorSensor(colorPort);
+		intensitySensor = new IntensitySensor(intensityPort);
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor, ODOMETER_PERIOD, WHEEL_RADIUS, TRACK);
 		lcd = new LCDInfo(odo, textLCD, false);	//start on creation

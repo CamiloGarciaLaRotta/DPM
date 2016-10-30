@@ -3,16 +3,18 @@
  */
 package utilities;
 
+import chassis.Main;
+import chassis.LightIntensitySensor;
+
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
 	private Odometer odometer;
-	private float color[];
 	
 	private static final double THRESHOLD_THETA = 40.0 * Math.PI / 180.0; //threshold for theta
 	private static final double THRESHOLD_POS = 5.0;	//threshold for x and y values
 	public static int count;
 	private double lastPosition[];
-	private float lastColor;
+	private float lastIntensity;
 	private final boolean useCorrection = true;
 	private final boolean updateAll[] = {true, true, true};
 
@@ -20,7 +22,6 @@ public class OdometryCorrection extends Thread {
 	public OdometryCorrection(Odometer odometer) {
 		this.odometer = odometer;
 		count = 0;
-		color = new float[Util.colorSensor];
 		lastPosition = new double[3]; //x, y, theta
 		odometer.getPosition(lastPosition, updateAll);	//need to set theta - may as well get current x and y
 	}
@@ -32,20 +33,19 @@ public class OdometryCorrection extends Thread {
 			return;
 		}
 		long correctionStart, correctionEnd;
-		Util.colorSensor.fetchSample(color,0);
-		lastColor = color[0] * 1000; //Scale the intensity value
+		lastIntensity = Main.gridLineDetector.getIntensity();
 		
 		while (true) {
+			float intensity;
 			correctionStart = System.currentTimeMillis();
-			Util.colorSensor.fetchSample(color,0); //Get intensity sample
-			color[0] *= 1000; //Scale intensity value
+			intensity = Main.gridLineDetector.getIntensity();
 			//Intensity at line is < 300.
-			if(color[0] < 300 && lastColor < 300) continue; //Only register line when the last measurement DID NOT measure a line
-			lastColor = color[0];
+			if(intensity < LightIntensitySensor.LINE_DETECTED && lastIntensity < LightIntensitySensor.LINE_DETECTED) continue; //Only register line when the last measurement DID NOT measure a line
+			lastIntensity = intensity;
 
 			// put your correction code here
 			
-			if(color[0] < 300) //Detected black
+			if(intensity < LightIntensitySensor.LINE_DETECTED) //Detected black
 			{
 				System.out.println("         LINE");
 				double currentPosition[] = new double[3];
