@@ -1,6 +1,6 @@
 package utilities;
 
-import chassis.Lab5;
+import chassis.Main;
 
 public class Avoider extends Thread{
 	
@@ -15,7 +15,7 @@ public class Avoider extends Thread{
 
 	@Override
 	public void run() {
-		while(Lab5.state != Lab5.RobotState.k_Avoiding) {
+		while(Main.state != Main.RobotState.k_Avoiding) {
 			try { Thread.sleep(300); } catch(Exception ex) {ex.printStackTrace();}
 		}
 		
