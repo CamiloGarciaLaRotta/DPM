@@ -161,30 +161,11 @@ public class Search extends Thread {
 			//Styrofoam block found - begin capture
 			Sound.twoBeeps();
 			Main.state = Main.RobotState.Capture; //If blockFound, switch to Capture state
-		} /*else { //PART 1
-			while(true) {
-				chassis.LCDInfo.getLCD().clear();
-				if(usSensor.getMedianSample(US_SAMPLES) <= BLOCK_DISTANCE) {
-					//Sound.beep();
-					Util.lcd.setLine1("Object detected");
-					if(isStyrofoamBlock()) {
-						Util.lcd.setLine2("Block");
-						Sound.beep();
-					} else {
-						Util.lcd.setLine2("Not a block");
-						Sound.twoBeeps();
-					}
-				}
-				try {
-					Thread.sleep(500);
-				} catch(Exception e) { }
-			}
-		}*/
+		}
 	}
 	
 	private boolean isStyrofoamBlock() {
 		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
-		//return (colorDistance(colorSensor.getColor(),STYROFOAM_COLOR) < 1.0);
 	}
 	
 	private boolean isObjectDetected() {

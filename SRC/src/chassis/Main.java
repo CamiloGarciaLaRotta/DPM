@@ -55,7 +55,7 @@ public class Main {
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor, ODOMETER_PERIOD, WHEEL_RADIUS, TRACK);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
-		USLocalizer localizer = new USLocalizer(odo, usSensor, USLocalizer.LocalizationType.RISING_EDGE, US_TO_CENTER);
+		USLocalizer localizer = new USLocalizer(odo, usSensor, US_TO_CENTER);
 		Search search = new Search(odo, colorSensor, usSensor);
 		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
 		
