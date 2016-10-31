@@ -16,7 +16,7 @@ public class USLocalizer extends Thread {
 	private USSensor usSensor;
 	private LocalizationType locType;
 	private double lastTheta;
-	int step; //TODO not sure we need this
+	int step;
 	private double minimumDistance;
 	private double distanceUSSensor;
 	private Navigation nav;
@@ -32,7 +32,7 @@ public class USLocalizer extends Thread {
 	}
 	
 	public void doLocalization() {
-		Main.state = Main.RobotState.k_Localization;
+		Main.state = Main.RobotState.Localization;
 		this.start();
 	}
 	
@@ -40,6 +40,9 @@ public class USLocalizer extends Thread {
 	public void run() {
 		double angleA, angleB;
 		//localize();
+		
+		//TODO clean up this entire class - lots of old & unused stuff here
+		
 		if (locType == LocalizationType.FALLING_EDGE) {
 			/*
 //if(locType == LocalizationType.FALLING_EDGE) return;
@@ -187,7 +190,7 @@ public class USLocalizer extends Thread {
 			Thread.sleep(2000);
 		} catch (Exception e) {	}
 		//slight pause to show localization is complete
-		Main.state = Main.RobotState.k_Search;
+		Main.state = Main.RobotState.Search;
 	}
 	
 	private boolean seesWall() {

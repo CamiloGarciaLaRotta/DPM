@@ -46,30 +46,9 @@ public class LCDInfo implements TimerListener{
 		LCD.drawInt((int)(pos[0]), 3, 0);
 		LCD.drawInt((int)(pos[1]), 3, 1);
 		LCD.drawInt((int)(pos[2] * 180.0 / Math.PI), 3, 2);
-		String stateString;
-		switch(Main.state) {
-		case k_Capture:
-			stateString = "Capture";
-			break;
-		case k_Disabled:
-			stateString = "Disabled";
-			break;
-		case k_Localization:
-			stateString = "Localization";
-			break;
-		case k_Search:
-			stateString = "Search";
-			break;
-		case k_Setup:
-			stateString = "Setup";
-			break;
-		case k_Avoiding:
-			stateString = "Avoiding";
-			break;
-		default:
-			stateString = "";
-			break;
-		}
+		
+		String stateString = Main.state.toString();
+		
 		LCD.drawString(stateString, 0, 4);
 		LCD.drawString(line1, 0, 5);
 		LCD.drawString(line2, 0, 6);

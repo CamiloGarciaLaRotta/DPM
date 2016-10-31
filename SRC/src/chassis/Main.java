@@ -10,7 +10,6 @@ import utilities.Odometer;
 import utilities.USLocalizer;
 import utilities.Search;
 import utilities.Capture;
-import utilities.Util;
 
 
 public class Main {
@@ -19,6 +18,7 @@ public class Main {
 	private static final double WHEEL_RADIUS = 2.141; //cm
 	private static final double TRACK = 16.50; //cm (16.50 previously)
 	private static final double US_TO_CENTER = 4.50; //cm from us sensor to center of wheels
+	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
@@ -32,90 +32,73 @@ public class Main {
 	public static ColorSensor colorSensor;
 	public static LightIntensitySensor gridLineDetector;
 	
-	public static RobotState state = RobotState.k_Disabled;
-	public static RobotState lastState = RobotState.k_Disabled;
-	public static DemoState demo = DemoState.k_Default;
+	public static RobotState state = RobotState.Disabled;
+	public static RobotState lastState = RobotState.Disabled;
+	public static DemoState demo = DemoState.Default;
 	
-	public enum RobotState {k_Setup, k_Localization, k_Search, k_Capture, k_Disabled, k_Avoiding};
-	public enum DemoState {k_Part1, k_Part2, k_Default};
+	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
+	public enum DemoState {Default};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
 	public static final int RESTING_ARM_POSITION	= 30;
 	
-	public static final double GRID_SIZE		= 30.48;
-	public static final double FIELD_BOUNDARY	= 58;
 
 	public static void main(String[] args) {
-		state = RobotState.k_Setup;
+		state = RobotState.Setup;
+		
 		//Setup sensors
 		usSensor = new USSensor(usPort);
-		
-		//leftArmMotor.rotate(-RESTING_ARM_POSITION);
-		//rightArmMotor.rotate(-RESTING_ARM_POSITION);
-		
 		colorSensor = new ColorSensor(colorPort);
 		gridLineDetector = new LightIntensitySensor(intensityPort);
+		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor, ODOMETER_PERIOD, WHEEL_RADIUS, TRACK);
-		lcd = new LCDInfo(odo, textLCD, false);	//start on creation
+		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		USLocalizer localizer = new USLocalizer(odo, usSensor, USLocalizer.LocalizationType.RISING_EDGE, US_TO_CENTER);
 		Search search = new Search(odo, colorSensor, usSensor);
 		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
 		
-		textLCD.clear();
-		textLCD.drawString("<-Part 1 Part 2->", 0, 5);
-		int input = Button.waitForAnyPress();
-		textLCD.clear(5);	//clear option display
-		lcd.resume();
+		textLCD.clear(); //blank display before selection
+		demo = stateSelect();	//select state
 		
-		switch(input) {
-		case Button.ID_RIGHT:
-			demo = DemoState.k_Part2;
-			state = RobotState.k_Search;
-			odo.start();	//start threads
-			localizer.doLocalization();
-			capture.start();
-			search.start();
-			lcd.resume();
-			break;
-		case Button.ID_LEFT:
-			demo = DemoState.k_Part1;
-			state = RobotState.k_Search;
-			LCDInfo.displayMessage("Part 1 started");
-			search.start();
-			break;
-		case Button.ID_ENTER:
-			odo.start();
-			lcd.resume();
-			leftMotor.flt();
-			rightMotor.flt();
-			break;
-		default:
-			//invalid input
-			System.exit(-1);
-		}
-		//Wait for escape to exit
-		while(Button.waitForAnyPress() != Button.ID_ESCAPE);
-		/*if(state == RobotState.k_Disabled) {	//execution has normally exited
-			try {
-				odo.join();
-				search.join();
-				capture.join();
-				localizer.join();
-			} catch (Exception e) {}
-		} else {								//cancelled while still running
-			try {
-				odo.interrupt();
-				search.interrupt();
-				capture.interrupt();
-				localizer.interrupt();
-			} catch (Exception e) {}
-		}*/
+		odo.start();
+		lcd.resume();
+		localizer.doLocalization();
+		search.start();
+		capture.start();
+		
+		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
+		
 		odo.interrupt();;
 		search.interrupt();
 		capture.interrupt();
 		localizer.interrupt();
 		System.exit(0);
+	}
+	
+	private static DemoState stateSelect() {
+		DemoState state = DemoState.Default;
+		DemoState [] states = DemoState.values();
+		boolean stateChosen = false;
+		while(!stateChosen) {
+			LCDInfo.displayMessage("<- "+state.toString() + " ->");
+			int selection = Button.waitForAnyPress();
+			switch(selection) {
+			case Button.ID_ENTER:
+				stateChosen = true;
+				break;
+			case Button.ID_RIGHT:
+				state = states[(state.ordinal() + 1) % states.length]; //increment state
+				break;
+			case Button.ID_LEFT:
+				state = states[(state.ordinal() - 1) + (state.ordinal() == 0 ? states.length : 0)]; //decrement with wrap around
+				break;
+			default:
+				break;
+			}
+		}
+		
+		return state;
 	}
 }
