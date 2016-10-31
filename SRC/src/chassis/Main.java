@@ -95,6 +95,7 @@ public class Main {
 				state = states[(state.ordinal() - 1) + (state.ordinal() == 0 ? states.length : 0)]; //decrement with wrap around
 				break;
 			default:
+				System.exit(-1);
 				break;
 			}
 		}
