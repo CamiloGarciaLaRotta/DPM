@@ -9,19 +9,14 @@ public class ColorSensor {
 	private float[] colorData;
 	private EV3ColorSensor colorValue;
 	
-	private Object mutex;
-	
 	public ColorSensor(Port colorPort) {
 		this.colorValue = new EV3ColorSensor(colorPort);
 		this.colorSample = colorValue.getMode("RGB");
 		this.colorData = new float[colorSample.sampleSize()];
-		this.mutex = new Object();
 	}
 	
 	public float[] getColor() {
-		synchronized(mutex) {
-			colorSample.fetchSample(colorData, 0);
-		}
+		colorSample.fetchSample(colorData, 0);
 		return colorData;
 	}
 	
