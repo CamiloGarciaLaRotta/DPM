@@ -23,7 +23,7 @@ public class Capture extends Thread {
 	
 	@Override
 	public void run() {
-		while(Main.state != Main.RobotState.k_Capture) {
+		while(Main.state != Main.RobotState.Capture) {
 			//wait for capture to begin
 			try {
 				Thread.sleep(300);
@@ -57,7 +57,7 @@ public class Capture extends Thread {
 		odo.forwardMotors();
 		nav.turnBy(Math.PI);
 
-		Main.state = Main.RobotState.k_Disabled;
+		Main.state = Main.RobotState.Disabled;
 		ascendArms();
 		Sound.beep();
 		Sound.beep();

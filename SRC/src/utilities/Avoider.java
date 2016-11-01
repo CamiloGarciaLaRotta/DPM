@@ -9,13 +9,15 @@ public class Avoider extends Thread{
 	
 	private static final int AVOID_SPEED	= 60;
 	
+	//TODO complete and test
+	
 	public Avoider(Odometer odo) {
 		this.odo = odo;
 	}
 
 	@Override
 	public void run() {
-		while(Main.state != Main.RobotState.k_Avoiding) {
+		while(Main.state != Main.RobotState.Avoiding) {
 			try { Thread.sleep(300); } catch(Exception ex) {ex.printStackTrace();}
 		}
 		
