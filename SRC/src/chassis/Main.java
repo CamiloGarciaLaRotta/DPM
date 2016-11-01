@@ -8,7 +8,9 @@ import lejos.hardware.port.Port;
 
 import utilities.Odometer;
 import utilities.USLocalizer;
+import utilities.Util;
 import utilities.Search;
+import utilities.Test;
 import utilities.Capture;
 
 /**
@@ -18,11 +20,7 @@ import utilities.Capture;
  *
  */
 public class Main {
-	//Constants (measurements, frequencies, etc)
-	private static final long ODOMETER_PERIOD = 25;
-	private static final double WHEEL_RADIUS = 2.141; //cm
-	private static final double TRACK = 16.50; //cm (16.50 previously)
-	private static final double US_TO_CENTER = 4.50; //cm from us sensor to center of wheels
+	//Constants (measurements, frequencies, etc) -> Util class
 	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
@@ -45,11 +43,11 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
-	public enum DemoState {Default};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, Test};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
-	public static final int RESTING_ARM_POSITION	= 30;
+	public static final int RESTING_ARM_POSITION = 30;
 	
 
 	public static void main(String[] args) {
@@ -61,24 +59,41 @@ public class Main {
 		gridLineDetector = new LightIntensitySensor(intensityPort);
 		
 		//Setup threads
-		Odometer odo = new Odometer(leftMotor, rightMotor, ODOMETER_PERIOD, WHEEL_RADIUS, TRACK);
+		Odometer odo = new Odometer(leftMotor, rightMotor, Util.ODOMETER_PERIOD, Util.WHEEL_RADIUS, Util.TRACK);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
-		USLocalizer localizer = new USLocalizer(odo, usSensor, US_TO_CENTER);
+		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		Search search = new Search(odo, colorSensor, usSensor);
 		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
 		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
 		
+		//threads intrinsic to all processes
 		odo.start();
 		lcd.resume();
-		localizer.doLocalization();
-		search.start();
-		capture.start();
+		
+		switch (demo) {
+		case Test:	
+			// They need to be verified in this order, 
+			// as a test builds on top of the prior one.
+//			Test.StraightLineTest(odo, 10); // test tachometer/odometer
+//			Test.SquareTest(odo, 3, 60); // test rotation
+//			Test.LocalizationTest(odo); // test US sensor
+//			Test.NavigationTest(odo, new int[][] {{60,60}}, true); // fine tune
+			break;
+		case Default: 
+			localizer.doLocalization();
+			search.start();
+			capture.start();
+			break;
+		}
 		
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
 		
-		odo.interrupt();;
+		//TODO if setting interrupt flag doesn't stop Threads,
+		//	   add while(!Thread.interrupted()) at the 
+		//	   beggining of each Thread's run() method
+		odo.interrupt();
 		search.interrupt();
 		capture.interrupt();
 		localizer.interrupt();

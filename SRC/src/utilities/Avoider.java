@@ -12,7 +12,7 @@ public class Avoider extends Thread{
 	private Odometer odo;
 	private Navigation nav;
 	
-	private static final int AVOID_SPEED	= 60;
+	private static final int AVOID_SPEED = 60;
 	
 	//TODO complete and test
 	

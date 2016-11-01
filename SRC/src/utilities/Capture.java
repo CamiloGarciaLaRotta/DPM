@@ -6,7 +6,6 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Capture extends Thread {
 	private Odometer odo;
-	private final double [] GOAL_ZONE = new double [] {80, 80}; //(80, 80) in cm, goal zone
 	
 	private final int ARM_SPEED	= 70;
 	
@@ -44,7 +43,7 @@ public class Capture extends Thread {
 		
 		getBlock();
 		Navigation nav = new Navigation(odo); //travel to scoring zone with block
-		nav.travelTo(GOAL_ZONE[0] - 17, GOAL_ZONE[1] - 17); 
+		nav.travelTo(Util.GOAL_ZONE[0] - 17,Util.GOAL_ZONE[1] - 17); 
 		
 		while(Navigation.PathBlocked) {
 			odo.stopMotors();
@@ -58,7 +57,7 @@ public class Capture extends Thread {
 				nav.turnBy(Math.PI/2);
 				odo.moveCM(Odometer.LINEDIR.Forward, 20, true);
 			}
-			nav.travelTo(GOAL_ZONE[0] - 17, GOAL_ZONE[1] - 17); 
+			nav.travelTo(Util.GOAL_ZONE[0] - 17, Util.GOAL_ZONE[1] - 17); 
 			nav.turnBy(Math.PI);
 		}
 		
