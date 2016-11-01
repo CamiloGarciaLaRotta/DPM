@@ -11,14 +11,19 @@ public class LightIntensitySensor {
 
 	public static final float LINE_DETECTED	= 300.0f;
 	
+	private Object mutex;
+	
 	public LightIntensitySensor(Port intensityPort) {
 		this.intensityValue = new EV3ColorSensor(intensityPort);
 		this.intensitySample = intensityValue.getMode("Red");
 		this.intensityData = new float[intensitySample.sampleSize()];
+		this.mutex = new Object();
 	}
 	
 	public float getIntensity() {
-		intensitySample.fetchSample(intensityData, 0);
+		synchronized(mutex) {
+			intensitySample.fetchSample(intensityData, 0);
+		}
 		return intensityData[0] * 1000.0f;
 	}
 	
