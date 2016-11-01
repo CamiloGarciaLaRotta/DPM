@@ -4,7 +4,7 @@
 package utilities;
 
 import chassis.Main;
-import utilities.LightIntensitySensor;
+import chassis.LightIntensitySensor;
 
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;

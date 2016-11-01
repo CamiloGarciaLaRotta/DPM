@@ -51,7 +51,7 @@ public class Main {
 		gridLineDetector = new LightIntensitySensor(intensityPort);
 		
 		//Setup threads
-		Odometer odo = new Odometer(leftMotor, rightMotor, Util.ODOMETER_PERIOD, Util.WHEEL_RADIUS, Util.TRACK);
+		Odometer odo = new Odometer(leftMotor, rightMotor);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		Search search = new Search(odo, colorSensor, usSensor);
@@ -68,7 +68,7 @@ public class Main {
 		case Test:	
 			// They need to be verified in this order, 
 			// as a test builds on top of the prior one.
-//			Test.StraightLineTest(odo, 10); // test tachometer/odometer
+			Test.StraightLineTest(odo, 10); // test tachometer/odometer
 //			Test.SquareTest(odo, 3, 60); // test rotation
 //			Test.LocalizationTest(odo); // test US sensor
 //			Test.NavigationTest(odo, new int[][] {{60,60}}, true); // fine tune
