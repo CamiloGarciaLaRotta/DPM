@@ -4,7 +4,7 @@
 package utilities;
 
 import chassis.Main;
-import utilities.LightIntensitySensor;
+import chassis.LightIntensitySensor;
 
 /**
  * @version 0.1
