@@ -24,6 +24,10 @@ public class Test {
 	 */
 	public static void SquareTest(Odometer odo, int laps, double length) {
 		double[] waypoints = new double[laps * 8];
+		
+		OdometryCorrection correct = new OdometryCorrection(odo);
+		correct.start();
+		
 		for(int c = 0; c < laps; c++) {
 			waypoints[4*c] = 0.0;
 			waypoints[4*c+1] = 0.0;
