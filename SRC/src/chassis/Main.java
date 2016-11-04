@@ -20,8 +20,6 @@ import utilities.Capture;
  *
  */
 public class Main {
-	//Constants (measurements, frequencies, etc) -> Util class
-	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
@@ -43,7 +41,7 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
-	public enum DemoState {Default, Test};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -73,18 +71,25 @@ public class Main {
 		lcd.resume();
 		
 		switch (demo) {
-		case Test:	
-			// They need to be verified in this order, 
-			// as a test builds on top of the prior one.
-			Test.StraightLineTest(odo, 10); // test tachometer/odometer
-//			Test.SquareTest(odo, 3, 60); // test rotation
-//			Test.LocalizationTest(odo); // test US sensor
-//			Test.NavigationTest(odo, new int[][] {{60,60}}, true); // fine tune
-			break;
-		case Default: 
+		case Default: //regular robot operation
 			localizer.doLocalization();
 			search.start();
 			capture.start();
+			break;
+			
+		// Tests need to be verified in this order, 
+		// as a test builds on top of the prior one.
+		case StraightLineTest:	
+			Test.StraightLineTest(odo, 10); // test tachometer/odometer
+			break;
+		case SquareTest:
+			Test.SquareTest(odo, 3, 60); //test rotation
+			break;
+		case LocalizationTest:
+			Test.LocalizationTest(odo); //test US sensor
+			break;
+		case NavigationTest:
+			Test.NavigationTest(odo, new int[][] {{60, 60}}, true); // TODO fine tune
 			break;
 		}
 		

@@ -33,6 +33,7 @@ public class Capture extends Thread {
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Capture) {
+			if(Thread.interrupted()) return;
 			//wait for capture to begin
 			try {
 				Thread.sleep(300);
@@ -46,6 +47,7 @@ public class Capture extends Thread {
 		nav.travelTo(Util.GOAL_ZONE[0] - 17,Util.GOAL_ZONE[1] - 17); 
 		
 		while(Navigation.PathBlocked) {
+			if(Thread.interrupted()) return;
 			odo.stopMotors();
 			//If it can (without going out of bounds), turn clockwise and move 20cm
 			if(inBounds(odo.getX() + 20*Math.cos(odo.getTheta() - Math.PI/2),odo.getY() - Math.sin(odo.getTheta() - Math.PI/2),60,60)) {

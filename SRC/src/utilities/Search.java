@@ -61,6 +61,8 @@ public class Search extends Thread {
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Search) {
+			//check if interrupted
+			if(Thread.interrupted()) return;
 			//wait for localization to finish
 			try {
 				Thread.sleep(300);
