@@ -4,12 +4,13 @@ import chassis.Main;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 
-
+/**
+ * @version 0.1
+ */
 public class Test {
 	/**
 	 * Simple localization routine
 	 * @param odo Odometer
-	 * @param type Localization method
 	 */
 	public static void LocalizationTest(Odometer odo) {
 		USLocalizer localizer = new USLocalizer(odo, Main.usSensor, Util.US_TO_CENTER);
