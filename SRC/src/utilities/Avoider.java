@@ -2,6 +2,11 @@ package utilities;
 
 import chassis.Main;
 
+/**
+ * @version 0.1
+ * @author juliette
+ * Checks if the robot must avoid an object in its path and then does it
+ */
 public class Avoider extends Thread{
 	
 	private Odometer odo;

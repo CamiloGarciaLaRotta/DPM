@@ -13,6 +13,10 @@ public class LightIntensitySensor {
 	
 	private Object mutex;
 	
+	/**
+	 * LightIntensitySensor Constructor
+	 * @param intensityPort - port sensor is connected to
+	 */
 	public LightIntensitySensor(Port intensityPort) {
 		this.intensityValue = new EV3ColorSensor(intensityPort);
 		this.intensitySample = intensityValue.getMode("Red");
@@ -20,6 +24,10 @@ public class LightIntensitySensor {
 		this.mutex = new Object();
 	}
 	
+	/**
+	 * Gets intensity from the sensor scaled by 1000
+	 * @return - intensity
+	 */
 	public float getIntensity() {
 		synchronized(mutex) {
 			intensitySample.fetchSample(intensityData, 0);

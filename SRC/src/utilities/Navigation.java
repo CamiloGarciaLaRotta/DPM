@@ -13,6 +13,12 @@ import chassis.Main;
  */
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Helpful tools to control robot navigation
+ * @version 0.1
+ * @author juliette
+ *
+ */
 public class Navigation {
 	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
@@ -21,8 +27,12 @@ public class Navigation {
 	
 	public static boolean PathBlocked = false;
 
-	public Navigation(Odometer odo) {
-		this.odometer = odo;
+	/**
+	 * Navigation Constructor
+	 * @param odometer - Odometer object
+	 */
+	public Navigation(Odometer odometer) {
+		this.odometer = odometer;
 
 		EV3LargeRegulatedMotor[] motors = this.odometer.getMotors();
 		this.leftMotor = motors[0];
@@ -33,8 +43,10 @@ public class Navigation {
 		this.rightMotor.setAcceleration(ACCELERATION);
 	}
 
-	/*
-	 * Functions to set the motor speeds jointly
+	/**
+	 * Function to set the motor speeds jointly
+	 * @param lSpd - speed of left motor
+	 * @param rSpd - speed of right motor
 	 */
 	public void setSpeeds(float lSpd, float rSpd) {
 		this.leftMotor.setSpeed(lSpd);
@@ -49,6 +61,11 @@ public class Navigation {
 			this.rightMotor.forward();
 	}
 
+	/**
+	 * Function to set the motor speeds jointly
+	 * @param lSpd - speed of left motor
+	 * @param rSpd - speed of right motor
+	 */
 	public void setSpeeds(int lSpd, int rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
@@ -62,7 +79,7 @@ public class Navigation {
 			this.rightMotor.forward();
 	}
 
-	/*
+	/**
 	 * Float the two motors jointly
 	 */
 	public void setFloat() {
@@ -72,9 +89,10 @@ public class Navigation {
 		this.rightMotor.flt(true);
 	}
 
-	/*
-	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
-	 * constantly updating it's heading
+	/**
+	 * TravelTo function that travels to designated position while constantly updating heading
+	 * @param x - x position
+	 * @param y - y position
 	 */
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
@@ -93,9 +111,10 @@ public class Navigation {
 		this.setSpeeds(0, 0);
 	}
 
-	/*
-	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
-	 * motors when the turn is completed
+	/**
+	 * TurnTo function which takes an angle and boolean as arguments
+	 * @param angle - absolute angle to turn to
+	 * @param stop - if the robot should stop moving after turning
 	 */
 	public void turnTo(double angle, boolean stop) {
 
@@ -135,20 +154,43 @@ public class Navigation {
 		}
 	}
 	
+	/**
+	 * turnBy function that turns by an angle relative to the robot
+	 * @param theta - relative angle to turn by
+	 */
 	public void turnBy(double theta) {
 		odometer.setMotorSpeeds(Odometer.ROTATE_SPEED, Odometer.ROTATE_SPEED);
 		odometer.getMotors()[0].rotate(convertAngle(odometer.wheelRadius,odometer.trackLength,theta * 180.0 / Math.PI), true);
 		odometer.getMotors()[1].rotate(-convertAngle(odometer.wheelRadius,odometer.trackLength,theta * 180.0 / Math.PI), false);
 	}
 	
+	/**
+	 * Converts linear distance to degrees a wheel must rotate
+	 * @param radius - radius of the wheel (cm)
+	 * @param distance - distance (cm)
+	 * @return - degrees to rotate
+	 */
 	private static int convertDistance(double radius, double distance) {
 		return (int)(distance * 180.0 / (Math.PI * radius));
 	}
 
+	/**
+	 * Converts angle to rotate to degrees a wheel must rotate
+	 * @param radius - radius of the wheel (cm)
+	 * @param width - distance between wheels
+	 * @param angle - angle to rotate
+	 * @return - degrees to rotate
+	 */
 	private static int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
 	}
 	
+	/**
+	 * Calculates minimal angle
+	 * @param theta1 - in radians
+	 * @param theta2 - in radians
+	 * @return - minimal angle between theta1 and theta2
+	 */
 	public static double minimalAngle(double theta1, double theta2) {
 		double dTheta = theta1 - theta2;
 		if(dTheta > Math.PI) dTheta -= 2*Math.PI;
@@ -156,10 +198,10 @@ public class Navigation {
 		return dTheta;
 	}
 	
-	/*
-	 * Go foward a set distance in cm
+	/**
+	 * Go forward a set distances
+	 * @param distance - distance to move (cm)
 	 */
-	
 	public void goForward(double distance) {
 		this.travelTo(Math.cos(Math.toRadians(this.odometer.getTheta())) * distance, Math.cos(Math.toRadians(this.odometer.getTheta())) * distance);
 

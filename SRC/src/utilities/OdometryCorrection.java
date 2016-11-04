@@ -6,6 +6,11 @@ package utilities;
 import chassis.Main;
 import chassis.LightIntensitySensor;
 
+/**
+ * @version 0.1
+ * @author juliette
+ * Corrects the odometer reading using the grid on the field
+ */
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
 	private Odometer odometer;
@@ -18,7 +23,10 @@ public class OdometryCorrection extends Thread {
 	private final boolean useCorrection = true;
 	private final boolean updateAll[] = {true, true, true};
 
-	// constructor
+	/**
+	 * 
+	 * @param odometer - odometer to correct
+	 */
 	public OdometryCorrection(Odometer odometer) {
 		this.odometer = odometer;
 		count = 0;
