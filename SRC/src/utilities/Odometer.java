@@ -2,6 +2,13 @@ package utilities;
 
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Odometer class for the robot
+ * All values in cm and radians unless otherwise specified.
+ * @author juliette
+ * @version 0.1
+ * 
+ */
 public class Odometer extends Thread {
 	
 	public enum TURNDIR {CW, CCW};
@@ -23,6 +30,14 @@ public class Odometer extends Thread {
 	public double wheelRadius;
 	private long odometerPeriod;
 
+	/**
+	 * Odometer constructor
+	 * @param leftMotor - left motor object
+	 * @param rightMotor - right motor object
+	 * @param odometerPeriod - period for odometer to update (ms)
+	 * @param wheelRadius - radius of robot wheels (cm)
+	 * @param track - distance between the wheels (cm)
+	 */
 	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, long odometerPeriod, double wheelRadius, double track) {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
@@ -38,6 +53,10 @@ public class Odometer extends Thread {
 		mutex = new Object();
 	}
 
+	/**
+	 * Start odometer
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		long updateStart, updateEnd;
@@ -55,7 +74,7 @@ public class Odometer extends Thread {
 			dTheta = (-dLeft + dRight)/trackLength;
 			dPos = (dLeft + dRight)/2;
 			synchronized (mutex) {
-				/**
+				/*
 				 * Don't use the variables x, y, or theta anywhere but here!
 				 * Only update the values of x, y, and theta in this block. 
 				 * Do not perform complex math
@@ -82,31 +101,54 @@ public class Odometer extends Thread {
 		}
 	}
 	
+	/**
+	 * 
+	 * @return array of motors (left, right)
+	 */
 	public EV3LargeRegulatedMotor[] getMotors() {
 		EV3LargeRegulatedMotor[] motors = {leftMotor, rightMotor};
 		return motors;
 	}
 	
+	/**
+	 * Update motor speeds (deg/s)
+	 * @param speedL - left speed
+	 * @param speedR - right sped
+	 */
 	public void setMotorSpeeds(int speedL, int speedR) {
 		leftMotor.setSpeed(speedL);
 		rightMotor.setSpeed(speedR);
 	}
 	
+	/**
+	 * Update motor speeds (deg/s)
+	 * @param speed - speed for both motors
+	 */
 	public void setMotorSpeed(int speed) {
 		leftMotor.setSpeed(speed);
 		rightMotor.setSpeed(speed);
 	}
 	
+	/**
+	 * Have both motors move forward
+	 */
 	public void forwardMotors() {
 		leftMotor.forward();
 		rightMotor.forward();
 	}
 	
+	/**
+	 * Have both motors move in reverse
+	 */
 	public void backwardMotors() {
 		leftMotor.backward();
 		rightMotor.backward();
 	}
 	
+	/**
+	 * Spin in a certain direction
+	 * @param dir - direction to spin in
+	 */
 	public void spin(TURNDIR dir) {
 		if(dir == TURNDIR.CW) {
 			leftMotor.forward();
@@ -118,11 +160,20 @@ public class Odometer extends Thread {
 		}
 	}
 	
+	/**
+	 * Stop motors
+	 */
 	public void stopMotors() {
 		setMotorSpeed(0);
 		forwardMotors();
 	}
 	
+	/**
+	 * Move a set distance
+	 * @param dir - direction to move in
+	 * @param distance - distance to move (cm)
+	 * @param stop - if the robot should stop after moving
+	 */
 	public void moveCM(LINEDIR dir, double distance, boolean stop) {
 		setMotorSpeeds(NAVIGATE_SPEED, NAVIGATE_SPEED);
 		if(dir == LINEDIR.Forward) forwardMotors();
@@ -141,6 +192,11 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/**
+	 * Write coordinates of the current position to position
+	 * @param position - array to hold x, y, and theta coordinates
+	 * @param update - if the x, y, and theta coordinates should be fetched
+	 */
 	public void getPosition(double[] position, boolean[] update) {
 		synchronized(mutex) {
 			if(update[0]) position[0] = x;
@@ -149,6 +205,10 @@ public class Odometer extends Thread {
 		}
 	}
 	
+	/**
+	 * Write coordinates of current position to position
+	 * @param position - array to hold x, y, and theta coordinates
+	 */
 	public void getPosition(double[] position) {
 		synchronized(mutex) {
 			position[0] = x;
@@ -157,6 +217,10 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/**
+	 * 
+	 * @return x coordinate from odometer
+	 */
 	public double getX() {
 		double result;
 		synchronized(mutex) {
@@ -165,6 +229,10 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @return y coordinate from odometer
+	 */
 	public double getY() {
 		double result;
 		synchronized(mutex) {
@@ -173,6 +241,10 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * 
+	 * @return heading from odometer
+	 */
 	public double getTheta() {
 		double result;
 		synchronized(mutex) {
@@ -181,6 +253,11 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * Overrides the current position in the odometer
+	 * @param position - x, y, and theta overrides
+	 * @param update - if x, y, and theta should be overridden
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
 		synchronized (mutex) {
@@ -193,18 +270,30 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/**
+	 * 
+	 * @param x - x coordinate override
+	 */
 	public void setX(double x) {
 		synchronized (mutex) {
 			this.x = x;
 		}
 	}
 
+	/**
+	 * 
+	 * @param y - y coordinate override
+	 */
 	public void setY(double y) {
 		synchronized (mutex) {
 			this.y = y;
 		}
 	}
 
+	/**
+	 * 
+	 * @param theta - heading override
+	 */
 	public void setTheta(double theta) {
 		synchronized (mutex) {
 			this.theta = theta;
@@ -251,6 +340,12 @@ public class Odometer extends Thread {
 		this.data = data;
 	}
 	
+	/**
+	 * Euclidean distance between two (x, y) points
+	 * @param a - point a
+	 * @param b - point b
+	 * @return euclidean distance
+	 */
 	public static double euclideanDistance(double[] a, double[] b) {
 		return Math.sqrt((a[0] - b[0])*(a[0] - b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 	}

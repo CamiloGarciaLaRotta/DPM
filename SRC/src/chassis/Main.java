@@ -11,7 +11,12 @@ import utilities.USLocalizer;
 import utilities.Search;
 import utilities.Capture;
 
-
+/**
+ * Base robot class with all hardware objects and loaded utilities
+ * @version 0.1
+ * @author juliette
+ *
+ */
 public class Main {
 	//Constants (measurements, frequencies, etc)
 	private static final long ODOMETER_PERIOD = 25;
@@ -36,6 +41,9 @@ public class Main {
 	public static RobotState lastState = RobotState.Disabled;
 	public static DemoState demo = DemoState.Default;
 	
+	/**
+	 * Current action the robot is doing
+	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
 	public enum DemoState {Default};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	

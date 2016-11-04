@@ -15,6 +15,10 @@ public class USSensor {
 	
 	private Object mutex;	//to avoid race conditions
 	
+	/**
+	 * USSensor Constructor
+	 * @param usPort - port sensor is connected to
+	 */
 	public USSensor(Port usPort) {
 		this.usSensor = new EV3UltrasonicSensor(usPort);
 		this.usValue = usSensor.getMode("Distance");
@@ -22,6 +26,10 @@ public class USSensor {
 		this.mutex = new Object();
 	}
 	
+	/**
+	 * 
+	 * @return - distance in cm capped at FIELD_BOUNDS
+	 */
 	public float getFilteredDataBasic() {
 		synchronized(mutex) {
 			usSensor.fetchSample(usData, 0); //Store distance in usData
@@ -29,6 +37,12 @@ public class USSensor {
 		return (usData[0] * 100.0f >= FIELD_BOUNDS) ? FIELD_BOUNDS : usData[0] * 100.0f; //Cap data at NO_WALL, scale data by 100.
 	}
 	
+	/**
+	 * 
+	 * @param samples - number of samples to take
+	 * @return - median sample taken using getFilteredDataBasic()
+	 * @see #getFilteredDataBasic()
+	 */
 	public float getMedianSample(int samples) {
 		float[] distSamples = new float[samples];
 		

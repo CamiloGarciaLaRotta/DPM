@@ -17,8 +17,14 @@ public class LCDInfo implements TimerListener{
 	// arrays for displaying data
 	private double [] pos;
 	
-	public LCDInfo(Odometer odo, TextLCD LCD, boolean start) {
-		this.odo = odo;
+	/**
+	 * Constructor for LCDInfo
+	 * @param odometer - Odometer object
+	 * @param LCD - TextLCD object
+	 * @param start - if the runtime display should begin on creation
+	 */
+	public LCDInfo(Odometer odometer, TextLCD LCD, boolean start) {
+		this.odo = odometer;
 		LCDInfo.LCD = LCD;
 		this.lcdTimer = new Timer(LCD_REFRESH, this);
 		
@@ -31,11 +37,19 @@ public class LCDInfo implements TimerListener{
 		if(start) lcdTimer.start();
 	}
 	
+	/**
+	 * Displays user message on line 3 of the LCD
+	 * @param message
+	 */
 	public static void displayMessage(String message) {
 		LCD.clear(3);
 		LCD.drawString(message, 0, 3);
 	}
 	
+	/**
+	 * Displays position and heading, robot state, and other messages
+	 * {@inheritDoc}
+	 */
 	public void timedOut() { 
 		odo.getPosition(pos);
 		LCD.clear();

@@ -14,13 +14,23 @@ public class Capture extends Thread {
 	private EV3LargeRegulatedMotor rightArm;
 	private Navigation nav;
 	
-	public Capture(Odometer odo, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm) {
-		this.odo = odo;
+	/**
+	 * Capture Thread Constructor
+	 * @param odometer - Odometer Object
+	 * @param leftArm - motor for left arm
+	 * @param rightArm - motor for right arm
+	 */
+	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm) {
+		this.odo = odometer;
 		this.leftArm = leftArm;
 		this.rightArm = rightArm;
 		this.nav = new Navigation(this.odo);
 	}
 	
+	/**
+	 * start Capture thread
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Capture) {
@@ -84,6 +94,14 @@ public class Capture extends Thread {
 		descendArms();
 	}
 	
+	/**
+	 * Checks if the position is in field bounds
+	 * @param x
+	 * @param y
+	 * @param width - field width (x)
+	 * @param height - field height (y)
+	 * @return
+	 */
 	public static boolean inBounds(double x,double y, double width, double height) {
 		return (x < width) && (y < height) && x > 0 && y > 0;
 	}

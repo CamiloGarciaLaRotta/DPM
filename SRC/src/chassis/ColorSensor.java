@@ -11,6 +11,10 @@ public class ColorSensor {
 	
 	private Object mutex;
 	
+	/**
+	 * ColorSensor Constructor (RGB mode)
+	 * @param colorPort - port sensor is connected to
+	 */
 	public ColorSensor(Port colorPort) {
 		this.colorValue = new EV3ColorSensor(colorPort);
 		this.colorSample = colorValue.getMode("RGB");
@@ -18,6 +22,10 @@ public class ColorSensor {
 		this.mutex = new Object();
 	}
 	
+	/**
+	 * 
+	 * @return - RGB data from color sensor
+	 */
 	public float[] getColor() {
 		synchronized(mutex) {
 			colorSample.fetchSample(colorData, 0);

@@ -1,8 +1,6 @@
 package utilities;
 
-import chassis.ColorSensor;
 import chassis.LCDInfo;
-import chassis.USSensor;
 
 public class Util {
 	public static LCDInfo lcd;

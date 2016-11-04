@@ -6,6 +6,13 @@ import chassis.USSensor;
 import lejos.hardware.Sound;
 import utilities.Odometer.LINEDIR;
 
+/**
+ * 
+ * @author juliette
+ * @version 0.1
+ * 
+ * Blue styrofoam block search functionality for the robot
+ */
 public class Search extends Thread {
 	private static final int US_SAMPLES = 10;
 	private Odometer odo;
@@ -28,8 +35,17 @@ public class Search extends Thread {
 		
 	public static final float[] STYROFOAM_COLOR = new float[] {0.0f,1.0f,1.0f};
 	
-	public Search(Odometer odo, ColorSensor colorSensor, USSensor usSensor) {
-		this.odo = odo;
+	/**
+	 * Constructor for Search Class
+	 * @param odometer - Odometer object
+	 * @param colorSensor - ColorSensor object
+	 * @param usSensor - USSensor object
+	 * 
+	 * @author Juliette Regimbal
+	 * @version 
+	 */
+	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor) {
+		this.odo = odometer;
 		this.colorSensor = colorSensor;
 		this.usSensor = usSensor;
 		this.corner = 0;
@@ -37,6 +53,11 @@ public class Search extends Thread {
 		nav = new Navigation(odo);
 		method1 = true;
 	}
+	
+	/**
+	 * Starts search thread
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Search) {
@@ -163,11 +184,18 @@ public class Search extends Thread {
 			Main.state = Main.RobotState.Capture; //If blockFound, switch to Capture state
 		}
 	}
-	
+	/**
+	 * 
+	 * @return if the detected object is a styrofoam block
+	 */
 	private boolean isStyrofoamBlock() {
 		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
+	/**
+	 * 
+	 * @return if there is an object that can be detected by the robot
+	 */
 	private boolean isObjectDetected() {
 		float currentDistance = usSensor.getMedianSample(US_SAMPLES);
 		boolean isObject = (lastDistanceDetected - currentDistance > DISTANCE_THRESHOLD) && (currentDistance <= 45);
@@ -175,6 +203,12 @@ public class Search extends Thread {
 		return isObject;
 	}
 	
+	/**
+	 * Measures distance between two RGB color vectors
+	 * @param a first RGB vector
+	 * @param b second RGB vector
+	 * @return magnitude of the distance between a and b
+	 */
 	public static float colorDistance(float[] a, float[] b){
 		return (float)Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]) + (a[2]-b[2])*(a[2]-b[2]));
 	}

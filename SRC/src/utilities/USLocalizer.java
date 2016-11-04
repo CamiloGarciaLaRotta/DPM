@@ -4,6 +4,12 @@ import chassis.Main;
 import chassis.USSensor;
 import lejos.hardware.Sound;
 
+/**
+ * @version 0.1
+ * Localize the robot in the first square to (0, 0, 90-degrees)
+ * @author juliette
+ *
+ */
 public class USLocalizer extends Thread {
 	private static final float NO_WALL = 45.0f;	//Minimum distance for which the US sensor reading should be interpreted as no wall detected
 	private static final double THETA_THRESHOLD = Math.PI / 6.0; //Minimum angle between two walls
@@ -16,19 +22,31 @@ public class USLocalizer extends Thread {
 	private double minimumDistance;
 	private double distanceUSSensor;
 	
-	public USLocalizer(Odometer odo,  USSensor usSensor, double distanceUSSensor) {
-		this.odo = odo;
+	/**
+	 * USLocalizer Constructor
+	 * @param odometer - Odometer object
+	 * @param usSensor - USSensor object
+	 * @param distanceUSSensor - distance of sensor from center of rotation (in cm)
+	 */
+	public USLocalizer(Odometer odometer,  USSensor usSensor, double distanceUSSensor) {
+		this.odo = odometer;
 		this.usSensor = usSensor;
 		this.distanceUSSensor = distanceUSSensor;
 		step = 0;
 		minimumDistance = NO_WALL;
 	}
 	
+	/**
+	 * Run to localize robot
+	 */
 	public void doLocalization() {
 		Main.state = Main.RobotState.Localization;
 		this.start();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		double angleA, angleB;
@@ -105,6 +123,10 @@ public class USLocalizer extends Thread {
 		Main.state = Main.RobotState.Search;
 	}
 	
+	/**
+	 * Checks if the robot sees a wall for localizing
+	 * @return - if a wall is seen
+	 */
 	private boolean seesWall() {
 		float sample = usSensor.getMedianSample(10);
 		if(sample < minimumDistance) minimumDistance = sample;
