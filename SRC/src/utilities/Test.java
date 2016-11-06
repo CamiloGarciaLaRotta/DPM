@@ -30,22 +30,22 @@ public class Test {
 		correct.start();
 		
 		for(int c = 0; c < laps; c++) {
-			waypoints[4*c] = 0.0;
-			waypoints[4*c+1] = 0.0;
+			waypoints[8*c] = 0.0;
+			waypoints[8*c+1] = 0.0;
 			
-			waypoints[4*c+2] = Util.SQUARE_LENGTH;
-			waypoints[4*c+3] = 0.0;
+			waypoints[8*c+2] = length;
+			waypoints[8*c+3] = 0.0;
 			
-			waypoints[4*c+4] = Util.SQUARE_LENGTH;
-			waypoints[4*c+5] = Util.SQUARE_LENGTH;
+			waypoints[8*c+4] = length;
+			waypoints[8*c+5] = length;
 			
-			waypoints[4*c+6] = 0.0;
-			waypoints[4*c+7] = Util.SQUARE_LENGTH;
+			waypoints[8*c+6] = 0.0;
+			waypoints[8*c+7] = length;
 		}
 		
 		Navigation nav = new Navigation(odo);
 		
-		for(int c = 0; c < waypoints.length; c++) {
+		for(int c = 0; c < waypoints.length/2; c++) {
 			nav.travelTo(waypoints[2*c], waypoints[2*c + 1]);
 		}
 		

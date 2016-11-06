@@ -5,13 +5,11 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
-
 import utilities.Odometer;
-import utilities.USLocalizer;
-import utilities.Util;
 import utilities.Search;
 import utilities.Test;
-import utilities.Capture;
+import utilities.USLocalizer;
+import utilities.Util;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
@@ -22,9 +20,7 @@ import utilities.Capture;
 public class Main {
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor rightArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
@@ -61,7 +57,7 @@ public class Main {
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		Search search = new Search(odo, colorSensor, usSensor);
-		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
+//		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
 		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
@@ -74,7 +70,7 @@ public class Main {
 		case Default: //regular robot operation
 			localizer.doLocalization();
 			search.start();
-			capture.start();
+//			capture.start();
 			break;
 			
 		// Tests need to be verified in this order, 
@@ -83,7 +79,7 @@ public class Main {
 			Test.StraightLineTest(odo, 10); // test tachometer/odometer
 			break;
 		case SquareTest:
-			Test.SquareTest(odo, 3, 60); //test rotation
+			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
 			break;
 		case LocalizationTest:
 			Test.LocalizationTest(odo); //test US sensor
@@ -100,7 +96,7 @@ public class Main {
 		//	   beggining of each Thread's run() method
 		odo.interrupt();
 		search.interrupt();
-		capture.interrupt();
+//		capture.interrupt();
 		localizer.interrupt();
 		System.exit(0);
 	}
