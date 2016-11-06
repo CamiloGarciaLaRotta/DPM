@@ -26,24 +26,18 @@ public class Odometer extends Thread {
 	private double oldltacho, oldrtacho;
 	
 	private double data;
-	public double trackLength; 
-	public double wheelRadius;
+
 	private long odometerPeriod;
 
 	/**
-	 * Odometer constructor
+	 * Odometer Constructor
 	 * @param leftMotor - left motor object
 	 * @param rightMotor - right motor object
-	 * @param odometerPeriod - period for odometer to update (ms)
-	 * @param wheelRadius - radius of robot wheels (cm)
-	 * @param track - distance between the wheels (cm)
 	 */
-	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, long odometerPeriod, double wheelRadius, double track) {
+	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor) {
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
-		this.trackLength = track;
-		this.wheelRadius = wheelRadius;
-		this.odometerPeriod = odometerPeriod;
+
 		this.x = this.y = 0.0;
 		this.theta = 0.5 * Math.PI;
 		this.leftMotorTachoCount = this.rightMotorTachoCount = 0;
@@ -67,14 +61,14 @@ public class Odometer extends Thread {
 			this.rightMotorTachoCount = this.rightMotor.getTachoCount();
 								
 			double dLeft, dRight, dTheta, dPos; //left wheel movement, right wheel movement, change in heading, and change in position
-			dLeft = wheelRadius * Math.PI * (this.leftMotorTachoCount - this.oldltacho) / 180.0;
-			dRight = wheelRadius * Math.PI * (this.rightMotorTachoCount - this.oldrtacho) / 180.0;
+			dLeft = Util.WHEEL_RADIUS * Math.PI * (this.leftMotorTachoCount - this.oldltacho) / 180.0;
+			dRight = Util.WHEEL_RADIUS * Math.PI * (this.rightMotorTachoCount - this.oldrtacho) / 180.0;
 			oldltacho = leftMotorTachoCount;
 			oldrtacho = rightMotorTachoCount;
-			dTheta = (-dLeft + dRight)/trackLength;
+			dTheta = (-dLeft + dRight)/Util.TRACK;
 			dPos = (dLeft + dRight)/2;
 			synchronized (mutex) {
-				/*
+				/**
 				 * Don't use the variables x, y, or theta anywhere but here!
 				 * Only update the values of x, y, and theta in this block. 
 				 * Do not perform complex math
@@ -89,9 +83,9 @@ public class Odometer extends Thread {
 
 			// this ensures that the odometer only runs once every period
 			updateEnd = System.currentTimeMillis();
-			if (updateEnd - updateStart < odometerPeriod) {
+			if (updateEnd - updateStart < Util.ODOMETER_PERIOD) {
 				try {
-					Thread.sleep(odometerPeriod - (updateEnd - updateStart));
+					Thread.sleep(Util.ODOMETER_PERIOD - (updateEnd - updateStart));
 				} catch (InterruptedException e) {
 					// there is nothing to be done here because it is not
 					// expected that the odometer will be interrupted by

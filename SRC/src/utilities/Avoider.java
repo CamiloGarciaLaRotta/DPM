@@ -12,7 +12,7 @@ public class Avoider extends Thread{
 	private Odometer odo;
 	private Navigation nav;
 	
-	private static final int AVOID_SPEED	= 60;
+	private static final int AVOID_SPEED = 60;
 	
 	//TODO complete and test
 	
@@ -23,6 +23,7 @@ public class Avoider extends Thread{
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Avoiding) {
+			if(Thread.interrupted()) return;
 			try { Thread.sleep(300); } catch(Exception ex) {ex.printStackTrace();}
 		}
 		
