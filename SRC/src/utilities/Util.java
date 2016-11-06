@@ -9,12 +9,16 @@ public class Util {
 	
 	// robot
 	public static LCDInfo lcd;
-	public static final long ODOMETER_PERIOD		= 25; //Hz
-	public static final double WHEEL_RADIUS			= 2.025; //cm
-	public static final double TRACK				= 15.01; //cm 
+	public static final long ODOMETER_PERIOD		= 25; 	//Hz
+	public static final double WHEEL_RADIUS			= 2.18; //cm
+	public static final double TRACK				= 16.6; //cm 
 	public static final double US_TO_CENTER			= 4.50; //cm from us sensor to center of wheels
-	public static final double INTENSITY_TO_CENTER	= 12; //cm from ligh sensor to center of wheels
-	public static final double GRIDLINE_THRESHOLD	= 0.1;
+	public static final double INTENSITY_TO_CENTER	= 12; 	//cm from ligh sensor to center of wheels
+	public static final double GRIDLINE_THRESHOLD	= 0.1;	//Error margin (in cm) to consider position at a gridline
+	public static final double ZONE_THRESHOLD		= 1.0;	//Error margin (in cm) for position at the green/red zone
+	public static final double BLOCK_HEIGHT			= 4.9;	//Height of the styrofoam blocks
+	public static final int US_SAMPLES				= 6; 	//Default amount of samples to take for median filter
+	public static final double FORKLIFT_HEIGHT		= 15.0;	//Length of forklift 
 
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
 
