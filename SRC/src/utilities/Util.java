@@ -5,7 +5,7 @@ import chassis.LCDInfo;
 public class Util {
 	// field
 	public static final double SQUARE_LENGTH = 30.48; //cm
-	public static final double FIELD_BOUNDARY = 3.0 * SQUARE_LENGTH;
+	public static final double FIELD_BOUNDARY = 3.0 * SQUARE_LENGTH; 
 	
 	// robot
 	public static LCDInfo lcd;

@@ -3,6 +3,7 @@ package utilities;
 import chassis.Main;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import utilities.Search.SearchState;
 
 public class Capture extends Thread {
 	private Odometer odo;
@@ -68,7 +69,8 @@ public class Capture extends Thread {
 		odo.forwardMotors();
 		nav.turnBy(Math.PI);
 
-		Main.state = Main.RobotState.Disabled;
+		Main.state = Main.RobotState.Search;
+		Search.searchState = SearchState.Default;
 		ascendArms();
 		Sound.beep();
 		Sound.beep();
