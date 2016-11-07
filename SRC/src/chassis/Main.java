@@ -5,11 +5,15 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
+
 import utilities.Odometer;
-import utilities.Search;
-import utilities.Test;
 import utilities.USLocalizer;
 import utilities.Util;
+import utilities.Search;
+import utilities.Test;
+import utilities.Avoider;
+import utilities.Capture;
+import utilities.Navigation;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
@@ -20,7 +24,9 @@ import utilities.Util;
 public class Main {
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3LargeRegulatedMotor rightArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
@@ -43,6 +49,9 @@ public class Main {
 	
 	public static final int RESTING_ARM_POSITION = 30;
 	
+	//TODO TODO TODO TODO
+	// - implement WIFI module
+	// - dynamically set GREEN, RED zone
 
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -54,10 +63,19 @@ public class Main {
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
+		Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
-		Search search = new Search(odo, colorSensor, usSensor);
-//		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
+		
+		// for testing only, when WIFI module is implemented it will be given automatically
+		double[][] GREEN = new double[][]{{6*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH},
+			{8*Util.SQUARE_LENGTH,4*Util.SQUARE_LENGTH}};
+		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+		
+		Search search = new Search(odo, colorSensor, usSensor, GREEN);
+		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor, GREEN);
+		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
@@ -70,7 +88,8 @@ public class Main {
 		case Default: //regular robot operation
 			localizer.doLocalization();
 			search.start();
-//			capture.start();
+			avoid.start();
+			capture.start();
 			break;
 			
 		// Tests need to be verified in this order, 
@@ -79,13 +98,14 @@ public class Main {
 			Test.StraightLineTest(odo, 10); // test tachometer/odometer
 			break;
 		case SquareTest:
-			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
+			Test.SquareTest(odo, 3, 60); //test rotation
 			break;
 		case LocalizationTest:
 			Test.LocalizationTest(odo); //test US sensor
 			break;
 		case NavigationTest:
-			Test.NavigationTest(odo, new int[][] {{60, 60}}, true); // TODO fine tune
+			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
+			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		}
 		
@@ -96,7 +116,8 @@ public class Main {
 		//	   beggining of each Thread's run() method
 		odo.interrupt();
 		search.interrupt();
-//		capture.interrupt();
+		avoid.interrupt();
+		capture.interrupt();
 		localizer.interrupt();
 		System.exit(0);
 	}
