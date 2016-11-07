@@ -48,6 +48,9 @@ public class Navigation {
 	 * @param lSpd - speed of left motor
 	 * @param rSpd - speed of right motor
 	 */
+	
+	//TODO: Only use of one setSpeeds(...) and cast args to floats
+	
 	public void setSpeeds(float lSpd, float rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
