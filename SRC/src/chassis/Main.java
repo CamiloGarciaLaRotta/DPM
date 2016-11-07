@@ -105,6 +105,7 @@ public class Main {
 			break;
 		case NavigationTest:
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
+			usSensor = new USSensor(usPort);
 			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 <<<<<<< ca66ea272c86bfda156e8b0310ac0cc738bfbde9
