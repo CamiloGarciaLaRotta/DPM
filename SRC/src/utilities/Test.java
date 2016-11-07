@@ -27,7 +27,7 @@ public class Test {
 		double[] waypoints = new double[laps * 8];
 		
 		OdometryCorrection correct = new OdometryCorrection(odo);
-		correct.start();
+		//correct.start();
 		
 		for(int c = 0; c < laps; c++) {
 			waypoints[8*c] = 0.0;
@@ -41,12 +41,14 @@ public class Test {
 			
 			waypoints[8*c+6] = 0.0;
 			waypoints[8*c+7] = length;
+			if(Button.readButtons() == Button.ID_ESCAPE) return;
 		}
 		
 		Navigation nav = new Navigation(odo);
 		
 		for(int c = 0; c < waypoints.length/2; c++) {
 			nav.travelTo(waypoints[2*c], waypoints[2*c + 1]);
+			if(Button.readButtons() == Button.ID_ESCAPE) return;
 		}
 		
 	}
@@ -61,7 +63,7 @@ public class Test {
 		for(int c = 0; c < 4; c++) {
 			odo.moveCM(Odometer.LINEDIR.Forward, distance, true);
 			
-			Button.waitForAnyPress();
+			if(Button.waitForAnyPress() == Button.ID_ESCAPE) break;
 			
 			odo.moveCM(Odometer.LINEDIR.Backward, distance, true);
 			

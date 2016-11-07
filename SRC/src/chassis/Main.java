@@ -58,7 +58,7 @@ public class Main {
 		
 		//Setup sensors
 		usSensor = new USSensor(usPort);
-		colorSensor = new ColorSensor(colorPort);
+		//colorSensor = new ColorSensor(colorPort);
 		gridLineDetector = new LightIntensitySensor(intensityPort);
 		
 		//Setup threads

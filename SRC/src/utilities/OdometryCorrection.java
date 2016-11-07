@@ -20,7 +20,7 @@ public class OdometryCorrection extends Thread {
 	public static int count;
 	private double lastPosition[];
 	private float lastIntensity;
-	private final boolean useCorrection = true;
+	private final boolean useCorrection = false;
 
 	/**
 	 * 
