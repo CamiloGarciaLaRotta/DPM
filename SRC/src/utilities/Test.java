@@ -1,6 +1,9 @@
 package utilities;
 
+import chassis.ColorSensor;
+import chassis.LCDInfo;
 import chassis.Main;
+import chassis.USSensor;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 
@@ -90,6 +93,26 @@ public class Test {
 				Button.waitForAnyPress();
 			}
 		}
+	}
+	
+	public static void RGBUnitVectorTest(ColorSensor color) {
+		float [] rgbRaw = new float[3];
+		while(Button.readButtons() != Button.ID_ESCAPE) {
+			rgbRaw = color.getColor();
+			double magnitude = Math.sqrt(rgbRaw[0]*rgbRaw[0] + rgbRaw[1]*rgbRaw[1] + rgbRaw[2]*rgbRaw[2]);
+			rgbRaw[0] /= magnitude;
+			rgbRaw[1] /= magnitude;
+			rgbRaw[2] /= magnitude;
+			LCDInfo.displayMessage(rgbRaw[0] + " " + rgbRaw[1] + " " + rgbRaw[2]);
+		}
+	}
+	
+	public static void ObjectDifferentiationTest(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
+		Search search = new Search(odometer, colorSensor, usSensor, GREEN);
+		Main.state = Main.RobotState.Search;
+		search.run();
+		while(Main.state == Main.RobotState.Search && Button.readButtons() != Button.ID_ESCAPE);
+		search.interrupt();
 	}
 	
 }

@@ -43,7 +43,7 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -55,11 +55,6 @@ public class Main {
 
 	public static void main(String[] args) {
 		state = RobotState.Setup;
-		
-		//Setup sensors
-		usSensor = new USSensor(usPort);
-		//colorSensor = new ColorSensor(colorPort);
-		gridLineDetector = new LightIntensitySensor(intensityPort);
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
@@ -86,6 +81,10 @@ public class Main {
 		
 		switch (demo) {
 		case Default: //regular robot operation
+			usSensor = new USSensor(usPort);
+			colorSensor = new ColorSensor(colorPort);
+			gridLineDetector = new LightIntensitySensor(intensityPort);
+			
 			localizer.doLocalization();
 			search.start();
 			avoid.start();
@@ -101,16 +100,25 @@ public class Main {
 			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
 			break;
 		case LocalizationTest:
+			usSensor = new USSensor(usPort);
 			Test.LocalizationTest(odo); //test US sensor
 			break;
 		case NavigationTest:
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
 			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
+<<<<<<< ca66ea272c86bfda156e8b0310ac0cc738bfbde9
 		case SearchTest:
 			search.start();
 			state = RobotState.Search;
 			break;
+=======
+		case RGBVectorTest:
+			colorSensor = new ColorSensor(colorPort);
+			Test.RGBUnitVectorTest(colorSensor);
+		default:
+			System.exit(-1);
+>>>>>>> Added object differentiation tests, rearranged sensor init
 		}
 		
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
