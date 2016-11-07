@@ -21,8 +21,6 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  *
  */
 public class Navigation {
-	final static int FAST = 150, SLOW = 100, ACCELERATION = 900;
-	final static double DEG_ERR = 4.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	
@@ -40,8 +38,8 @@ public class Navigation {
 		this.rightMotor = motors[1];
 
 		// set acceleration
-		this.leftMotor.setAcceleration(ACCELERATION);
-		this.rightMotor.setAcceleration(ACCELERATION);
+		this.leftMotor.setAcceleration(Util.NAV_ACCELERATION);
+		this.rightMotor.setAcceleration(Util.NAV_ACCELERATION);
 	}
 
 	/**
@@ -102,7 +100,7 @@ public class Navigation {
 		Navigation.PathBlocked = false;
 		double minAng;
 		while (Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
-											new double[] {x,y}) > CM_ERR) {
+											new double[] {x,y}) > Util.CM_TOLERANCE) {
 			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
@@ -128,7 +126,7 @@ public class Navigation {
 		if(error > Math.PI) error -= 2 * Math.PI;
 		else if(error < -Math.PI) error += 2 * Math.PI;
 		
-		while (Math.abs(error) > DEG_ERR * Math.PI / 180.0) {
+		while (Math.abs(error) > Util.DEG_TOLERANCE * Math.PI / 180.0) {
 			
 			error = angle - this.odometer.getTheta();
 			
@@ -139,19 +137,19 @@ public class Navigation {
 			
 			
 			if (error < -Math.PI) {
-				this.setSpeeds(-SLOW, SLOW);
+				this.setSpeeds(-Util.NAV_SLOW, Util.NAV_SLOW);
 				//odometer.getMotors()[0].forward();
 				//odometer.getMotors()[1].backward();
 			} else if (error < 0.0) {
-				this.setSpeeds(SLOW, -SLOW);
+				this.setSpeeds(Util.NAV_SLOW, -Util.NAV_SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();
 			} else if (error > Math.PI) {
-				this.setSpeeds(SLOW, -SLOW);
+				this.setSpeeds(Util.NAV_SLOW, -Util.NAV_SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();
 			} else {
-				this.setSpeeds(-SLOW, SLOW);
+				this.setSpeeds(-Util.NAV_SLOW, Util.NAV_SLOW);
 				//odometer.getMotors()[0].forward();
 				//odometer.getMotors()[1].backward();
 			}
