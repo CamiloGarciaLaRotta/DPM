@@ -33,8 +33,8 @@ public class Util {
 	
 	// robot
 	public static final double WHEEL_RADIUS			= 2.18; //cm
-	public static final double TRACK				= 16.6; //cm 
-	public static final double US_TO_CENTER			= 4.50; //cm from us sensor to center of wheels
+	public static final double TRACK				= 16.4; //cm 
+	public static final double US_TO_CENTER			= 12.0; //cm from us sensor to center of wheels
 	public static final double INTENSITY_TO_CENTER	= 12; 	//cm from ligh sensor to center of wheels
 
 	// sensors
