@@ -6,18 +6,21 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import utilities.Search.SearchState;
 
 public class Capture extends Thread {
+	
+	// instances
 	private Odometer odo;
 	private Navigation nav;
 	
-	private int towerHeight;
+	// coordinates
+	private double[][] GREEN;
 	
+	// states
 	public enum CaptureState {Disabled, Grab, Return, Stack};
 	public enum ForkliftPosition {Ground, Up, Tower, Block};
 	public static CaptureState captureState = CaptureState.Disabled;
-	
 	private ForkliftPosition liftPos;
 	
-	private double[][] green;
+	private int towerHeight;
 	
 	/**
 	 * Capture Thread Constructor
@@ -25,10 +28,10 @@ public class Capture extends Thread {
 	 * @param leftArm - motor for left arm
 	 * @param rightArm - motor for right arm
 	 */
-	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm, double[][] green) {
+	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm, double[][] GREEN) {
 		this.odo = odometer;
 		this.nav = new Navigation(this.odo);
-		this.green = green;
+		this.GREEN = GREEN;
 		this.towerHeight = 0;
 		this.liftPos = ForkliftPosition.Up;
 	}
@@ -59,7 +62,7 @@ public class Capture extends Thread {
 				odo.setMotorSpeed(Odometer.NAVIGATE_SPEED);
 				odo.forwardMotors();
 				//TODO: Update this with position of tower
-				while(Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, new double[] {green[0][0],green[0][1]}) > Util.ZONE_THRESHOLD);
+				while(Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, new double[] {GREEN[0][0],GREEN[0][1]}) > Util.ZONE_THRESHOLD);
 				odo.stopMotors();
 				captureState = CaptureState.Stack;
 				break;

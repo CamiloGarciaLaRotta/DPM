@@ -15,13 +15,13 @@ import utilities.Search.SearchState;
  */
 public class Avoider extends Thread{
 	
+	// instances
 	private Odometer odo;
 	private Navigation nav;
 	private USSensor usSensor;
 	
+	// coordinates
 	private double[] currPos = new double[3];
-	private double distance;
-	
 	private Rectangle RED;
 	private Rectangle currRect = new Rectangle();
 	
@@ -31,23 +31,26 @@ public class Avoider extends Thread{
 	private final Rectangle x3 = new Rectangle(300,300,10, 10);
 	private final Rectangle x4 = new Rectangle(-5,300,10, 10);
 	
+	// states
 	public enum AvoidState {Disabled, Enabled};
 	public static AvoidState avoidState = AvoidState.Disabled;
 	
+	private double distance;
+
+	
 	//TODO TODO TODO TODO
 	// - find more elegant way of choosing CW or CCW for obstacle avoidance
-	// - Handle CW and CCW avoidance depending on the position of the robot on the map
-	// - Right now avoidance only avoids blocks or zones one at a time, make dynamic
 	// - Discuss with Software if use of java.awt.rectangle is pertinent
 	// - Is it alright to hardcode corner values? they are absolute and final regardless anything
 	
-	public Avoider(Odometer odo, Navigation nav, USSensor usSensor) {
+	
+	public Avoider(Odometer odo, Navigation nav, USSensor usSensor, double[][] RED) {
 		this.odo = odo;
 		this.nav = nav;
 		this.usSensor = usSensor;
-		int red_width = 1;	// to be updated via constructor 
-		int red_height = 2;	// depending on wifi RED coordinates
-		this.RED = new Rectangle(0*40,9*40,red_width*40, red_height*40);
+		int red_width = (int)(RED[1][0] - RED[0][0]); 
+		int red_height = (int)(RED[1][1] - RED[0][1]);	
+		this.RED = new Rectangle((int)(RED[0][0]*40), (int)(RED[1][1]*40), red_width*40, red_height*40);
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public class Avoider extends Thread{
 			
 			// build current position rectangle
 			odo.getPosition(this.currPos);
-			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH),5, 5);
+			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH), Util.ROBOT_RECTANGLE, Util.ROBOT_RECTANGLE);
 			
 			boolean CCW = chooseOrientation(currPos);
 			
@@ -66,12 +69,12 @@ public class Avoider extends Thread{
 				
 				Main.state = RobotState.Avoiding;
 				// check for physical obstacles
-				if(distance < Util.MIN_D){
+				if(distance < Util.AVOID_DISTANCE){
 					odo.stopMotors();
 					
 					do{
 						linearAvoidance(CCW);
-					} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.MIN_D);
+					} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
 					
 					// no more obstacle ahead, advance a bit before returning control to Search
 					odo.moveCM(LINEDIR.Forward, Util.WOOD_MIN_WIDTH, true);

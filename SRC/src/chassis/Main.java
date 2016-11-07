@@ -11,7 +11,9 @@ import utilities.USLocalizer;
 import utilities.Util;
 import utilities.Search;
 import utilities.Test;
+import utilities.Avoider;
 import utilities.Capture;
+import utilities.Navigation;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
@@ -47,6 +49,9 @@ public class Main {
 	
 	public static final int RESTING_ARM_POSITION = 30;
 	
+	//TODO TODO TODO TODO
+	// - implement WIFI module
+	// - dynamically set GREEN, RED zone
 
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -58,10 +63,19 @@ public class Main {
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
+		Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
-		Search search = new Search(odo, colorSensor, usSensor);
-		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor);
+		
+		// for testing only, when WIFI module is implemented it will be given automatically
+		double[][] GREEN = new double[][]{{6*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH},
+			{8*Util.SQUARE_LENGTH,4*Util.SQUARE_LENGTH}};
+		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+		
+		Search search = new Search(odo, colorSensor, usSensor, GREEN);
+		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor, GREEN);
+		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
@@ -74,6 +88,7 @@ public class Main {
 		case Default: //regular robot operation
 			localizer.doLocalization();
 			search.start();
+			avoid.start();
 			capture.start();
 			break;
 			
@@ -89,7 +104,8 @@ public class Main {
 			Test.LocalizationTest(odo); //test US sensor
 			break;
 		case NavigationTest:
-			Test.NavigationTest(odo, new int[][] {{60, 60}}, true); // TODO fine tune
+			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
+			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		}
 		
@@ -100,6 +116,7 @@ public class Main {
 		//	   beggining of each Thread's run() method
 		odo.interrupt();
 		search.interrupt();
+		avoid.interrupt();
 		capture.interrupt();
 		localizer.interrupt();
 		System.exit(0);

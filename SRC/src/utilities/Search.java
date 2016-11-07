@@ -1,6 +1,5 @@
 package utilities;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,39 +21,31 @@ import utilities.Odometer.TURNDIR;
  */
 public class Search extends Thread {
 	
-	// temporary hardcoded values, awaiting wifi module
-	// coordinates: ((bottomLeft x,y), (upperRight x,y))
-	private Rectangle GREEN;
-	private Rectangle currRect;
-	private double[][] GREEN_ARR;
-	private double[] N;
-	private double[] S;
-	private double[] E;
-	private double[] W;
+	// Instances
+	private Odometer odo;	
+	private Navigation nav;
+	private USSensor usSensor;
+	private ColorSensor colorSensor;
+	
+	// Coordinates
+	private double[][] GREEN; // ((bottomLeft x,y), (upperRight x,y))
+	private double[] N, W, S, E;
 	private double[][] cardinals = new double[][] {N,W,S,E};
 	private int currCardinal;
 	
-	private double[] currPos = new double[3];
-	
+	// object detection
 	private ArrayList<double[]> objectLocations = new ArrayList<double[]>();
-
-	private static final int US_SAMPLES = 10;
-	private Odometer odo;
-	private USSensor usSensor;
-	private ColorSensor colorSensor;
 	private float lastDistanceDetected;
-	private final float DISTANCE_THRESHOLD = 25; //cm
 	private final static float BLOCK_DISTANCE = 4.0f; //distance to detect block type in cm
-	public static double[] blockLocation;
-	public static double[] obstacleLocation;
-	private Navigation nav;
 	
-	public static final float[] STYROFOAM_COLOR = new float[] {0.0f,1.0f,1.0f};
+	// states
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Iddle};
 	public static SearchState searchState = SearchState.Default;
 	
 	//TODO TODO TODO TODO
-	// - when latching angle for detected object, make sure it doesnt latch it multiple times -> give a min interval
+	// - when latching angle for detected object, make sure it doesn't latch it multiple times -> give a min interval
+	// - at this state code would only avoid 1 object, handle dynamic obstacle avoidance
+	
 
 	/**
 	 * Constructor for Search Class
@@ -65,29 +56,22 @@ public class Search extends Thread {
 	 * @author Juliette Regimbal
 	 * @version 
 	 */
-	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor) {
+	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		this.odo = odometer;
 		this.colorSensor = colorSensor;
 		this.usSensor = usSensor;
 		nav = new Navigation(odo);
-		int green_width = 1;	// to be updated via constructor 
-		int green_height = 2;	// depending on wifi RED coordinates
-		this.GREEN = new Rectangle(6*30,3*30,green_width*40, green_height*40);
-
-		this.GREEN_ARR = new double[][]{{6*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH},
-								{8*Util.SQUARE_LENGTH,4*Util.SQUARE_LENGTH}}; 
-								
-		this.currRect = new Rectangle();
-		
+	
 		// mid points of the GREEN box
-		double midX = (GREEN_ARR[0][0] + GREEN_ARR[1][0]) / 2;
-		double midY = (GREEN_ARR[1][0] + GREEN_ARR[1][1]) / 2;
+		this.GREEN = GREEN;
+		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
+		double midY = (GREEN[1][0] + GREEN[1][1]) / 2;
 		
 		// cardinal search points
-		this.S = new double[] {midX, GREEN_ARR[0][1]};
-		this.N = new double[] {midX, GREEN_ARR[1][1]};
-		this.W = new double[] {GREEN_ARR[0][0], midY};
-		this.E = new double[] {GREEN_ARR[1][0], midY};
+		this.S = new double[] {midX, GREEN[0][1]};
+		this.N = new double[] {midX, GREEN[1][1]};
+		this.W = new double[] {GREEN[0][0], midY};
+		this.E = new double[] {GREEN[1][0], midY};
 		
 		this.currCardinal = 0;
 	}
@@ -108,10 +92,6 @@ public class Search extends Thread {
 		}
 		
 		isStyrofoamBlock(); //Initialize rgb mode
-		
-		// build current position rectangle
-		odo.getPosition(this.currPos);
-		currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH),5, 5);
 		
 		switch(searchState) {
 		
@@ -183,7 +163,7 @@ public class Search extends Thread {
 					odo.stopMotors();
 					
 					// latch distance to object
-					double distance = usSensor.getMedianSample(US_SAMPLES);
+					double distance = usSensor.getMedianSample(Util.US_SAMPLES);
 					objectLocations.add(new double[] {distance, odo.getTheta()});
 					
 					// resume scatter search
@@ -238,13 +218,13 @@ public class Search extends Thread {
 		odo.setMotorSpeed(70); // verify that the forward speed is adequate
 		odo.forwardMotors();   // and create constant for its value
 		
-		while(usSensor.getMedianSample(US_SAMPLES) > 6); // make constant for this value
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > 6); // make constant for this value
 		odo.stopMotors();
 		
 		odo.setMotorSpeeds(60, 60); // make constant for this value
 		odo.forwardMotors();
 		
-		while(usSensor.getMedianSample(US_SAMPLES) > BLOCK_DISTANCE); //wait until close enough to determine if it's a styrofoam block
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > BLOCK_DISTANCE); //wait until close enough to determine if it's a styrofoam block
 		odo.stopMotors();// inspect object
 		if(isStyrofoamBlock()) { 
 			searchState = SearchState.Iddle;
@@ -269,8 +249,8 @@ public class Search extends Thread {
 	 * @return if there is an object that can be detected by the robot
 	 */
 	private boolean isObjectDetected() {
-		float currentDistance = usSensor.getMedianSample(US_SAMPLES);
-		boolean isObject = (lastDistanceDetected - currentDistance > DISTANCE_THRESHOLD) && (currentDistance <= 45);
+		float currentDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+		boolean isObject = (lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
 		lastDistanceDetected = currentDistance;
 		return isObject;
 	}
