@@ -67,6 +67,7 @@ public class Capture extends Thread {
 				//TODO: Make sure tower is in range
 				moveForklift(ForkliftPosition.Tower);
 				odo.moveCM(Odometer.LINEDIR.Backward, 2, true);
+				Search.searchState = SearchState.AtDropZone;
 				captureState = CaptureState.Disabled;
 				break;
 			default:

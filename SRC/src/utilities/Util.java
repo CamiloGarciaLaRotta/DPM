@@ -20,10 +20,12 @@ public class Util {
 	public static LCDInfo lcd;
 	public static final double WHEEL_RADIUS			= 2.18; //cm
 	public static final double TRACK				= 16.6; //cm 
+	public static final int SLOW_MOTOR 				= 60;   //deg/sec
+	public static final int FAST_MOTOR 				= 150;  //deg/sec
 	public static final double US_TO_CENTER			= 4.50; //cm from us sensor to center of wheels
 	public static final double INTENSITY_TO_CENTER	= 12; 	//cm from ligh sensor to center of wheels
 	public static final long ODOMETER_PERIOD		= 25; 	//Hz
-	public static final int AVOIDER_PERIOD			= 1000;  //ms to wait between each avoidance check;
+	public static final int SLEEP_PERIOD			= 1000;  //ms to wait between each avoidance check;
 	public static final int US_SAMPLES				= 6; 	//Default amount of samples to take for median filter
 	public static final double FORKLIFT_HEIGHT		= 15.0;	//Length of forklift 
 	
@@ -31,6 +33,7 @@ public class Util {
 
 	// special coordinates
 	public static final double [] GOAL_ZONE = {80, 80}; //TODO not actual value, to be defined
+
 
 	public static void setLCD(LCDInfo lcd) {
 		Util.lcd = lcd;

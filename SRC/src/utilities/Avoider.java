@@ -2,7 +2,9 @@ package utilities;
 
 import java.awt.Rectangle;
 
+import chassis.Main;
 import chassis.USSensor;
+import chassis.Main.RobotState;
 import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
@@ -33,7 +35,7 @@ public class Avoider extends Thread{
 	public static AvoidState avoidState = AvoidState.Disabled;
 	
 	//TODO TODO TODO TODO
-	// - Search requires this thread to change its state once its safe to continue
+	// - find more elegant way of choosing CW or CCW for obstacle avoidance
 	// - Handle CW and CCW avoidance depending on the position of the robot on the map
 	// - Right now avoidance only avoids blocks or zones one at a time, make dynamic
 	// - Discuss with Software if use of java.awt.rectangle is pertinent
@@ -62,6 +64,7 @@ public class Avoider extends Thread{
 			
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
+				Main.state = RobotState.Avoiding;
 				// check for physical obstacles
 				if(distance < Util.MIN_D){
 					odo.stopMotors();
@@ -91,7 +94,7 @@ public class Avoider extends Thread{
 			
 			// lower stress on CPU
 			try {
-				Thread.sleep(Util.AVOIDER_PERIOD);
+				Thread.sleep(Util.SLEEP_PERIOD);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -100,7 +103,20 @@ public class Avoider extends Thread{
 
 	// choose rotation sense depending on current position and heading
 	private boolean chooseOrientation(double[] currPos) {
-		//TODO
+		double currX = currPos[0];
+		double currY = currPos[1];
+		double currT = currPos[2];
+		
+		if(currT > Math.PI/4 && currT < 3*Math.PI/4) {
+			if (currX > 8*Util.SQUARE_LENGTH) return true;
+		} else if (currT > 5*Math.PI/4 && currT < 7*Math.PI/4) {
+			if (currX < 2*Util.SQUARE_LENGTH) return true;
+		} else if (currT > 3*Math.PI/4 && currT < 5*Math.PI/4) {
+			if (currY > 8*Util.SQUARE_LENGTH) return true;
+		} else if (currT > 7*Math.PI/4 || currT < Math.PI/4) {
+			if (currY < 2*Util.SQUARE_LENGTH) return true;
+		}
+		
 		return false;
 	}
 
