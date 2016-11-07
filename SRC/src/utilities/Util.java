@@ -27,6 +27,13 @@ public class Util {
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
 	public static final long ODOMETER_PERIOD		= 25; 	//Hz
 	
+	// navigation
+	public static final int NAV_FAST				= 200;
+	public static final int NAV_SLOW				= 100;
+	public static final int NAV_ACCELERATION		= 4000;
+	public static final double DEG_TOLERANCE		= 5.0; //degrees
+	public static final double CM_TOLERANCE			= 1.0; //cm
+	
 	// motors
 	public static final int SLOW_MOTOR 				= 60;   //deg/sec
 	public static final int FAST_MOTOR 				= 150;  //deg/sec	
