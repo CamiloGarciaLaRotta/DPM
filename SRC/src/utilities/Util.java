@@ -31,7 +31,7 @@ public class Util {
 	public static final int NAV_FAST				= 200;
 	public static final int NAV_SLOW				= 100;
 	public static final int NAV_ACCELERATION		= 4000;
-	public static final double DEG_TOLERANCE		= 5.0; //degrees
+	public static final double DEG_TOLERANCE		= 3.0; //degrees
 	public static final double CM_TOLERANCE			= 1.0; //cm
 	
 	// motors
