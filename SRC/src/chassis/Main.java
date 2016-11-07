@@ -79,9 +79,10 @@ public class Main {
 		odo.start();
 		lcd.resume();
 		
+		usSensor = new USSensor(usPort);	// nearly everything needs this so it cannot be safely ignored.
+		
 		switch (demo) {
 		case Default: //regular robot operation
-			usSensor = new USSensor(usPort);
 			colorSensor = new ColorSensor(colorPort);
 			gridLineDetector = new LightIntensitySensor(intensityPort);
 			
@@ -100,12 +101,10 @@ public class Main {
 			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
 			break;
 		case LocalizationTest:
-			usSensor = new USSensor(usPort);
 			Test.LocalizationTest(odo); //test US sensor
 			break;
 		case NavigationTest:
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
-			usSensor = new USSensor(usPort);
 			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 <<<<<<< ca66ea272c86bfda156e8b0310ac0cc738bfbde9
