@@ -3,15 +3,24 @@ package utilities;
 import chassis.Main;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import utilities.Search.SearchState;
 
 public class Capture extends Thread {
+	
+	// instances
 	private Odometer odo;
-	
-	private final int ARM_SPEED	= 70;
-	
-	private EV3LargeRegulatedMotor leftArm;
-	private EV3LargeRegulatedMotor rightArm;
 	private Navigation nav;
+	
+	// coordinates
+	private double[][] GREEN;
+	
+	// states
+	public enum CaptureState {Disabled, Grab, Return, Stack};
+	public enum ForkliftPosition {Ground, Up, Tower, Block};
+	public static CaptureState captureState = CaptureState.Disabled;
+	private ForkliftPosition liftPos;
+	
+	private int towerHeight;
 	
 	/**
 	 * Capture Thread Constructor
@@ -19,11 +28,12 @@ public class Capture extends Thread {
 	 * @param leftArm - motor for left arm
 	 * @param rightArm - motor for right arm
 	 */
-	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm) {
+	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm, double[][] GREEN) {
 		this.odo = odometer;
-		this.leftArm = leftArm;
-		this.rightArm = rightArm;
 		this.nav = new Navigation(this.odo);
+		this.GREEN = GREEN;
+		this.towerHeight = 0;
+		this.liftPos = ForkliftPosition.Up;
 	}
 	
 	/**
@@ -32,67 +42,62 @@ public class Capture extends Thread {
 	 */
 	@Override
 	public void run() {
-		while(Main.state != Main.RobotState.Capture) {
-			if(Thread.interrupted()) return;
-			//wait for capture to begin
-			try {
-				Thread.sleep(300);
-			} catch (InterruptedException e){ }
-		}
-		nav.turnBy(Math.PI);
-		odo.moveCM(Odometer.LINEDIR.Backward, 3, true);
-		
-		getBlock();
-		Navigation nav = new Navigation(odo); //travel to scoring zone with block
-		nav.travelTo(Util.GOAL_ZONE[0] - 17,Util.GOAL_ZONE[1] - 17); 
-		
-		while(Navigation.PathBlocked) {
-			if(Thread.interrupted()) return;
-			odo.stopMotors();
-			//If it can (without going out of bounds), turn clockwise and move 20cm
-			if(inBounds(odo.getX() + 20*Math.cos(odo.getTheta() - Math.PI/2),odo.getY() - Math.sin(odo.getTheta() - Math.PI/2),60,60)) {
-				nav.turnBy(Math.PI/2);
-				odo.moveCM(Odometer.LINEDIR.Forward,20,true);
+		while(true) {
+			switch(captureState) {
+			case Disabled:
+				try {
+					Thread.sleep(500);
+				}catch(Exception ex) { ex.printStackTrace(); }
+				break;
+			case Grab:
+				//TODO: Make sure block is in range
+				moveForklift(ForkliftPosition.Block);
+				//TODO: Close claw
+				moveForklift(ForkliftPosition.Up);
+				captureState = CaptureState.Return;
+				break;
+			case Return:
+				odo.moveCM(Odometer.LINEDIR.Backward, 3, true);
+				nav.turnBy(Math.PI);
+				odo.setMotorSpeed(Odometer.NAVIGATE_SPEED);
+				odo.forwardMotors();
+				//TODO: Update this with position of tower
+				while(Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, new double[] {GREEN[0][0],GREEN[0][1]}) > Util.ZONE_THRESHOLD);
+				odo.stopMotors();
+				captureState = CaptureState.Stack;
+				break;
+			case Stack:
+				//TODO: Make sure tower is in range
+				moveForklift(ForkliftPosition.Tower);
+				odo.moveCM(Odometer.LINEDIR.Backward, 2, true);
+				Search.searchState = SearchState.AtDropZone;
+				captureState = CaptureState.Disabled;
+				break;
+			default:
+				break;
 			}
-			//Otherwise turn counterclockwise and move 20cm
-			else {
-				nav.turnBy(Math.PI/2);
-				odo.moveCM(Odometer.LINEDIR.Forward, 20, true);
-			}
-			nav.travelTo(Util.GOAL_ZONE[0] - 17, Util.GOAL_ZONE[1] - 17); 
-			nav.turnBy(Math.PI);
 		}
-		
-		//TODO implement capture code
-		odo.setMotorSpeeds(0, 0); //ensure motors are stopped
-		odo.forwardMotors();
-		nav.turnBy(Math.PI);
-
-		Main.state = Main.RobotState.Disabled;
-		ascendArms();
-		Sound.beep();
-		Sound.beep();
-		Sound.beep();
 	}
 	
-	private void descendArms() {
-		leftArm.setSpeed(ARM_SPEED);
-		rightArm.setSpeed(ARM_SPEED);
-		this.leftArm.rotate(90 + Main.RESTING_ARM_POSITION,true);
-		this.rightArm.rotate(90 + Main.RESTING_ARM_POSITION,false);
-	}
-	
-	private void ascendArms() {
-		leftArm.setSpeed(ARM_SPEED);
-		rightArm.setSpeed(ARM_SPEED);
-		this.leftArm.rotate(-90,true);
-		this.rightArm.rotate(-90,false);
-	}
-	
-	private void getBlock() {
-		//TODO CATCH BLOCK, avoid the obstacle if it lies in the path
-		Sound.beep();
-		descendArms();
+	private void moveForklift(ForkliftPosition pos) {
+		double theta = 0;
+		if(pos == this.liftPos) return;
+		//TODO: Figure out relationship between motor angle and forklift position
+		switch(pos) {
+		case Ground:
+			//TODO: theta --> full length of forklift
+			break;
+		case Up:
+			theta = 0;
+			break;
+		case Tower:
+			//TODO: theta --> towerHeight * Util.BLOCK_HEIGHT
+			break;
+		case Block:
+			//TODO: theta --> full length of forklift - Util.BLOCK_HEIGHT
+			break;
+		}
+		//TODO: Motor.rotate(theta)
 	}
 	
 	/**
