@@ -49,6 +49,9 @@ public class Test {
 			nav.travelTo(waypoints[2*c], waypoints[2*c + 1]);
 		}
 		
+		nav.travelTo(0, 0);
+		nav.turnTo(0, true);
+		
 	}
 	
 	/**
