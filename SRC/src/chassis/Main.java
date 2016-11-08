@@ -107,18 +107,15 @@ public class Main {
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
 			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
-<<<<<<< ca66ea272c86bfda156e8b0310ac0cc738bfbde9
 		case SearchTest:
 			search.start();
 			state = RobotState.Search;
 			break;
-=======
 		case RGBVectorTest:
 			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
 		default:
 			System.exit(-1);
->>>>>>> Added object differentiation tests, rearranged sensor init
 		}
 		
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
