@@ -43,7 +43,7 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -106,6 +106,10 @@ public class Main {
 		case NavigationTest:
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
 			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
+			break;
+		case SearchTest:
+			search.start();
+			state = RobotState.Search;
 			break;
 		}
 		

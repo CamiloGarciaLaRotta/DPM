@@ -116,10 +116,11 @@ public class USLocalizer extends Thread {
 		nav.turnTo(Math.PI/2, true);
 		Sound.beepSequenceUp();
 		
+		//slight pause to show localization is complete
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {	}
-		//slight pause to show localization is complete
+	
 		Main.state = Main.RobotState.Search;
 	}
 	

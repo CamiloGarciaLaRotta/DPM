@@ -28,9 +28,11 @@ public class Search extends Thread {
 	private ColorSensor colorSensor;
 	
 	// Coordinates
-	private double[][] GREEN; // ((bottomLeft x,y), (upperRight x,y))
-	private double[] N, W, S, E;
-	private double[][] cardinals = new double[][] {N,W,S,E};
+	private double[] N = new double[2];
+	private double[] W = new double[2];
+	private double[] S = new double[2];
+	private double[] E = new double[2];
+	private double[][] cardinals = new double[4][2];
 	private int currCardinal;
 	
 	// object detection
@@ -40,7 +42,7 @@ public class Search extends Thread {
 	
 	// states
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Iddle};
-	public static SearchState searchState = SearchState.Default;
+	public static SearchState searchState;
 	
 	//TODO TODO TODO TODO
 	// - when latching angle for detected object, make sure it doesn't latch it multiple times -> give a min interval
@@ -61,9 +63,10 @@ public class Search extends Thread {
 		this.colorSensor = colorSensor;
 		this.usSensor = usSensor;
 		nav = new Navigation(odo);
-	
+		
+		Search.searchState = SearchState.Default;
+		
 		// mid points of the GREEN box
-		this.GREEN = GREEN;
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
 		double midY = (GREEN[1][0] + GREEN[1][1]) / 2;
 		
@@ -73,7 +76,9 @@ public class Search extends Thread {
 		this.W = new double[] {GREEN[0][0], midY};
 		this.E = new double[] {GREEN[1][0], midY};
 		
-		this.currCardinal = 0;
+		this.cardinals = new double[][] {N,W,S,E};
+		
+		this.currCardinal = -1;
 	}
 	
 	/**
@@ -93,124 +98,135 @@ public class Search extends Thread {
 		
 		isStyrofoamBlock(); //Initialize rgb mode
 		
-		switch(searchState) {
-		
-		case Default: 
-			Avoider.avoidState = AvoidState.Disabled;
+		while(true){
+			switch(searchState) {
 			
-			if(currCardinal == -1) { // at origin, not yet at GREEN zone
-				currCardinal++;
-				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+			case Default: 
+				Avoider.avoidState = AvoidState.Disabled;
 				
-				// verify if navigation was interrupted
-				if (Navigation.PathBlocked) {
-					// does the robot already have a block?
-					if(Capture.captureState == CaptureState.Disabled) inspectObject();
-					else {
-						Avoider.avoidState = AvoidState.Enabled;
-						// wait for avoider to finish
-						while(Main.state == RobotState.Avoiding);
-					}
-					
-				}
-			} else { 
-				// no more object at that cardinal point
-				if(objectLocations.isEmpty()) {
+				if(currCardinal == -1) { // at origin, not yet at GREEN zone
 					currCardinal++;
-					
-					// linear set of instructions to reach next cardinal
-					nav.turnBy(-90);
-					odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
-					odo.forwardMotors();
-					
-					// advance until at axis of next cardinal
-					String axis = (currCardinal % 2 == 0) ? "Y" : "X";
-					switch(axis){
-					case "X": 
-						while(odo.getX() < cardinals[currCardinal][0] - 2 || 
-								odo.getX() > cardinals[currCardinal][0] + 2);
-						break;
-					case "Y": 
-						while(odo.getY() < cardinals[currCardinal][1] - 2 ||
-								odo.getY() > cardinals[currCardinal][1] + 2);
-						break;
-					}
-					odo.stopMotors();
-				
 					nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 					
+					// verify if navigation was interrupted
+					if (Navigation.PathBlocked) {
+						// does the robot already have a block?
+						if(Capture.captureState == CaptureState.Disabled) inspectObject();
+						else {
+							Avoider.avoidState = AvoidState.Enabled;
+							// wait for avoider to finish
+							while(Main.state == RobotState.Avoiding);
+						}
+						
+					}
+					
 					Search.searchState = SearchState.AtCardinal;
-				} else {
-					Search.searchState = SearchState.Inspecting;
-				}				
-			}
-			
-			Avoider.avoidState = AvoidState.Disabled;
-
-			break;
-			
-		case AtCardinal:
-			
-			// turn to start scanning angle
-			double startAngle = 90 * currCardinal;
-			nav.turnTo(startAngle, true);
-			
-			// start scatter search
-			odo.spin(TURNDIR.CCW);
-			while(odo.getTheta() < startAngle + 180) {
-				// object found
-				if (isObjectDetected()) {
-					odo.stopMotors();
 					
-					// latch distance to object
-					double distance = usSensor.getMedianSample(Util.US_SAMPLES);
-					objectLocations.add(new double[] {distance, odo.getTheta()});
+				} else { 
+					// no more object at that cardinal point
+					if(objectLocations.isEmpty()) {
+						currCardinal++;
+						
+						// linear set of instructions to reach next cardinal
+						nav.turnBy(-90);
+						odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
+						odo.forwardMotors();
+						
+						// advance until at axis of next cardinal
+						String axis = (currCardinal % 2 == 0) ? "Y" : "X";
+						switch(axis){
+						case "X": 
+							while(odo.getX() < cardinals[currCardinal][0] - 2 || 
+									odo.getX() > cardinals[currCardinal][0] + 2);
+							break;
+						case "Y": 
+							while(odo.getY() < cardinals[currCardinal][1] - 2 ||
+									odo.getY() > cardinals[currCardinal][1] + 2);
+							break;
+						}
+						odo.stopMotors();
 					
-					// resume scatter search
-					odo.spin(TURNDIR.CCW);
+						nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+						
+						Search.searchState = SearchState.AtCardinal;
+					} else {
+						Search.searchState = SearchState.Inspecting;
+					}				
 				}
-			}
-			
-			// sort list of object locations
-			Collections.sort(objectLocations, new Comparator<double[]>() {
-				@Override
-				public int compare(double[] location1, double[] location2) {
-					if (location1[0] == location2[0]) { 
-			             return 0;
-			        } else { 
-			           return location1[0] > location2[0] ? 1 : -1;
-			        }
-				}
-		    });
-			
-			searchState = SearchState.Inspecting;
+				
+				Avoider.avoidState = AvoidState.Disabled;
 
-			break;
-		
-		case AtDropZone:
-			nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-			searchState = SearchState.Default;
-			break;
+				break;
+				
+			case AtCardinal:
+				
+				// turn to start scanning angle
+				double startAngle = Math.PI/2 * currCardinal;
+				nav.turnTo(startAngle, true);
+				
+				// start scatter search
+				odo.setMotorSpeed(Util.SLOW_MOTOR);
+				odo.spin(TURNDIR.CCW);
+				double targetAngle = startAngle + Math.PI;
+				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
+					// object found
+					if (isObjectDetected()) {
+						odo.stopMotors();
+						
+						// latch distance to object
+						double distance = usSensor.getMedianSample(Util.US_SAMPLES);
+						objectLocations.add(new double[] {distance, odo.getTheta()});
+						
+						// resume scatter search
+						odo.setMotorSpeed(Util.SLOW_MOTOR);
+						odo.spin(TURNDIR.CCW);
+					}
+				}
+				
+				odo.stopMotors();
+				
+				// sort list of object locations
+				Collections.sort(objectLocations, new Comparator<double[]>() {
+					@Override
+					public int compare(double[] location1, double[] location2) {
+						if (location1[0] == location2[0]) { 
+				             return 0;
+				        } else { 
+				           return location1[0] > location2[0] ? 1 : -1;
+				        }
+					}
+			    });
+				
+				searchState = SearchState.Inspecting;
+
+				break;
 			
-		case Inspecting: 
+			case AtDropZone:
+				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+				searchState = SearchState.Default;
+				break;
+				
+			case Inspecting: 
+				
+				// examine closest object
+				double heading = objectLocations.get(0)[1];
+				objectLocations.remove(0);
+				nav.turnTo(heading, true);
+				
+				inspectObject();
+				
+				break;
+				
+			case Iddle:
 			
-			// examine closest object
-			double heading = objectLocations.get(0)[1];
-			objectLocations.remove(0);
-			nav.turnTo(heading, true);
-			
-			inspectObject();
-			
-			break;
-			
-		case Iddle:
-		
-			// iddle state, waiting for capture to return and stack block
-			try{
-				Thread.sleep(Util.SLEEP_PERIOD);
-			} catch(Exception e) {}
-			break;
+				// iddle state, waiting for capture to return and stack block
+				try{
+					Thread.sleep(Util.SLEEP_PERIOD);
+				} catch(Exception e) {}
+				break;
+			}
 		}
+		
 	}
 
 	// when object is in sight, approach slowly and insect

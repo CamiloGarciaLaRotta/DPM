@@ -4,6 +4,7 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 import utilities.Odometer;
+import utilities.Search;
 
 public class LCDInfo implements TimerListener{
 	public static final int LCD_REFRESH = 100;
@@ -61,8 +62,10 @@ public class LCDInfo implements TimerListener{
 		LCD.drawInt((int)(pos[2] * 180.0 / Math.PI), 3, 2);
 		
 		String stateString = Main.state.toString();
+		String searchString = Search.searchState.toString();
+		LCD.drawString("Robot : " + stateString, 0, 3);
+		LCD.drawString("Search: " + searchString, 0, 4);
 		
-		LCD.drawString(stateString, 0, 4);
 		LCD.drawString(line1, 0, 5);
 		LCD.drawString(line2, 0, 6);
 	}

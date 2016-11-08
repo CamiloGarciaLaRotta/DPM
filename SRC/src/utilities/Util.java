@@ -40,6 +40,7 @@ public class Util {
 	// sensors
 	public static final int SLEEP_PERIOD			= 1000;  //ms to wait between each thread check;
 	public static final int US_SAMPLES				= 6; 	//Default amount of samples to take for median filter
+	public static final double SCAN_THETA_THRESHOLD = Math.PI/60;
 		
 	// lcd
 	public static LCDInfo lcd;
