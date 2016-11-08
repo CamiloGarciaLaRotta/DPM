@@ -27,8 +27,6 @@ public class Odometer extends Thread {
 	
 	private double data;
 
-	private long odometerPeriod;
-
 	/**
 	 * Odometer Constructor
 	 * @param leftMotor - left motor object

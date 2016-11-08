@@ -1,5 +1,6 @@
 package utilities;
 import chassis.Main;
+import lejos.hardware.Sound;
 /* 
  *
  * File: Navigation.java
@@ -20,8 +21,8 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  *
  */
 public class Navigation {
-	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
-	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
+	final static int FAST = 150, SLOW = 100, ACCELERATION = 900;
+	final static double DEG_ERR = 4.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	
@@ -100,11 +101,12 @@ public class Navigation {
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
 		double minAng;
-		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
-			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
-			if (minAng < 0)
-				minAng += 360.0;
-			this.turnTo(minAng * Math.PI / 180.0, false);
+		while (Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
+											new double[] {x,y}) > CM_ERR) {
+			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+			//minAng = minimalAngle(odometer.getTheta(),minAng);
+			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
+			this.turnTo(minAng, false);
 			this.setSpeeds(FAST, FAST);
 			if(Main.usSensor.getFilteredDataBasic() < 10) {
 				Navigation.PathBlocked = true;
@@ -112,6 +114,7 @@ public class Navigation {
 			}
 		}
 		this.setSpeeds(0, 0);
+		Sound.beep();
 	}
 
 	/**
@@ -122,6 +125,8 @@ public class Navigation {
 	public void turnTo(double angle, boolean stop) {
 
 		double error = angle - this.odometer.getTheta();
+		if(error > Math.PI) error -= 2 * Math.PI;
+		else if(error < -Math.PI) error += 2 * Math.PI;
 		
 		while (Math.abs(error) > DEG_ERR * Math.PI / 180.0) {
 			
@@ -141,7 +146,7 @@ public class Navigation {
 				this.setSpeeds(SLOW, -SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();
-			} else if (error > 180.0) {
+			} else if (error > Math.PI) {
 				this.setSpeeds(SLOW, -SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();

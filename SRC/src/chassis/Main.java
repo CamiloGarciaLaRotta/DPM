@@ -98,7 +98,7 @@ public class Main {
 			Test.StraightLineTest(odo, 10); // test tachometer/odometer
 			break;
 		case SquareTest:
-			Test.SquareTest(odo, 3, 60); //test rotation
+			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
 			break;
 		case LocalizationTest:
 			Test.LocalizationTest(odo); //test US sensor
