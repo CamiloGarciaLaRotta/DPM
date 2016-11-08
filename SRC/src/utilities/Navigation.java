@@ -105,7 +105,7 @@ public class Navigation {
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			this.turnTo(minAng, false);
-			this.setSpeeds(FAST, FAST);
+			this.setSpeeds(Util.FAST_MOTOR, Util.FAST_MOTOR);
 			if(Main.usSensor.getFilteredDataBasic() < 10) {
 				Navigation.PathBlocked = true;
 				break;

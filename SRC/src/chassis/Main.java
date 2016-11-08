@@ -31,8 +31,9 @@ public class Main {
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
-	public static USSensor usSensor;
-	public static ColorSensor colorSensor;
+	public static USSensor usSensor = new USSensor(usPort);
+	public static ColorSensor colorSensor = new ColorSensor(colorPort);
+
 	public static LightIntensitySensor gridLineDetector;
 	
 	public static RobotState state = RobotState.Disabled;
@@ -63,8 +64,8 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
-		double[][] GREEN = new double[][]{{6*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH},
-			{8*Util.SQUARE_LENGTH,4*Util.SQUARE_LENGTH}};
+		double[][] GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+			{2*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 		
@@ -79,11 +80,8 @@ public class Main {
 		odo.start();
 		lcd.resume();
 		
-		usSensor = new USSensor(usPort);	// nearly everything needs this so it cannot be safely ignored.
-		
 		switch (demo) {
 		case Default: //regular robot operation
-			colorSensor = new ColorSensor(colorPort);
 			gridLineDetector = new LightIntensitySensor(intensityPort);
 			
 			localizer.doLocalization();

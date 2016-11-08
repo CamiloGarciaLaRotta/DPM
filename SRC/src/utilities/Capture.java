@@ -22,6 +22,13 @@ public class Capture extends Thread {
 	
 	private int towerHeight;
 	
+	//TODO TODO TODO TODO
+	// -  when retrieving: return with block to cardinal point
+	//					   turn to face center of GREEN
+	//					   advance till tower
+	//					   drop block
+	//					   set searchState.AtDropZones
+	
 	/**
 	 * Capture Thread Constructor
 	 * @param odometer - Odometer Object

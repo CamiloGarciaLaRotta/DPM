@@ -128,24 +128,15 @@ public class Search extends Thread {
 						currCardinal++;
 						
 						// linear set of instructions to reach next cardinal
-						nav.turnBy(-90);
-						odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
-						odo.forwardMotors();
+						// at this step the robot is ensured to be on the old cardinal point
 						
-						// advance until at axis of next cardinal
-						String axis = (currCardinal % 2 == 0) ? "Y" : "X";
-						switch(axis){
-						case "X": 
-							while(odo.getX() < cardinals[currCardinal][0] - 2 || 
-									odo.getX() > cardinals[currCardinal][0] + 2);
-							break;
-						case "Y": 
-							while(odo.getY() < cardinals[currCardinal][1] - 2 ||
-									odo.getY() > cardinals[currCardinal][1] + 2);
-							break;
-						}
-						odo.stopMotors();
+						// place on correct heading
+						nav.turnTo((Math.PI + (currCardinal-1)*Math.PI/2), true);
+						
+						// travel until it reaches the axis of next cardinal point
+						travelToAxis(true);
 					
+						// travel to the cardinal point without fear of bumping onto the tower
 						nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						Search.searchState = SearchState.AtCardinal;
@@ -202,18 +193,26 @@ public class Search extends Thread {
 				break;
 			
 			case AtDropZone:
-				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+				
+				// back off until  to avoid colliding with tower
+				travelToAxis(false);
+				
 				searchState = SearchState.Default;
+				
 				break;
 				
 			case Inspecting: 
 				
-				// examine closest object
-				double heading = objectLocations.get(0)[1];
-				objectLocations.remove(0);
-				nav.turnTo(heading, true);
-				
-				inspectObject();
+				if(!objectLocations.isEmpty()) {
+					// examine closest object
+					double heading = objectLocations.get(0)[1];
+					objectLocations.remove(0);
+					nav.turnTo(heading, true);
+					
+					inspectObject();
+				} else {
+					searchState = SearchState.Default;
+				}
 				
 				break;
 				
@@ -226,6 +225,30 @@ public class Search extends Thread {
 				break;
 			}
 		}
+		
+	}
+
+	// travel to correspondent axis of current cardinal point
+	private void travelToAxis(boolean frontwards) {
+		
+		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
+	
+		odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
+		if (frontwards) odo.forwardMotors();
+		else odo.backwardMotors();
+		
+		switch(axis){
+		case "X": 
+			while(odo.getX() < cardinals[currCardinal][0] - Util.CM_TOLERANCE || 
+					odo.getX() > cardinals[currCardinal][0] + Util.CM_TOLERANCE);
+			break;
+		case "Y": 
+			while(odo.getY() < cardinals[currCardinal][1] - Util.CM_TOLERANCE ||
+					odo.getY() > cardinals[currCardinal][1] + Util.CM_TOLERANCE);
+			break;
+		}
+		
+		odo.stopMotors();
 		
 	}
 
@@ -248,6 +271,7 @@ public class Search extends Thread {
 		} else {
 			// object was wooden block
 			// return to cardinal point and inspect next object
+			nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 			searchState = SearchState.Default;
 		}	
 	}
