@@ -13,11 +13,15 @@ public class Capture extends Thread {
 	
 	// coordinates
 	private double[][] GREEN;
+	private double[] towerPosition;
 	
 	// states
 	public enum CaptureState {Disabled, Grab, Return, Stack};
-	public enum ForkliftPosition {Ground, Up, Tower, Block};
+	public enum ForkliftPosition {Ground, Up, Tower};
 	public static CaptureState captureState = CaptureState.Disabled;
+
+	private EV3LargeRegulatedMotor forkliftMotor;
+	private EV3LargeRegulatedMotor clawMotor;
 	private ForkliftPosition liftPos;
 	
 	private int towerHeight;
@@ -35,12 +39,15 @@ public class Capture extends Thread {
 	 * @param leftArm - motor for left arm
 	 * @param rightArm - motor for right arm
 	 */
-	public Capture(Odometer odometer, EV3LargeRegulatedMotor leftArm, EV3LargeRegulatedMotor rightArm, double[][] GREEN) {
+	public Capture(Odometer odometer, EV3LargeRegulatedMotor forkliftMotor, EV3LargeRegulatedMotor clawMotor, double[][] GREEN) {
 		this.odo = odometer;
 		this.nav = new Navigation(this.odo);
 		this.GREEN = GREEN;
 		this.towerHeight = 0;
 		this.liftPos = ForkliftPosition.Up;
+		this.forkliftMotor = forkliftMotor;
+		this.clawMotor = clawMotor;
+		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2};
 	}
 	
 	/**
@@ -58,26 +65,28 @@ public class Capture extends Thread {
 				break;
 			case Grab:
 				//TODO: Make sure block is in range
-				moveForklift(ForkliftPosition.Block);
-				//TODO: Close claw
-				moveForklift(ForkliftPosition.Up);
+				moveForklift(ForkliftPosition.Ground); //Descend forklift
+				grip();
+				moveForklift(ForkliftPosition.Up); //Raise forklift to top to avoid colliding into stuff
 				captureState = CaptureState.Return;
 				break;
 			case Return:
-				odo.moveCM(Odometer.LINEDIR.Backward, 3, true);
-				nav.turnBy(Math.PI);
-				odo.setMotorSpeed(Odometer.NAVIGATE_SPEED);
+				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
+				double targetHeading = Math.atan2(odo.getY() - towerPosition[1],odo.getX() - towerPosition[0]);
+				nav.turnTo(targetHeading,true); //Turn to face tower position, stop motors
+				odo.setMotorSpeed(Odometer.NAVIGATE_SPEED); //Move forward until the tower is detected.
 				odo.forwardMotors();
-				//TODO: Update this with position of tower
-				while(Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, new double[] {GREEN[0][0],GREEN[0][1]}) > Util.ZONE_THRESHOLD);
+				while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.TOWER_DISTANCE);
 				odo.stopMotors();
 				captureState = CaptureState.Stack;
 				break;
 			case Stack:
 				//TODO: Make sure tower is in range
-				moveForklift(ForkliftPosition.Tower);
-				odo.moveCM(Odometer.LINEDIR.Backward, 2, true);
-				Search.searchState = SearchState.AtDropZone;
+				moveForklift(ForkliftPosition.Tower); //Descend forklift to height of current tower
+				ungrip();
+				moveForklift(ForkliftPosition.Up);
+				odo.moveCM(Odometer.LINEDIR.Backward, 5, true); //Back up to avoid bumping into tower
+				Search.searchState = SearchState.AtDropZone; //Pass control back to search
 				captureState = CaptureState.Disabled;
 				break;
 			default:
@@ -87,24 +96,34 @@ public class Capture extends Thread {
 	}
 	
 	private void moveForklift(ForkliftPosition pos) {
+		//Moves forklift to either the ground position, up position, or to the height of the tower.
+		//Formula for converting height to motor tacho position is convenient in radians.
+		//However, EV3LargeRegulatedMotor's rotate function TAKE DEGREES. Be sure to switch.
 		double theta = 0;
 		if(pos == this.liftPos) return;
-		//TODO: Figure out relationship between motor angle and forklift position
+		this.liftPos = pos;
 		switch(pos) {
 		case Ground:
-			//TODO: theta --> full length of forklift
+			theta = Util.FORKLIFT_HEIGHT / Util.FORKLIFT_ROPE_RADIUS;
 			break;
 		case Up:
 			theta = 0;
 			break;
 		case Tower:
-			//TODO: theta --> towerHeight * Util.BLOCK_HEIGHT
+			theta = (Util.FORKLIFT_HEIGHT - towerHeight * Util.FOAM_HEIGHT) / Util.FORKLIFT_ROPE_RADIUS;
 			break;
-		case Block:
-			//TODO: theta --> full length of forklift - Util.BLOCK_HEIGHT
+		default:
 			break;
 		}
-		//TODO: Motor.rotate(theta)
+		forkliftMotor.rotateTo((int)(theta * 180 / Math.PI)); //Converting theta to degrees and rotating.
+	}
+
+	private void grip() {
+		clawMotor.rotateTo(Util.GRIP_STRENGTH);
+	}
+
+	private void ungrip() {
+		clawMotor.rotateTo(0);
 	}
 	
 	/**
