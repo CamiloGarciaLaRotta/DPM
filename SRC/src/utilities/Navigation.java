@@ -105,7 +105,6 @@ public class Navigation {
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			this.turnTo(minAng, false);
-			this.setSpeeds(Util.FAST_MOTOR, Util.FAST_MOTOR);
 			if(Main.usSensor.getFilteredDataBasic() < 10) {
 				Navigation.PathBlocked = true;
 				break;
@@ -137,19 +136,19 @@ public class Navigation {
 			
 			
 			if (error < -Math.PI) {
-				this.setSpeeds(-Util.NAV_SLOW, Util.NAV_SLOW);
+				this.setSpeeds(-Util.MOTOR_SLOW, Util.MOTOR_SLOW);
 				//odometer.getMotors()[0].forward();
 				//odometer.getMotors()[1].backward();
 			} else if (error < 0.0) {
-				this.setSpeeds(Util.NAV_SLOW, -Util.NAV_SLOW);
+				this.setSpeeds(Util.MOTOR_SLOW, -Util.MOTOR_SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();
 			} else if (error > Math.PI) {
-				this.setSpeeds(Util.NAV_SLOW, -Util.NAV_SLOW);
+				this.setSpeeds(Util.MOTOR_SLOW, -Util.MOTOR_SLOW);
 				//odometer.getMotors()[0].backward();
 				//odometer.getMotors()[1].forward();
 			} else {
-				this.setSpeeds(-Util.NAV_SLOW, Util.NAV_SLOW);
+				this.setSpeeds(-Util.MOTOR_SLOW, Util.MOTOR_SLOW);
 				//odometer.getMotors()[0].forward();
 				//odometer.getMotors()[1].backward();
 			}

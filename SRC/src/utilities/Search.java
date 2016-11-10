@@ -157,7 +157,7 @@ public class Search extends Thread {
 				nav.turnTo(startAngle, true);
 				
 				// start scatter search
-				odo.setMotorSpeed(Util.SLOW_MOTOR);
+				odo.setMotorSpeed(Util.MOTOR_SLOW);
 				odo.spin(TURNDIR.CCW);
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
@@ -170,7 +170,7 @@ public class Search extends Thread {
 						objectLocations.add(new double[] {distance, odo.getTheta()});
 						
 						// resume scatter search
-						odo.setMotorSpeed(Util.SLOW_MOTOR);
+						odo.setMotorSpeed(Util.MOTOR_SLOW);
 						odo.spin(TURNDIR.CCW);
 					}
 				}
@@ -234,7 +234,7 @@ public class Search extends Thread {
 		
 		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
 	
-		odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
+		odo.setMotorSpeeds(Util.MOTOR_SLOW, Util.MOTOR_SLOW);
 		if (frontwards) odo.forwardMotors();
 		else odo.backwardMotors();
 		
