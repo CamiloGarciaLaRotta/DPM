@@ -16,7 +16,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
  * Helpful tools to control robot navigation
- * @version 0.1
+ * @version 0.2
  * @author juliette
  *
  */

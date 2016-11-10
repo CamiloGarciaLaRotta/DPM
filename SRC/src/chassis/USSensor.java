@@ -7,6 +7,11 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
+/**
+ * @version 0.2
+ * @author juliette
+ * Provides access to USSensor functions.
+ */
 public class USSensor {
 	private SensorModes usSensor;
 	private float[] usData;

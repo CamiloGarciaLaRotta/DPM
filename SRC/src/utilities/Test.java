@@ -8,7 +8,9 @@ import lejos.hardware.Button;
 import lejos.hardware.Sound;
 
 /**
- * @version 0.1
+ * Testing methods for the robot
+ * @version 0.2
+ * 
  */
 public class Test {
 	/**
@@ -97,6 +99,10 @@ public class Test {
 		}
 	}
 	
+	/**
+	 * Measure RGB unit vectors
+	 * @param color - ColorSensor object
+	 */
 	public static void RGBUnitVectorTest(ColorSensor color) {
 		float [] rgbRaw = new float[3];
 		while(Button.readButtons() != Button.ID_ESCAPE) {
@@ -109,6 +115,14 @@ public class Test {
 		}
 	}
 	
+	/**
+	 * Tests object differentiation in Search thread
+	 * @see Search
+	 * @param odometer - Odometer Object
+	 * @param colorSensor - ColorSensor Object
+	 * @param usSensor - USSensor Object
+	 * @param GREEN - coordinates of scoring zone
+	 */
 	public static void ObjectDifferentiationTest(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		Search search = new Search(odometer, colorSensor, usSensor, GREEN);
 		Main.state = Main.RobotState.Search;

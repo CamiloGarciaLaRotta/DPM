@@ -9,9 +9,11 @@ import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
 /**
- * @version 0.1
- * @author juliette
  * Checks if the robot must avoid an object in its path and then does it
+ * Runs constantly and can interrupt other processes.
+ * @version 0.2
+ * @author juliette
+
  */
 public class Avoider extends Thread{
 	
@@ -43,7 +45,13 @@ public class Avoider extends Thread{
 	// - Discuss with Software if use of java.awt.rectangle is pertinent
 	// - Is it alright to hardcode corner values? they are absolute and final regardless anything
 	
-	
+	/**
+	 * 
+	 * @param odo - Odometer object
+	 * @param nav - Navigation object
+	 * @param usSensor - USSensor object
+	 * @param RED - coordinates of red zone to always avoid
+	 */
 	public Avoider(Odometer odo, Navigation nav, USSensor usSensor, double[][] RED) {
 		this.odo = odo;
 		this.nav = nav;
@@ -53,6 +61,9 @@ public class Avoider extends Thread{
 		this.RED = new Rectangle((int)(RED[0][0]*40), (int)(RED[1][1]*40), red_width*40, red_height*40);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		while(true){
@@ -104,7 +115,12 @@ public class Avoider extends Thread{
 		}
 	}
 
-	// choose rotation sense depending on current position and heading
+	/**
+	 * Choose rotation sense depending on current position and heading
+	 * Decides direction to turn when object encountered
+	 * @param currPos - X, Y, heading coordinates
+	 * @return - true is counterclockwise, false is clockwise
+	 */
 	private boolean chooseOrientation(double[] currPos) {
 		double currX = currPos[0];
 		double currY = currPos[1];
@@ -123,7 +139,10 @@ public class Avoider extends Thread{
 		return false;
 	}
 
-	// linear set of instructions to avoid obstacle
+	/**
+	 *  linear set of instructions to avoid obstacle
+	 * @param CCW - direction to turn (should be determined by chooseOrientation)
+	 */
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*90);

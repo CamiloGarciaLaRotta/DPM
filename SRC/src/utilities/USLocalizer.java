@@ -5,7 +5,7 @@ import chassis.USSensor;
 import lejos.hardware.Sound;
 
 /**
- * @version 0.1
+ * @version 0.2
  * Localize the robot in the first square to (0, 0, 90-degrees)
  * @author juliette
  *

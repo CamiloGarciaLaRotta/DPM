@@ -5,6 +5,12 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import utilities.Search.SearchState;
 
+/**
+ * Thread that runs when capturing a styrofoam block
+ * @version 0.2
+ * 
+ *
+ */
 public class Capture extends Thread {
 	
 	// instances
@@ -35,9 +41,10 @@ public class Capture extends Thread {
 	
 	/**
 	 * Capture Thread Constructor
-	 * @param odometer - Odometer Object
-	 * @param leftArm - motor for left arm
-	 * @param rightArm - motor for right arm
+	 * @param odometer Odometer Object
+	 * @param forkliftMotor Motor for forklift control
+	 * @param clawMotor Motor for grabbing claw
+	 * @param GREEN green scoring zone coordinates
 	 */
 	public Capture(Odometer odometer, EV3LargeRegulatedMotor forkliftMotor, EV3LargeRegulatedMotor clawMotor, double[][] GREEN) {
 		this.odo = odometer;
@@ -130,8 +137,8 @@ public class Capture extends Thread {
 	 * Checks if the position is in field bounds
 	 * @param x
 	 * @param y
-	 * @param width - field width (x)
-	 * @param height - field height (y)
+	 * @param width field width (x)
+	 * @param height field height (y)
 	 * @return
 	 */
 	public static boolean inBounds(double x,double y, double width, double height) {

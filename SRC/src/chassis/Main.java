@@ -17,7 +17,7 @@ import utilities.Navigation;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
- * @version 0.1
+ * @version 0.2
  * @author juliette
  *
  */
@@ -44,6 +44,11 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
+	/**
+	 * 
+	 * @author juliette
+	 * Select test to run or run in match mode (Default).
+	 */
 	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
@@ -54,6 +59,10 @@ public class Main {
 	// - implement WIFI module
 	// - dynamically set GREEN, RED zone
 
+	/**
+	 * Main execution thread.
+	 * @param args - None used
+	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
 		
@@ -129,6 +138,10 @@ public class Main {
 		System.exit(0);
 	}
 	
+	/**
+	 * Creates menu to select a demo state
+	 * @return Selected demo state
+	 */
 	private static DemoState stateSelect() {
 		DemoState state = DemoState.Default;
 		DemoState [] states = DemoState.values();

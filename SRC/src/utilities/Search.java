@@ -13,11 +13,11 @@ import utilities.Capture.CaptureState;
 import utilities.Odometer.TURNDIR;
 
 /**
- * 
- * @author juliette
- * @version 0.1
- * 
  * Blue styrofoam block search functionality for the robot
+ * @author juliette
+ * @version 0.2
+ * 
+ *
  */
 public class Search extends Thread {
 	
@@ -54,6 +54,7 @@ public class Search extends Thread {
 	 * @param odometer - Odometer object
 	 * @param colorSensor - ColorSensor object
 	 * @param usSensor - USSensor object
+	 * @param GREEN - coordinates of the green scoring zone
 	 * 
 	 * @author Juliette Regimbal
 	 * @version 
@@ -252,7 +253,9 @@ public class Search extends Thread {
 		
 	}
 
-	// when object is in sight, approach slowly and insect
+	/**
+	 * When object is in sight, approach slowly and inspect
+	 */
 	private void inspectObject() {
 		odo.setMotorSpeed(70); // verify that the forward speed is adequate
 		odo.forwardMotors();   // and create constant for its value

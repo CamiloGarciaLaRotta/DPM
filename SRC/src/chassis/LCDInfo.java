@@ -6,6 +6,12 @@ import lejos.utility.TimerListener;
 import utilities.Odometer;
 import utilities.Search;
 
+/**
+ * Methods and display thread for the EV3 LCD
+ * @version 0.2
+ * @author juliette
+ * 
+ */
 public class LCDInfo implements TimerListener{
 	public static final int LCD_REFRESH = 100;
 	private Odometer odo;
@@ -70,22 +76,40 @@ public class LCDInfo implements TimerListener{
 		LCD.drawString(line2, 0, 6);
 	}
 	
+	/**
+	 * Stop LCD thread updates
+	 */
 	public void pause() {
 		lcdTimer.stop();
 	}
 	
+	/**
+	 * Restart LCD thread updates
+	 */
 	public void resume() {
 		lcdTimer.start();
 	}
 	
+	/**
+	 * 
+	 * @return TextLCD object
+	 */
 	public static TextLCD getLCD() {
 		return LCD;
 	}
 	
+	/**
+	 * Display custom string
+	 * @param line1 - String to display on user line 1
+	 */
 	public void setLine1(String line1) {
 		this.line1 = line1;
 	}
 	
+	/**
+	 * Display custom string
+	 * @param line2 - String to display on user line 2
+	 */
 	public void setLine2(String line2) {
 		this.line2 = line2;
 	}

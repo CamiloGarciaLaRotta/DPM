@@ -2,6 +2,12 @@ package utilities;
 
 import chassis.LCDInfo;
 
+/**
+ * Constants (mainly physical) used throughout the robot
+ * @version
+ * @author juliette
+ * 
+ */
 public class Util {
 	// field
 	public static final double SQUARE_LENGTH = 30.48; 		//cm

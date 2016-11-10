@@ -4,6 +4,12 @@ import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
 
+/**
+ * Provides access to Light Sensor functions
+ * @version 0.2
+ * @author juliette
+ * 
+ */
 public class LightIntensitySensor {
 	private SampleProvider intensitySample;
 	private float[] intensityData;
