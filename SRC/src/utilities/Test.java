@@ -99,6 +99,13 @@ public class Test {
 		}
 	}
 	
+	public static void TrackMeasureTest(Odometer odo, int rotations) {
+		Navigation nav = new Navigation(odo);
+		for(int i = 0; i < rotations; i++) {
+			nav.turnBy(2*Math.PI);
+		}
+	}
+	
 	/**
 	 * Measure RGB unit vectors
 	 * @param color - ColorSensor object
