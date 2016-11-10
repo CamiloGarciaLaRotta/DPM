@@ -283,6 +283,7 @@ public class Search extends Thread {
 	 * 
 	 * @return if the detected object is a styrofoam block
 	 */
+	//TODO use complete RGB vector to compare
 	private boolean isStyrofoamBlock() {
 		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}

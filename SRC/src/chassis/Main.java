@@ -11,6 +11,7 @@ import utilities.USLocalizer;
 import utilities.Util;
 import utilities.Search;
 import utilities.Test;
+import utilities.ThreadEnder;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
@@ -49,7 +50,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -70,6 +71,7 @@ public class Main {
 		Odometer odo = new Odometer(leftMotor, rightMotor);
 		Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
+		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
@@ -87,6 +89,7 @@ public class Main {
 		
 		//threads intrinsic to all processes
 		odo.start();
+		ender.start();
 		lcd.resume();
 		
 		switch (demo) {
@@ -121,6 +124,8 @@ public class Main {
 		case RGBVectorTest:
 			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
+		case TrackTest:
+			Test.TrackMeasureTest(odo, 10);
 		default:
 			System.exit(-1);
 		}
