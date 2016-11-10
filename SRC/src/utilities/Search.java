@@ -69,7 +69,7 @@ public class Search extends Thread {
 		
 		// mid points of the GREEN box
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
-		double midY = (GREEN[1][0] + GREEN[1][1]) / 2;
+		double midY = (GREEN[0][1] + GREEN[1][1]) / 2;
 		
 		// cardinal search points
 		this.S = new double[] {midX, GREEN[0][1]};
@@ -293,7 +293,9 @@ public class Search extends Thread {
 	 */
 	private boolean isObjectDetected() {
 		float currentDistance = usSensor.getMedianSample(Util.US_SAMPLES);
-		boolean isObject = (lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
+		// avoids latching the same object multiple times by creating a +/-5% BW around a detected object
+		boolean isObject = (currentDistance < 1.05*lastDistanceDetected) && (currentDistance > 0.05*lastDistanceDetected) &&
+							(lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
 		lastDistanceDetected = currentDistance;
 		return isObject;
 	}

@@ -74,7 +74,7 @@ public class Main {
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
 		double[][] GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-			{2*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 		
