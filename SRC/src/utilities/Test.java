@@ -1,11 +1,16 @@
 package utilities;
 
+import chassis.ColorSensor;
+import chassis.LCDInfo;
 import chassis.Main;
+import chassis.USSensor;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 
 /**
- * @version 0.1
+ * Testing methods for the robot
+ * @version 0.2
+ * 
  */
 public class Test {
 	/**
@@ -26,8 +31,8 @@ public class Test {
 	public static void SquareTest(Odometer odo, int laps, double length) {
 		double[] waypoints = new double[laps * 8];
 		
-//		OdometryCorrection correct = new OdometryCorrection(odo);
-//		correct.start();
+		//OdometryCorrection correct = new OdometryCorrection(odo);
+		//correct.start();
 		
 		for(int c = 0; c < laps; c++) {
 			waypoints[8*c] = 0.0;
@@ -41,12 +46,14 @@ public class Test {
 			
 			waypoints[8*c+6] = 0.0;
 			waypoints[8*c+7] = length;
+			if(Button.readButtons() == Button.ID_ESCAPE) return;
 		}
 		
 		Navigation nav = new Navigation(odo);
 		
 		for(int c = 0; c < waypoints.length/2; c++) {
 			nav.travelTo(waypoints[2*c], waypoints[2*c + 1]);
+			if(Button.readButtons() == Button.ID_ESCAPE) return;
 		}
 		
 		nav.travelTo(0, 0);
@@ -64,7 +71,7 @@ public class Test {
 		for(int c = 0; c < 4; c++) {
 			odo.moveCM(Odometer.LINEDIR.Forward, distance, true);
 			
-			Button.waitForAnyPress();
+			if(Button.waitForAnyPress() == Button.ID_ESCAPE) break;
 			
 			odo.moveCM(Odometer.LINEDIR.Backward, distance, true);
 			
@@ -90,6 +97,45 @@ public class Test {
 				Button.waitForAnyPress();
 			}
 		}
+	}
+	
+	public static void TrackMeasureTest(Odometer odo, int rotations) {
+		Navigation nav = new Navigation(odo);
+		for(int i = 0; i < rotations; i++) {
+			nav.turnBy(2*Math.PI);
+		}
+	}
+	
+	/**
+	 * Measure RGB unit vectors
+	 * @param color - ColorSensor object
+	 */
+	public static void RGBUnitVectorTest(ColorSensor color) {
+		float [] rgbRaw = new float[3];
+		while(Button.readButtons() != Button.ID_ESCAPE) {
+			rgbRaw = color.getColor();
+			double magnitude = Math.sqrt(rgbRaw[0]*rgbRaw[0] + rgbRaw[1]*rgbRaw[1] + rgbRaw[2]*rgbRaw[2]);
+			rgbRaw[0] /= magnitude;
+			rgbRaw[1] /= magnitude;
+			rgbRaw[2] /= magnitude;
+			LCDInfo.displayMessage(rgbRaw[0] + " " + rgbRaw[1] + " " + rgbRaw[2]);
+		}
+	}
+	
+	/**
+	 * Tests object differentiation in Search thread
+	 * @see Search
+	 * @param odometer - Odometer Object
+	 * @param colorSensor - ColorSensor Object
+	 * @param usSensor - USSensor Object
+	 * @param GREEN - coordinates of scoring zone
+	 */
+	public static void ObjectDifferentiationTest(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
+		Search search = new Search(odometer, colorSensor, usSensor, GREEN);
+		Main.state = Main.RobotState.Search;
+		search.run();
+		while(Main.state == Main.RobotState.Search && Button.readButtons() != Button.ID_ESCAPE);
+		search.interrupt();
 	}
 	
 }

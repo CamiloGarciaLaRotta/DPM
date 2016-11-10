@@ -7,9 +7,10 @@ import chassis.Main;
 import chassis.LightIntensitySensor;
 
 /**
- * @version 0.1
- * @author juliette
  * Corrects the odometer reading using the grid on the field
+ * @version 0.2
+ * @author juliette
+ * 
  */
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
@@ -20,7 +21,7 @@ public class OdometryCorrection extends Thread {
 	public static int count;
 	private double lastPosition[];
 	private float lastIntensity;
-	private final boolean useCorrection = true;
+	private final boolean useCorrection = false;
 
 	/**
 	 * 
@@ -33,7 +34,10 @@ public class OdometryCorrection extends Thread {
 		odometer.getPosition(lastPosition, Util.UPDATE_ALL);	//need to set theta - may as well get current x and y
 	}
 
-	// run method (required for Thread)
+	/**
+	 * run method (required for Thread)
+	 * {@inheritDoc}
+	 */
 	public void run() {
 		if(!useCorrection)
 		{

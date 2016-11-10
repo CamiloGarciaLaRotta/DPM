@@ -6,7 +6,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  * Odometer class for the robot
  * All values in cm and radians unless otherwise specified.
  * @author juliette
- * @version 0.1
+ * @version 0.2
  * 
  */
 public class Odometer extends Thread {
@@ -153,7 +153,7 @@ public class Odometer extends Thread {
 	}
 	
 	/**
-	 * Stop motors
+	 * Stop motors safely
 	 */
 	public void stopMotors() {
 		setMotorSpeed(0);
@@ -324,10 +324,18 @@ public class Odometer extends Thread {
 		}
 	}
 	
+	/**
+	 * @deprecated
+	 * @return - data
+	 */
 	public double getFilteredData() {
 		return data;
 	}
 	
+	/**
+	 * @deprecated
+	 * @param data - data to set
+	 */
 	public void setData(double data) {
 		this.data = data;
 	}
@@ -342,9 +350,13 @@ public class Odometer extends Thread {
 		return Math.sqrt((a[0] - b[0])*(a[0] - b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 	}
 	
-	/*
+	/**
+	 * Use function in Navigation
+	 * @deprecated
+	 * @see Navigation#turnTo(double, boolean)
+	 */
 	public void turnTo(double theta) {
-		if(Math.abs(theta - getTheta()) > THETA_THRESHOLD) {
+		if(Math.abs(theta - getTheta()) > Util.DEG_TOLERANCE) {
 			double adjustment = theta - getTheta();
 			if(Math.abs(adjustment) > Math.PI) adjustment -= Math.PI*2;
 			if(!(Math.abs(theta - getTheta()) < Math.PI)) {
@@ -352,18 +364,26 @@ public class Odometer extends Thread {
 				else theta = theta - Math.PI;
 			} 
 			turnBy(adjustment);
-			Sound.beep();
+			//Sound.beep();
 		}
 	}
 	
+	/**
+	 * @deprecated
+	 * @see Navigation#turnBy(double)
+	 */
 	public void turnBy(double theta) {
 		setMotorSpeeds(ROTATE_SPEED, ROTATE_SPEED);
-		leftMotor.rotate(convertAngle(wheelRadius,trackLength,theta * 180.0 / Math.PI), true);
-		rightMotor.rotate(-convertAngle(wheelRadius,trackLength,theta * 180.0 / Math.PI), false);
+		leftMotor.rotate(convertAngle(Util.WHEEL_RADIUS,Util.TRACK,theta * 180.0 / Math.PI), true);
+		rightMotor.rotate(-convertAngle(Util.WHEEL_RADIUS,Util.TRACK,theta * 180.0 / Math.PI), false);
 	}
 	
+	/**
+	 * @deprecated
+	 * @see Navigation#travelTo(double, double)
+	 */
 	public void travelTo(double x, double y) {
-		while(euclideanDistance(new double [] {x, y}, new double [] {getX(), getY()}) > NAVIGATE_THRESHOLD) {			
+		while(euclideanDistance(new double [] {x, y}, new double [] {getX(), getY()}) > Util.CM_TOLERANCE) {			
 			double dx = x - getX();
 			double dy = y - getY();
 			double theta = Math.atan2(dy,dx);
@@ -379,15 +399,28 @@ public class Odometer extends Thread {
 		leftMotor.stop();
 	}
 	
+	/**
+	 * @deprecated
+	 * @param radius - wheel radius
+	 * @param distance - linear distance
+	 * @return - degrees to turn
+	 * Replaced by method in Navigation
+	 */
 	private int convertDistance(double radius, double distance) {
 		return (int)(distance * 180.0 / (Math.PI * radius));
 	}
 
+	/**
+	 * @deprecated
+	 * @param radius - wheel radius
+	 * @param width - track width
+	 * @param angle - angle to turn
+	 * @return - degrees to rotate each wheel
+	 * Replaced by method in Navigation
+	 */
 	private int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
 	}
-	
-*/
 	
 }
 

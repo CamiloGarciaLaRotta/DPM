@@ -11,13 +11,14 @@ import utilities.USLocalizer;
 import utilities.Util;
 import utilities.Search;
 import utilities.Test;
+import utilities.ThreadEnder;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
- * @version 0.1
+ * @version 0.2
  * @author juliette
  *
  */
@@ -31,8 +32,9 @@ public class Main {
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
-	public static USSensor usSensor;
-	public static ColorSensor colorSensor;
+	public static USSensor usSensor = new USSensor(usPort);
+	public static ColorSensor colorSensor = new ColorSensor(colorPort);
+
 	public static LightIntensitySensor gridLineDetector;
 	
 	public static RobotState state = RobotState.Disabled;
@@ -43,7 +45,12 @@ public class Main {
 	 * Current action the robot is doing
 	 */
 	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	/**
+	 * 
+	 * @author juliette
+	 * Select test to run or run in match mode (Default).
+	 */
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -53,23 +60,23 @@ public class Main {
 	// - implement WIFI module
 	// - dynamically set GREEN, RED zone
 
+	/**
+	 * Main execution thread.
+	 * @param args - None used
+	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
-		
-		//Setup sensors
-		usSensor = new USSensor(usPort);
-		colorSensor = new ColorSensor(colorPort);
-		gridLineDetector = new LightIntensitySensor(intensityPort);
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
 		Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
+		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
-		double[][] GREEN = new double[][]{{6*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH},
-			{8*Util.SQUARE_LENGTH,4*Util.SQUARE_LENGTH}};
+		double[][] GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 		
@@ -82,10 +89,13 @@ public class Main {
 		
 		//threads intrinsic to all processes
 		odo.start();
+		ender.start();
 		lcd.resume();
 		
 		switch (demo) {
 		case Default: //regular robot operation
+			gridLineDetector = new LightIntensitySensor(intensityPort);
+			
 			localizer.doLocalization();
 			search.start();
 			avoid.start();
@@ -111,6 +121,13 @@ public class Main {
 			search.start();
 			state = RobotState.Search;
 			break;
+		case RGBVectorTest:
+			colorSensor = new ColorSensor(colorPort);
+			Test.RGBUnitVectorTest(colorSensor);
+		case TrackTest:
+			Test.TrackMeasureTest(odo, 10);
+		default:
+			System.exit(-1);
 		}
 		
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
@@ -126,6 +143,10 @@ public class Main {
 		System.exit(0);
 	}
 	
+	/**
+	 * Creates menu to select a demo state
+	 * @return Selected demo state
+	 */
 	private static DemoState stateSelect() {
 		DemoState state = DemoState.Default;
 		DemoState [] states = DemoState.values();

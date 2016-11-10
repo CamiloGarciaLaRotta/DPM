@@ -13,11 +13,11 @@ import utilities.Capture.CaptureState;
 import utilities.Odometer.TURNDIR;
 
 /**
- * 
- * @author juliette
- * @version 0.1
- * 
  * Blue styrofoam block search functionality for the robot
+ * @author juliette
+ * @version 0.2
+ * 
+ *
  */
 public class Search extends Thread {
 	
@@ -54,6 +54,7 @@ public class Search extends Thread {
 	 * @param odometer - Odometer object
 	 * @param colorSensor - ColorSensor object
 	 * @param usSensor - USSensor object
+	 * @param GREEN - coordinates of the green scoring zone
 	 * 
 	 * @author Juliette Regimbal
 	 * @version 
@@ -68,7 +69,7 @@ public class Search extends Thread {
 		
 		// mid points of the GREEN box
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
-		double midY = (GREEN[1][0] + GREEN[1][1]) / 2;
+		double midY = (GREEN[0][1] + GREEN[1][1]) / 2;
 		
 		// cardinal search points
 		this.S = new double[] {midX, GREEN[0][1]};
@@ -128,24 +129,15 @@ public class Search extends Thread {
 						currCardinal++;
 						
 						// linear set of instructions to reach next cardinal
-						nav.turnBy(-90);
-						odo.setMotorSpeeds(Util.SLOW_MOTOR, Util.SLOW_MOTOR);
-						odo.forwardMotors();
+						// at this step the robot is ensured to be on the old cardinal point
 						
-						// advance until at axis of next cardinal
-						String axis = (currCardinal % 2 == 0) ? "Y" : "X";
-						switch(axis){
-						case "X": 
-							while(odo.getX() < cardinals[currCardinal][0] - 2 || 
-									odo.getX() > cardinals[currCardinal][0] + 2);
-							break;
-						case "Y": 
-							while(odo.getY() < cardinals[currCardinal][1] - 2 ||
-									odo.getY() > cardinals[currCardinal][1] + 2);
-							break;
-						}
-						odo.stopMotors();
+						// place on correct heading
+						nav.turnTo((Math.PI + (currCardinal-1)*Math.PI/2), true);
+						
+						// travel until it reaches the axis of next cardinal point
+						travelToAxis(true);
 					
+						// travel to the cardinal point without fear of bumping onto the tower
 						nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						Search.searchState = SearchState.AtCardinal;
@@ -165,7 +157,7 @@ public class Search extends Thread {
 				nav.turnTo(startAngle, true);
 				
 				// start scatter search
-				odo.setMotorSpeed(Util.SLOW_MOTOR);
+				odo.setMotorSpeed(Util.MOTOR_SLOW);
 				odo.spin(TURNDIR.CCW);
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
@@ -178,7 +170,7 @@ public class Search extends Thread {
 						objectLocations.add(new double[] {distance, odo.getTheta()});
 						
 						// resume scatter search
-						odo.setMotorSpeed(Util.SLOW_MOTOR);
+						odo.setMotorSpeed(Util.MOTOR_SLOW);
 						odo.spin(TURNDIR.CCW);
 					}
 				}
@@ -202,18 +194,26 @@ public class Search extends Thread {
 				break;
 			
 			case AtDropZone:
-				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+				
+				// back off until  to avoid colliding with tower
+				travelToAxis(false);
+				
 				searchState = SearchState.Default;
+				
 				break;
 				
 			case Inspecting: 
 				
-				// examine closest object
-				double heading = objectLocations.get(0)[1];
-				objectLocations.remove(0);
-				nav.turnTo(heading, true);
-				
-				inspectObject();
+				if(!objectLocations.isEmpty()) {
+					// examine closest object
+					double heading = objectLocations.get(0)[1];
+					objectLocations.remove(0);
+					nav.turnTo(heading, true);
+					
+					inspectObject();
+				} else {
+					searchState = SearchState.Default;
+				}
 				
 				break;
 				
@@ -229,7 +229,33 @@ public class Search extends Thread {
 		
 	}
 
-	// when object is in sight, approach slowly and insect
+	// travel to correspondent axis of current cardinal point
+	private void travelToAxis(boolean frontwards) {
+		
+		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
+	
+		odo.setMotorSpeeds(Util.MOTOR_SLOW, Util.MOTOR_SLOW);
+		if (frontwards) odo.forwardMotors();
+		else odo.backwardMotors();
+		
+		switch(axis){
+		case "X": 
+			while(odo.getX() < cardinals[currCardinal][0] - Util.CM_TOLERANCE || 
+					odo.getX() > cardinals[currCardinal][0] + Util.CM_TOLERANCE);
+			break;
+		case "Y": 
+			while(odo.getY() < cardinals[currCardinal][1] - Util.CM_TOLERANCE ||
+					odo.getY() > cardinals[currCardinal][1] + Util.CM_TOLERANCE);
+			break;
+		}
+		
+		odo.stopMotors();
+		
+	}
+
+	/**
+	 * When object is in sight, approach slowly and inspect
+	 */
 	private void inspectObject() {
 		odo.setMotorSpeed(70); // verify that the forward speed is adequate
 		odo.forwardMotors();   // and create constant for its value
@@ -248,6 +274,7 @@ public class Search extends Thread {
 		} else {
 			// object was wooden block
 			// return to cardinal point and inspect next object
+			nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 			searchState = SearchState.Default;
 		}	
 	}
@@ -256,6 +283,7 @@ public class Search extends Thread {
 	 * 
 	 * @return if the detected object is a styrofoam block
 	 */
+	//TODO use complete RGB vector to compare
 	private boolean isStyrofoamBlock() {
 		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
@@ -266,7 +294,9 @@ public class Search extends Thread {
 	 */
 	private boolean isObjectDetected() {
 		float currentDistance = usSensor.getMedianSample(Util.US_SAMPLES);
-		boolean isObject = (lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
+		// avoids latching the same object multiple times by creating a +/-5% BW around a detected object
+		boolean isObject = (currentDistance < 1.05*lastDistanceDetected) && (currentDistance > 0.05*lastDistanceDetected) &&
+							(lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
 		lastDistanceDetected = currentDistance;
 		return isObject;
 	}

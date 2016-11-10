@@ -4,6 +4,12 @@ import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
 
+/**
+ * Provides access to ColorSensor functions in RGB mode.
+ * @version 0.2
+ * @author juliette
+ * 
+ */
 public class ColorSensor {
 	private SampleProvider colorSample;
 	private float[] colorData;
