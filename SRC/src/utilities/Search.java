@@ -38,7 +38,6 @@ public class Search extends Thread {
 	// object detection
 	private ArrayList<double[]> objectLocations = new ArrayList<double[]>();
 	private float lastDistanceDetected;
-	private final static float BLOCK_DISTANCE = 4.0f; //distance to detect block type in cm
 	
 	// states
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Iddle};
@@ -79,6 +78,7 @@ public class Search extends Thread {
 		
 		this.cardinals = new double[][] {N,W,S,E};
 		
+		this.lastDistanceDetected = -1;
 		this.currCardinal = -1;
 	}
 	
@@ -103,10 +103,15 @@ public class Search extends Thread {
 			switch(searchState) {
 			
 			case Default: 
-				Avoider.avoidState = AvoidState.Disabled;
-				
-				if(currCardinal == -1) { // at origin, not yet at GREEN zone
-					currCardinal++;
+				// at origin, not yet at GREEN zone
+				if(currCardinal == -1) { 
+					
+					// in case we encounter foam on our way to GREEN zone
+					//Capture.moveForklift(FOrkliftPosition.Ground)
+					
+					// next cardinal, wrap around
+					currCardinal++; currCardinal %= 4;
+					
 					nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 					
 					// verify if navigation was interrupted
@@ -124,9 +129,11 @@ public class Search extends Thread {
 					Search.searchState = SearchState.AtCardinal;
 					
 				} else { 
+					
 					// no more object at that cardinal point
 					if(objectLocations.isEmpty()) {
-						currCardinal++;
+						// next cardinal, wrap around
+						currCardinal++; currCardinal %= 4;
 						
 						// linear set of instructions to reach next cardinal
 						// at this step the robot is ensured to be on the old cardinal point
@@ -155,6 +162,9 @@ public class Search extends Thread {
 				// turn to start scanning angle
 				double startAngle = Math.PI/2 * currCardinal;
 				nav.turnTo(startAngle, true);
+				
+				// reinitialize last distance 
+				this.lastDistanceDetected = -1;
 				
 				// start scatter search
 				odo.setMotorSpeed(Util.MOTOR_SLOW);
@@ -234,7 +244,7 @@ public class Search extends Thread {
 		
 		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
 	
-		odo.setMotorSpeeds(Util.MOTOR_SLOW, Util.MOTOR_SLOW);
+		odo.setMotorSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 		if (frontwards) odo.forwardMotors();
 		else odo.backwardMotors();
 		
@@ -257,22 +267,27 @@ public class Search extends Thread {
 	 * When object is in sight, approach slowly and inspect
 	 */
 	private void inspectObject() {
-		odo.setMotorSpeed(70); // verify that the forward speed is adequate
-		odo.forwardMotors();   // and create constant for its value
+		odo.setMotorSpeed(Util.MOTOR_SLOW); 
+		odo.forwardMotors(); 
 		
-		while(usSensor.getMedianSample(Util.US_SAMPLES) > 6); // make constant for this value
+		//wait until close enough to determine if it's a styrofoam block
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		
-		odo.setMotorSpeeds(60, 60); // make constant for this value
-		odo.forwardMotors();
-		
-		while(usSensor.getMedianSample(Util.US_SAMPLES) > BLOCK_DISTANCE); //wait until close enough to determine if it's a styrofoam block
-		odo.stopMotors();// inspect object
+		// inspect object
 		if(isStyrofoamBlock()) { 
 			searchState = SearchState.Iddle;
 			Main.state = Main.RobotState.Capture;
 		} else {
-			// object was wooden block
+			// backoff a little to avoid hitting the block while turning
+			odo.setMotorSpeed(Util.MOTOR_SLOW);
+			odo.backwardMotors();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			// return to cardinal point and inspect next object
 			nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 			searchState = SearchState.Default;
@@ -283,6 +298,7 @@ public class Search extends Thread {
 	 * 
 	 * @return if the detected object is a styrofoam block
 	 */
+	//TODO use complete RGB vector to compare
 	private boolean isStyrofoamBlock() {
 		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
@@ -293,9 +309,13 @@ public class Search extends Thread {
 	 */
 	private boolean isObjectDetected() {
 		float currentDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+		
+		// at each iteration of scatter search, last distance is reset
+		if (this.lastDistanceDetected < 0)  this.lastDistanceDetected = currentDistance;
+		
 		// avoids latching the same object multiple times by creating a +/-5% BW around a detected object
-		boolean isObject = (currentDistance < 1.05*lastDistanceDetected) && (currentDistance > 0.05*lastDistanceDetected) &&
-							(lastDistanceDetected - currentDistance > Util.SEARCH_DISTANCE) && (currentDistance <= 45);
+		boolean isObject = (currentDistance < lastDistanceDetected + 5) && 
+						(currentDistance > lastDistanceDetected - 5) && (currentDistance <= Util.SEARCH_DISTANCE);
 		lastDistanceDetected = currentDistance;
 		return isObject;
 	}
