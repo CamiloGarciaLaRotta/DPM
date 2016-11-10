@@ -105,13 +105,13 @@ public class Navigation {
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			this.turnTo(minAng, false);
+			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 			if(Main.usSensor.getFilteredDataBasic() < 10) {
 				Navigation.PathBlocked = true;
 				break;
 			}
 		}
-		this.setSpeeds(0, 0);
-		Sound.beep();
+		this.setSpeeds(0,0);
 	}
 
 	/**

@@ -20,7 +20,8 @@ public class Util {
 	public static final double WOOD_MIN_WIDTH		= 15;	//minimum distance to travel to avoid wooden block
 	
 	// search
-	public static final double SEARCH_DISTANCE 		= 25; 	//distance (in cm) to detect object 
+	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
+	public final static float BLOCK_DISTANCE		= 5.0f; //distance (in cm) to detect block type
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	
