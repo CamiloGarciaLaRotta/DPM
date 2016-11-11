@@ -4,6 +4,8 @@ import chassis.Main;
 import chassis.USSensor;
 import lejos.hardware.Sound;
 
+//TODO have it localize with the starting corner as input
+
 /**
  * @version 0.2
  * Localize the robot in the first square to (0, 0, 90-degrees)

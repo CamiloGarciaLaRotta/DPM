@@ -1,6 +1,10 @@
 package chassis;
 
+import java.io.IOException;
+import java.util.HashMap;
+
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -15,7 +19,8 @@ import utilities.ThreadEnder;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
-
+import wifi.WifiConnection;
+;
 /**
  * Base robot class with all hardware objects and loaded utilities
  * @version 0.2
@@ -23,6 +28,10 @@ import utilities.Navigation;
  *
  */
 public class Main {
+	//Wifi
+	private static WifiConnection conn = null;
+	private static HashMap<String, Integer> transmission = null;
+	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
@@ -40,6 +49,10 @@ public class Main {
 	public static RobotState state = RobotState.Disabled;
 	public static RobotState lastState = RobotState.Disabled;
 	public static DemoState demo = DemoState.Default;
+	public static RobotTask task;
+	public static int startingCorner;
+	public static double[][] GREEN;
+	public static double[][] RED;
 	
 	/**
 	 * Current action the robot is doing
@@ -52,6 +65,8 @@ public class Main {
 	 */
 	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
+	public enum RobotTask {Builder, Collector};
+	
 	public static LCDInfo lcd;
 	
 	public static final int RESTING_ARM_POSITION = 30;
@@ -63,6 +78,7 @@ public class Main {
 	/**
 	 * Main execution thread.
 	 * @param args - None used
+	 * @throws IOException 
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -75,10 +91,28 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
-		double[][] GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
-		double[][] RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
-				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+		
+		if(Util.USE_WIFI) {
+			GREEN = new double[2][2];
+			RED = new double[2][2];
+			HashMap<String, Integer> parameters = null;
+			try {
+				parameters = wifiConnect();
+			} catch (IOException e) {	//failed to connect to wifi
+				System.err.println(e);
+				System.exit(-1);
+			}
+			if(parameters != null) {
+				transmissionParse(parameters);
+			}
+		} else {	//default parameters
+			GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+				{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+			startingCorner = 1;
+			task = RobotTask.Builder;
+		}
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor, GREEN);
@@ -171,5 +205,50 @@ public class Main {
 		}
 		
 		return state;
+	}
+	
+	private static void transmissionParse(HashMap<String, Integer> transmission) {
+		if(transmission != null) {
+			//Get task
+			if(transmission.get("BTN") == Util.TEAM_NUMBER) {
+				task = RobotTask.Builder;
+			} else {
+				task = RobotTask.Collector;
+			}
+			
+			//Get assigned starting corner
+			if(task == RobotTask.Builder) {
+				startingCorner = transmission.get("BSC");
+			} else {
+				startingCorner = transmission.get("CSC");
+			}
+			
+			//Get zone coordinates
+			RED[0][0] = transmission.get("LRZx");
+			RED[0][1] = transmission.get("LRZy");
+			RED[1][0] = transmission.get("URZx");
+			RED[1][1] = transmission.get("URZy");
+			
+			GREEN[0][0] = transmission.get("LGZx");
+			GREEN[0][1] = transmission.get("LGZy");
+			GREEN[1][0] = transmission.get("UGZx");
+			GREEN[1][1] = transmission.get("UGZy");
+		}
+	}
+	
+	private static HashMap<String, Integer> wifiConnect() throws IOException {
+		System.out.println("Connecting to "+Util.IP_ADDR);
+		conn = new WifiConnection(Util.IP_ADDR, Util.TEAM_NUMBER, true);
+		
+		if(conn != null) {
+			HashMap<String, Integer> t = conn.StartData;
+			if(t == null) {
+				System.out.println("Failed to get transmission data.");
+			} else {
+				System.out.println("Transmission received");
+				return t;
+			}
+		}
+		return null;
 	}
 }

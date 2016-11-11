@@ -63,4 +63,9 @@ public class Util {
 	public static void setLCD(LCDInfo lcd) {
 		Util.lcd = lcd;
 	}
+	
+	//Wifi
+	public static final String IP_ADDR				= "192.168.1.1";
+	public static final int TEAM_NUMBER				= 15;
+	public static final boolean USE_WIFI			= false;
 }
