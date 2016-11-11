@@ -25,15 +25,17 @@ import utilities.Navigation;
 public class Main {
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor rightArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor forkliftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final EV3LargeRegulatedMotor clawMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
 	public static USSensor usSensor = new USSensor(usPort);
 	public static ColorSensor colorSensor = new ColorSensor(colorPort);
+
+	public static Forklift forklift;
 
 	public static LightIntensitySensor gridLineDetector;
 	
@@ -73,6 +75,7 @@ public class Main {
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
+		forklift = new Forklift(forkliftMotor,clawMotor);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
 		double[][] GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
@@ -81,7 +84,7 @@ public class Main {
 				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
-		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor, GREEN);
+		Capture capture = new Capture(odo, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		
 		textLCD.clear(); //blank display before selection
