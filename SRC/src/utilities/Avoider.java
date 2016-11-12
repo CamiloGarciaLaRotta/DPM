@@ -72,7 +72,7 @@ public class Avoider extends Thread{
 			
 			// build current position rectangle
 			odo.getPosition(this.currPos);
-			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH), Util.ROBOT_RECTANGLE, Util.ROBOT_RECTANGLE);
+			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH), Util.ROBOT_WIDTH, Util.ROBOT_LENGTH);
 			
 			boolean CCW = chooseOrientation(currPos);
 			
@@ -88,7 +88,7 @@ public class Avoider extends Thread{
 					} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
 					
 					// no more obstacle ahead, advance a bit before returning control to Search
-					odo.moveCM(LINEDIR.Forward, Util.WOOD_MIN_WIDTH, true);
+					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
 				}
 				
 				// check for RED zone
@@ -125,6 +125,9 @@ public class Avoider extends Thread{
 		double currX = currPos[0];
 		double currY = currPos[1];
 		double currT = currPos[2];
+		
+		if(currT  < 0.0) currT += 2*Math.PI;
+		else if(currT > 2*Math.PI) currT -= 2 * Math.PI;
 		
 		if(currT > Math.PI/4 && currT < 3*Math.PI/4) {
 			if (currX > 8*Util.SQUARE_LENGTH) return true;
