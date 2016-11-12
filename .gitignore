@@ -5,3 +5,5 @@
 #Compressed Files
 *.zip
 *.gz
+
+*.sh

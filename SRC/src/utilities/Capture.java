@@ -23,12 +23,9 @@ public class Capture extends Thread {
 	
 	// states
 	public enum CaptureState {Disabled, Grab, Return, Stack};
-	public enum ForkliftPosition {Ground, Up, Tower};
 	public static CaptureState captureState = CaptureState.Disabled;
 
-	private EV3LargeRegulatedMotor forkliftMotor;
 	private EV3LargeRegulatedMotor clawMotor;
-	private ForkliftPosition liftPos;
 	
 	private int towerHeight;
 	
@@ -42,18 +39,14 @@ public class Capture extends Thread {
 	/**
 	 * Capture Thread Constructor
 	 * @param odometer Odometer Object
-	 * @param forkliftMotor Motor for forklift control
 	 * @param clawMotor Motor for grabbing claw
 	 * @param GREEN green scoring zone coordinates
 	 */
-	public Capture(Odometer odometer, EV3LargeRegulatedMotor forkliftMotor, EV3LargeRegulatedMotor clawMotor, double[][] GREEN) {
+	public Capture(Odometer odometer, double[][] GREEN) {
 		this.odo = odometer;
 		this.nav = new Navigation(this.odo);
 		this.GREEN = GREEN;
 		this.towerHeight = 0;
-		this.liftPos = ForkliftPosition.Up;
-		this.forkliftMotor = forkliftMotor;
-		this.clawMotor = clawMotor;
 		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2};
 	}
 	
@@ -72,9 +65,9 @@ public class Capture extends Thread {
 				break;
 			case Grab:
 				//TODO: Make sure block is in range
-				moveForklift(ForkliftPosition.Ground); //Descend forklift
-				grip();
-				moveForklift(ForkliftPosition.Up); //Raise forklift to top to avoid colliding into stuff
+				Main.forklift.liftDown();
+				Main.forklift.grip();
+				Main.forklift.liftUp();
 				captureState = CaptureState.Return;
 				break;
 			case Return:
@@ -89,9 +82,9 @@ public class Capture extends Thread {
 				break;
 			case Stack:
 				//TODO: Make sure tower is in range
-				moveForklift(ForkliftPosition.Tower); //Descend forklift to height of current tower
-				ungrip();
-				moveForklift(ForkliftPosition.Up);
+				Main.forklift.liftToTower(towerHeight);
+				Main.forklift.ungrip();
+				Main.forklift.liftUp();
 				odo.moveCM(Odometer.LINEDIR.Backward, 5, true); //Back up to avoid bumping into tower
 				Search.searchState = SearchState.AtDropZone; //Pass control back to search
 				captureState = CaptureState.Disabled;
@@ -100,37 +93,6 @@ public class Capture extends Thread {
 				break;
 			}
 		}
-	}
-	
-	private void moveForklift(ForkliftPosition pos) {
-		//Moves forklift to either the ground position, up position, or to the height of the tower.
-		//Formula for converting height to motor tacho position is convenient in radians.
-		//However, EV3LargeRegulatedMotor's rotate function TAKE DEGREES. Be sure to switch.
-		double theta = 0;
-		if(pos == this.liftPos) return;
-		this.liftPos = pos;
-		switch(pos) {
-		case Ground:
-			theta = Util.FORKLIFT_HEIGHT / Util.FORKLIFT_ROPE_RADIUS;
-			break;
-		case Up:
-			theta = 0;
-			break;
-		case Tower:
-			theta = (Util.FORKLIFT_HEIGHT - towerHeight * Util.FOAM_HEIGHT) / Util.FORKLIFT_ROPE_RADIUS;
-			break;
-		default:
-			break;
-		}
-		forkliftMotor.rotateTo((int)(theta * 180 / Math.PI)); //Converting theta to degrees and rotating.
-	}
-
-	private void grip() {
-		clawMotor.rotateTo(Util.GRIP_STRENGTH);
-	}
-
-	private void ungrip() {
-		clawMotor.rotateTo(0);
 	}
 	
 	/**

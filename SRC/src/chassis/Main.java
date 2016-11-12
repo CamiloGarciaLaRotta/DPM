@@ -8,11 +8,12 @@ import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
-
+import utilities.Avoider;
+import utilities.Capture;
+import utilities.Navigation;
 import utilities.Odometer;
-import utilities.USLocalizer;
-import utilities.Util;
 import utilities.Search;
 import utilities.Test;
 import utilities.ThreadEnder;
@@ -20,7 +21,7 @@ import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
 import wifi.WifiConnection;
-;
+
 /**
  * Base robot class with all hardware objects and loaded utilities
  * @version 0.2
@@ -34,15 +35,17 @@ public class Main {
 	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final EV3LargeRegulatedMotor leftArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor rightArmMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor forkliftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3MediumRegulatedMotor clawMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
 	private static TextLCD textLCD = LocalEV3.get().getTextLCD();
 	public static USSensor usSensor = new USSensor(usPort);
 	public static ColorSensor colorSensor = new ColorSensor(colorPort);
+
+	public static Forklift forklift;
 
 	public static LightIntensitySensor gridLineDetector;
 	
@@ -63,7 +66,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public enum RobotTask {Builder, Collector};
 	
@@ -89,6 +92,7 @@ public class Main {
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
+		forklift = new Forklift(forkliftMotor,clawMotor);
 		
 		// for testing only, when WIFI module is implemented it will be given automatically
 		
@@ -115,7 +119,7 @@ public class Main {
 		}
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
-		Capture capture = new Capture(odo,leftArmMotor,rightArmMotor, GREEN);
+		Capture capture = new Capture(odo, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		
 		textLCD.clear(); //blank display before selection
@@ -139,7 +143,7 @@ public class Main {
 		// Tests need to be verified in this order, 
 		// as a test builds on top of the prior one.
 		case StraightLineTest:	
-			Test.StraightLineTest(odo, 10); // test tachometer/odometer
+			Test.StraightLineTest(odo, Util.SQUARE_LENGTH); // test tachometer/odometer
 			break;
 		case SquareTest:
 			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
@@ -160,6 +164,8 @@ public class Main {
 			Test.RGBUnitVectorTest(colorSensor);
 		case TrackTest:
 			Test.TrackMeasureTest(odo, 10);
+		case ForkliftTest:
+			Test.ForkliftTest();
 		default:
 			System.exit(-1);
 		}

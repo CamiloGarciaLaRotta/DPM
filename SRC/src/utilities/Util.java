@@ -28,10 +28,11 @@ public class Util {
 	public static final int ROBOT_RECTANGLE			= 5;	//side (in cm) of square around rectangle for avoidance
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 15.0;	//Length (in cm) of forklift 
-	public static final double FORKLIFT_ROPE_RADIUS	= 1.0; //Radius of circle that the rope wraps around to lift the forklift
+	public static final double FORKLIFT_HEIGHT		= 24.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_ROPE_RADIUS	= 1.0; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
-	public static final double TOWER_DISTANCE		= 8.0; //Distance from tower before forklift is lowered
+	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
+	public static final int FORKLIFT_ACCEL			= 300; //Acceleration of forklift (deg/s^2) 
 	
 	// odometry
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
