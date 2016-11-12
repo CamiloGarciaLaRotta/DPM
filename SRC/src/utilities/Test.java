@@ -138,4 +138,24 @@ public class Test {
 		search.interrupt();
 	}
 	
+	public static void ForkliftTest() {
+		int option;
+		do {
+			option = Button.waitForAnyPress();
+			switch(option) {
+			case Button.ID_UP:
+				Main.forklift.liftUp();
+				break;
+			case Button.ID_DOWN:
+				Main.forklift.liftDown();
+				break;
+			case Button.ID_ENTER:
+				Main.forklift.toggleGrip();
+				break;
+			default:
+				break;
+			}
+		}while(option != Button.ID_ESCAPE);
+	}
+	
 }

@@ -4,17 +4,17 @@ import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
-
-import utilities.Odometer;
-import utilities.USLocalizer;
-import utilities.Util;
-import utilities.Search;
-import utilities.Test;
-import utilities.ThreadEnder;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
+import utilities.Odometer;
+import utilities.Search;
+import utilities.Test;
+import utilities.ThreadEnder;
+import utilities.USLocalizer;
+import utilities.Util;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
@@ -26,8 +26,8 @@ public class Main {
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor forkliftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor clawMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor forkliftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3MediumRegulatedMotor clawMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
@@ -52,7 +52,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public static LCDInfo lcd;
 	
@@ -108,7 +108,7 @@ public class Main {
 		// Tests need to be verified in this order, 
 		// as a test builds on top of the prior one.
 		case StraightLineTest:	
-			Test.StraightLineTest(odo, 10); // test tachometer/odometer
+			Test.StraightLineTest(odo, Util.SQUARE_LENGTH); // test tachometer/odometer
 			break;
 		case SquareTest:
 			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
@@ -129,6 +129,8 @@ public class Main {
 			Test.RGBUnitVectorTest(colorSensor);
 		case TrackTest:
 			Test.TrackMeasureTest(odo, 10);
+		case ForkliftTest:
+			Test.ForkliftTest();
 		default:
 			System.exit(-1);
 		}
