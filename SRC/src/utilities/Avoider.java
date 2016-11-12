@@ -79,6 +79,7 @@ public class Avoider extends Thread{
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
 				Main.state = RobotState.Avoiding;
+				
 				// check for physical obstacles
 				if(distance < Util.AVOID_DISTANCE){
 					odo.stopMotors();
