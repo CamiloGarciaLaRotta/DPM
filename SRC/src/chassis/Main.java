@@ -17,6 +17,8 @@ import utilities.Odometer;
 import utilities.Search;
 import utilities.Test;
 import utilities.ThreadEnder;
+import utilities.USLocalizer;
+import utilities.Util;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
