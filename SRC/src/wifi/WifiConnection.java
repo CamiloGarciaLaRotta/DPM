@@ -1,4 +1,4 @@
-/*
+/**
 * @author Sean Lawlor
 * @date November 3, 2011
 * @class ECSE 211 - Design Principle and Methods
@@ -22,7 +22,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
 
-/*
+/**
  * This class opens a wifi connection, waits for the data
  * and then allows access to the data after closing the wifi socket.
  * 

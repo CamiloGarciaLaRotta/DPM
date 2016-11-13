@@ -15,7 +15,7 @@ import utilities.Odometer.TURNDIR;
 /**
  * Blue styrofoam block search functionality for the robot
  * @author juliette
- * @version 0.2
+ * @version 3.0
  * 
  *
  */
@@ -51,9 +51,6 @@ public class Search extends Thread {
 	 * @param colorSensor - ColorSensor object
 	 * @param usSensor - USSensor object
 	 * @param GREEN - coordinates of the green scoring zone
-	 * 
-	 * @author Juliette Regimbal
-	 * @version 
 	 */
 	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		this.odo = odometer;

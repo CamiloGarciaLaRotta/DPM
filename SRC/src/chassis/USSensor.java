@@ -8,8 +8,7 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 /**
- * @version 0.2
- * @author juliette
+ * @version 3.0
  * Provides access to USSensor functions.
  */
 public class USSensor {

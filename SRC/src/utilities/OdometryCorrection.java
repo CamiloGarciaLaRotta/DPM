@@ -8,9 +8,7 @@ import chassis.LightIntensitySensor;
 
 /**
  * Corrects the odometer reading using the grid on the field
- * @version 0.2
- * @author juliette
- * 
+ * @version 3.0
  */
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;

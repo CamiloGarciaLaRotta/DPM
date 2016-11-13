@@ -6,8 +6,7 @@ import lejos.robotics.SampleProvider;
 
 /**
  * Provides access to ColorSensor functions in RGB mode.
- * @version 0.2
- * @author juliette
+ * @version 3.0
  * 
  */
 public class ColorSensor {

@@ -26,7 +26,7 @@ import wifi.WifiConnection;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
- * @version 0.2
+ * @version 3.0
  * @author juliette
  *
  */
@@ -69,21 +69,18 @@ public class Main {
 	 * Select test to run or run in match mode (Default).
 	 */
 	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
-	
+	/**
+	 * Robot job. Either builder or garbage collector. Builder is default.
+	 */
 	public enum RobotTask {Builder, Collector};
 	
 	public static LCDInfo lcd;
 	
 	public static final int RESTING_ARM_POSITION = 30;
-	
-	//TODO TODO TODO TODO
-	// - implement WIFI module
-	// - dynamically set GREEN, RED zone
 
 	/**
 	 * Main execution thread.
 	 * @param args - None used
-	 * @throws IOException 
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -223,6 +220,10 @@ public class Main {
 		return state;
 	}
 	
+	/**
+	 * Parses transmission information and sets robot parameters.
+	 * @param transmission transmission information gotten from wifi.
+	 */
 	private static void transmissionParse(HashMap<String, Integer> transmission) {
 		if(transmission != null) {
 			//Get task
@@ -252,6 +253,12 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Connects to wifi and waits for information to be transmitted.
+	 * @return Transmission parameters to be parsed
+	 * @throws IOException Fails if robot cannot connect to server.
+	 * @see Util#IP_ADDR
+	 */
 	private static HashMap<String, Integer> wifiConnect() throws IOException {
 		System.out.println("Connecting to "+Util.IP_ADDR);
 		conn = new WifiConnection(Util.IP_ADDR, Util.TEAM_NUMBER, true);

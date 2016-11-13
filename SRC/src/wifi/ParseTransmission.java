@@ -1,4 +1,4 @@
-/*
+/**
 * @author Sean Lawlor
 * @date November 3, 2011
 * @class ECSE 211 - Design Principle and Methods
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 
-/*
+/**
  * Static parsers for parsing data off the communication channel
  * 
  * The order of data is defined in the Server's Transmission class

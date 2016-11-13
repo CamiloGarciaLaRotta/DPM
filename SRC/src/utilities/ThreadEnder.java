@@ -4,8 +4,7 @@ import lejos.hardware.Button;
 
 /**
  * Thread that terminates program when escape pressed
- * @version 0.2
- * @author juliette
+ * @version 3.0
  * 
  */
 public class ThreadEnder extends Thread{

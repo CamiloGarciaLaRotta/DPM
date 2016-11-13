@@ -9,7 +9,7 @@ import lejos.hardware.Sound;
 
 /**
  * Testing methods for the robot
- * @version 0.2
+ * @version 3.0
  * 
  */
 public class Test {

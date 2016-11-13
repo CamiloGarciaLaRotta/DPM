@@ -11,9 +11,7 @@ import utilities.Search.SearchState;
 /**
  * Checks if the robot must avoid an object in its path and then does it
  * Runs constantly and can interrupt other processes.
- * @version 0.2
- * @author juliette
-
+ * @version 3.0
  */
 public class Avoider extends Thread{
 	

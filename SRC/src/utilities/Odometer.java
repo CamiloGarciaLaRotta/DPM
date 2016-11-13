@@ -5,8 +5,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 /**
  * Odometer class for the robot
  * All values in cm and radians unless otherwise specified.
- * @author juliette
- * @version 0.2
+ * @version 3.0
  * 
  */
 public class Odometer extends Thread {

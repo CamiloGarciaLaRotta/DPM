@@ -8,7 +8,7 @@ import utilities.Search;
 
 /**
  * Methods and display thread for the EV3 LCD
- * @version 0.2
+ * @version 3.0
  * @author juliette
  * 
  */

@@ -7,7 +7,7 @@ import utilities.Search.SearchState;
 
 /**
  * Thread that runs when capturing a styrofoam block
- * @version 0.2
+ * @version 3.0
  * 
  *
  */
@@ -39,7 +39,6 @@ public class Capture extends Thread {
 	/**
 	 * Capture Thread Constructor
 	 * @param odometer Odometer Object
-	 * @param clawMotor Motor for grabbing claw
 	 * @param GREEN green scoring zone coordinates
 	 */
 	public Capture(Odometer odometer, double[][] GREEN) {

@@ -6,8 +6,7 @@ import lejos.robotics.SampleProvider;
 
 /**
  * Provides access to Light Sensor functions
- * @version 0.2
- * @author juliette
+ * @version 3.0
  * 
  */
 public class LightIntensitySensor {

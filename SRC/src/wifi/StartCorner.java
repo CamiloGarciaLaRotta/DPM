@@ -1,4 +1,4 @@
-/*
+/**
 * @author Sean Lawlor
 * @date November 3, 2011
 * @class ECSE 211 - Design Principle and Methods

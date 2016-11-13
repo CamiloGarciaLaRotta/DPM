@@ -4,8 +4,7 @@ import chassis.LCDInfo;
 
 /**
  * Constants (mainly physical) used throughout the robot
- * @version
- * @author juliette
+ * @version 3.0
  * 
  */
 public class Util {
