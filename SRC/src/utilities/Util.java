@@ -55,9 +55,9 @@ public class Util {
 	public static final long ODOMETER_PERIOD		= 25; 	//Hz
 	
 	// navigation
-	public static final int NAV_ACCELERATION		= 4000;
+	public static final int NAV_ACCELERATION		= 900;
 	public static final double DEG_TOLERANCE		= 3.0; //degrees
-	public static final double CM_TOLERANCE			= 1.0; //cm
+	public static final double CM_TOLERANCE			= 0.5; //cm
 	
 	// motors
 	public static final int MOTOR_FAST				= 200; //deg/sec
