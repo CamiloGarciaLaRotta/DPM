@@ -68,7 +68,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public enum RobotTask {Builder, Collector};
 	
@@ -112,8 +112,8 @@ public class Main {
 				transmissionParse(parameters);
 			}
 		} else {	//default parameters
-			GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-				{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+			GREEN = new double[][]{{10*Util.SQUARE_LENGTH,10*Util.SQUARE_LENGTH},
+				{30*Util.SQUARE_LENGTH,20*Util.SQUARE_LENGTH}};
 			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 			startingCorner = 1;
@@ -164,10 +164,15 @@ public class Main {
 		case RGBVectorTest:
 			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
+			break;
 		case TrackTest:
 			Test.TrackMeasureTest(odo, 10);
+			break;
 		case ForkliftTest:
 			Test.ForkliftTest();
+			break;
+		case Avoidance:
+			break;
 		default:
 			System.exit(-1);
 		}
