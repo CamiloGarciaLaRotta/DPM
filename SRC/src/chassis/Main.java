@@ -112,10 +112,11 @@ public class Main {
 		//threads intrinsic to all processes
 		odo.start();
 		ender.start();
-
+		lcd.resume();
 		
 		switch (demo) {
 		case Default: //regular robot operation
+			lcd.pause();
 			textLCD.clear();
 			gridLineDetector = new LightIntensitySensor(intensityPort);
 			if(Util.USE_WIFI) {
@@ -136,6 +137,7 @@ public class Main {
 
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
+			lcd.resume();
 			localizer.doLocalization();
 			search.start();
 			avoid.start();
@@ -176,7 +178,6 @@ public class Main {
 		default:
 			System.exit(-1);
 		}
-		lcd.resume();
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
 		
 		//TODO if setting interrupt flag doesn't stop Threads,
