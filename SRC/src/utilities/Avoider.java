@@ -79,6 +79,7 @@ public class Avoider extends Thread{
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
 				Main.state = RobotState.Avoiding;
+				
 				// check for physical obstacles
 				if(distance < Util.AVOID_DISTANCE){
 					odo.stopMotors();
@@ -149,7 +150,10 @@ public class Avoider extends Thread{
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*90);
-		odo.moveCM(LINEDIR.Forward, Util.WOOD_MIN_WIDTH, true);
+		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * Util.WOOD_MIN_WIDTH, odo.getY() + Math.sin(odo.getTheta()) * Util.WOOD_MIN_WIDTH);
+		double[] pos = new double[3];
+		odo.getPosition(pos);
+		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path
 		nav.turnBy(-1*coeff*90);
 	}
 }

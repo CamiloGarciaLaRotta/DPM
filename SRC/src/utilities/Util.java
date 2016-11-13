@@ -17,6 +17,7 @@ public class Util {
 	
 	// blocks
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
+	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks
 	public static final double WOOD_MIN_WIDTH		= 15;	//minimum distance to travel to avoid wooden block
 	
 	// search
