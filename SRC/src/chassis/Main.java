@@ -33,7 +33,6 @@ import wifi.WifiConnection;
 public class Main {
 	//Wifi
 	private static WifiConnection conn = null;
-	private static HashMap<String, Integer> transmission = null;
 	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
