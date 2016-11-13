@@ -99,9 +99,13 @@ public class Navigation {
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
 		double minAng;
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+		double error = minAng - this.odometer.getTheta();
+		if(error > Math.PI) error -= 2 * Math.PI;
+		else if(error < -Math.PI) error += 2 * Math.PI;
+		turnBy(error);
 		while (Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
 											new double[] {x,y}) > Util.CM_TOLERANCE) {
-			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			this.turnTo(minAng, false);
