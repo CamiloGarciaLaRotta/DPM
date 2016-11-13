@@ -96,29 +96,14 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		forklift = new Forklift(forkliftMotor,clawMotor);
 		
-		// for testing only, when WIFI module is implemented it will be given automatically
+		// Default values for these - could be changed by wifi if enabled
+		GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+		startingCorner = 1;
+		task = RobotTask.Builder;
 		
-		if(Util.USE_WIFI) {
-			GREEN = new double[2][2];
-			RED = new double[2][2];
-			HashMap<String, Integer> parameters = null;
-			try {
-				parameters = wifiConnect();
-			} catch (IOException e) {	//failed to connect to wifi
-				System.err.println(e);
-				System.exit(-1);
-			}
-			if(parameters != null) {
-				transmissionParse(parameters);
-			}
-		} else {	//default parameters
-			GREEN = new double[][]{{10*Util.SQUARE_LENGTH,10*Util.SQUARE_LENGTH},
-				{30*Util.SQUARE_LENGTH,20*Util.SQUARE_LENGTH}};
-			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
-					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
-			startingCorner = 1;
-			task = RobotTask.Builder;
-		}
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, GREEN);
@@ -130,12 +115,30 @@ public class Main {
 		//threads intrinsic to all processes
 		odo.start();
 		ender.start();
-		lcd.resume();
+
 		
 		switch (demo) {
 		case Default: //regular robot operation
+			textLCD.clear();
 			gridLineDetector = new LightIntensitySensor(intensityPort);
-			
+			if(Util.USE_WIFI) {
+				HashMap<String, Integer> parameters = null;
+				try {
+					parameters = wifiConnect();
+				} catch (IOException e) {	//failed to connect to wifi
+					Sound.beepSequence();
+					System.err.println(e);
+					System.exit(-1);
+				}
+				Sound.beep();
+				if(parameters != null) {
+					transmissionParse(parameters);
+					Sound.beepSequenceUp();
+				}
+			} else {	//default parameters
+
+			}
+			System.out.print("\n\n\n\n\n\n\n\n");
 			localizer.doLocalization();
 			search.start();
 			avoid.start();
@@ -176,7 +179,7 @@ public class Main {
 		default:
 			System.exit(-1);
 		}
-		
+		lcd.resume();
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
 		
 		//TODO if setting interrupt flag doesn't stop Threads,
