@@ -83,7 +83,6 @@ public class Search extends Thread {
 	 * Starts search thread
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 		while(Main.state != Main.RobotState.Search) {
@@ -107,34 +106,40 @@ public class Search extends Thread {
 					// next cardinal, wrap around
 					currCardinal++; currCardinal %= 4;
 					
-					nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 					// until it arrives at current cardinal
-//					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
-//									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > 2){
-//						
-//						// travel to cardinal
-//						if(odo.getMotors()[0].getRotationSpeed() +/- 5) {
-//							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-//						}
-//						
-//						// verify if navigation was interrupted
-//						if (Navigation.PathBlocked) {
-//							// does the robot already have a block?
-//							if(Capture.captureState == CaptureState.Disabled) inspectObject();
-//							else {
-//								Avoider.avoidState = AvoidState.Enabled;
-//								// wait for avoider to finish
-//								while(Main.state == RobotState.Avoiding);
-//							}
-//						}	
-//					}
+					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
+									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > 10){     //adjust value during tests
+						
+						// if not moving, travel to cardinal
+						if(odo.getMotors()[0].getRotationSpeed() < 5) { //adjust value during tests
+							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+						}
+						
+						// verify if navigation was interrupted
+						if (Navigation.PathBlocked) {
+							// does the robot already have a block?
+							if(Capture.captureState == CaptureState.Disabled) testForObject();
+							else {
+								Avoider.avoidState = AvoidState.Enabled;
+								// wait for avoider to finish
+								//avoid race condition
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								while(Main.state == RobotState.Avoiding);
+								Avoider.avoidState = AvoidState.Disabled;
+							}
+						}	
+					}
 					
 					Search.searchState = SearchState.AtCardinal;
 					
 				} else { 
 					
 					// no more object at that cardinal point
-					if(objectLocations.isEmpty()) {
+					if(this.objectLocations.isEmpty()) {
 						// next cardinal, wrap around
 						currCardinal++; currCardinal %= 4;
 						
@@ -174,17 +179,9 @@ public class Search extends Thread {
 				odo.spin(TURNDIR.CCW);
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
-					// object found
-					if (isObjectDetected()) {
-						odo.stopMotors();
-						
-						// latch object's coordinates
-						double distance = usSensor.getMedianSample(Util.US_SAMPLES);
-						double heading = odo.getTheta();
-						double X = odo.getX() + distance*Math.cos(heading);
-						double Y = odo.getY() + distance*Math.sin(heading);
-						objectLocations.add(new double[] {X,Y,distance,heading});
-						
+					// test for object
+					if (testForObject()) {
+
 						// resume scatter search
 						odo.setMotorSpeed(Util.MOTOR_SLOW);
 						odo.spin(TURNDIR.CCW);
@@ -194,7 +191,7 @@ public class Search extends Thread {
 				odo.stopMotors();
 				
 				// sort list of object locations
-				Collections.sort(objectLocations, new Comparator<double[]>() {
+				Collections.sort(this.objectLocations, new Comparator<double[]>() {
 					@Override
 					public int compare(double[] location1, double[] location2) {
 						if (location1[2] == location2[2]) { 
@@ -220,16 +217,16 @@ public class Search extends Thread {
 				
 			case Inspecting: 
 				
-				if(!objectLocations.isEmpty()) {
+				if(!this.objectLocations.isEmpty()) {
 					// examine closest object
 					
-					double X = objectLocations.get(0)[0];
-					double Y = objectLocations.get(0)[1];
+					double X = this.objectLocations.get(0)[0];
+					double Y = this.objectLocations.get(0)[1];
 					
 					// turn towards object
-					nav.turnTo(objectLocations.get(0)[3], true); 
+					nav.turnTo(this.objectLocations.get(0)[3], true); 
 					
-					objectLocations.remove(0);
+					this.objectLocations.remove(0);
 					
 					inspectObject(X, Y);
 				} else {
@@ -283,7 +280,7 @@ public class Search extends Thread {
 		
 		//wait until close enough to determine if it's a styrofoam block
 		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE ||
-				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) < Util.BLOCK_DISTANCE); 
+				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		
 		// inspect object
@@ -291,11 +288,11 @@ public class Search extends Thread {
 			searchState = SearchState.Iddle;
 			Main.state = Main.RobotState.Capture;
 		} else {
-			// backoff a little to avoid hitting the block while turning
+			// back-off a little to avoid hitting the block while turning
 			odo.setMotorSpeed(Util.MOTOR_SLOW);
 			odo.backwardMotors();
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -319,31 +316,39 @@ public class Search extends Thread {
 	 * 
 	 * @return if there is an object that can be detected by the robot
 	 */
-	private boolean isObjectDetected() {
-	
+	private boolean testForObject() {
+		
 		float currDistance = usSensor.getMedianSample(Util.US_SAMPLES);	
+		
+		// no object detected
+		if (currDistance > Util.SEARCH_DISTANCE) return false;
+		
+		// object detected
+		odo.stopMotors();
+		
 		double currHeading = odo.getTheta();
 		double objX =  odo.getX() + currDistance*Math.cos(currHeading);
 		double objY = odo.getY() + currDistance*Math.sin(currHeading);
 		
+		boolean isObject;
+		
 		// always latch first encountered object at each cardinal
 		if (this.lastDistanceDetected < 0)  {
 			// at each iteration of scatter search, last distance is reset
-			this.lastDistanceDetected = currDistance;
 			this.lastX = objX; 
 			this.lastY = objY;
-			return true;
+			isObject = true;
+		} else {
+			// avoids latching the same object multiple times 
+			 isObject = (Odometer.euclideanDistance(new double[] {this.lastX, this.lastY},
+									new double[] {objX, objY}) > Util.FOAM_WIDTH);
 		}
 		
-
-		
-		// avoids latching the same object multiple times 
-		boolean isObject = (Odometer.euclideanDistance(new double[] {this.lastX, this.lastY},
-								new double[] {objX, objY}) > 5);;
-		//TODO if distance between last latched point and current > foam side
-//		boolean isObject = (currentDistance < lastDistanceDetected + Util.SEARCH_DISTANCE) && 
-//						(currentDistance > lastDistanceDetected + Util.SEARCH_DISTANCE) && (currentDistance <= Util.SEARCH_DISTANCE);
-		lastDistanceDetected = currDistance;
+		// latch all important information
+		if (isObject) {
+			this.objectLocations.add(new double[] {objX,objY,currDistance,currHeading});
+			this.lastDistanceDetected = currDistance;
+		}
 		
 		return isObject;
 	}
