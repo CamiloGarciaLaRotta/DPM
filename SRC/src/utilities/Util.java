@@ -17,6 +17,7 @@ public class Util {
 	
 	// blocks
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
+	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks
 	public static final double WOOD_MIN_WIDTH		= 15;	//minimum distance to travel to avoid wooden block
 	
 	// search
@@ -25,7 +26,22 @@ public class Util {
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	
-	public static final int ROBOT_RECTANGLE			= 5;	//side (in cm) of square around rectangle for avoidance
+	
+	
+	/**
+	 *        \___ ___/
+	 *            |
+	 *         -------   ---
+	 *         |+---+|    |
+	 *         |+---+|  LENGTH
+	 *         | EV3 |    |
+	 *         |_____|   ---
+	 *         
+	 *         +WIDTH+
+	 */
+	
+	public static final int ROBOT_WIDTH				= 20;	//width (in cm) of collision rectangle around robot
+	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
 	public static final double FORKLIFT_HEIGHT		= 24.0;	//Length (in cm) of forklift 

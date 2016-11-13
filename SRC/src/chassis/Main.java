@@ -33,6 +33,7 @@ import wifi.WifiConnection;
 public class Main {
 	//Wifi
 	private static WifiConnection conn = null;
+	private static HashMap<String, Integer> transmission = null;
 	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
@@ -67,7 +68,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	
 	public enum RobotTask {Builder, Collector};
 	
@@ -95,7 +96,7 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		forklift = new Forklift(forkliftMotor,clawMotor);
 		
-		// for testing only, when WIFI module is implemented it will be given automatically
+		// Default values for these - could be changed by wifi if enabled
 		GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
 			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
@@ -114,6 +115,7 @@ public class Main {
 		//threads intrinsic to all processes
 		odo.start();
 		ender.start();
+
 		
 		switch (demo) {
 		case Default: //regular robot operation
@@ -165,10 +167,15 @@ public class Main {
 		case RGBVectorTest:
 			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
+			break;
 		case TrackTest:
 			Test.TrackMeasureTest(odo, 10);
+			break;
 		case ForkliftTest:
 			Test.ForkliftTest();
+			break;
+		case Avoidance:
+			break;
 		default:
 			System.exit(-1);
 		}
