@@ -54,6 +54,8 @@ public class Util {
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
 	public static final int FORKLIFT_ACCEL			= 300; //Acceleration of forklift (deg/s^2) 
 	public static final int CLAW_ACCEL				= 500;
+	public static final double CLAW_TO_CENTER		= 16.0;
+	public static final double DROP_SPACE			= 1.0; //Distance above tower to drop next block from when stacking
 	
 	// odometry
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
