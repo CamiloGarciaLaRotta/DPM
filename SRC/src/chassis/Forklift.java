@@ -18,6 +18,7 @@ public class Forklift {
 		this.clawMotor = clawMotor;
 		this.gripped = false;
 		forkliftMotor.setAcceleration(Util.FORKLIFT_ACCEL);
+		clawMotor.setAcceleration(Util.CLAW_ACCEL);
 	}
 
 	public void liftUp() { //Move lift all the way up
@@ -26,7 +27,7 @@ public class Forklift {
 
 	public void liftDown() { //Move lift all the way down (to ground)
 		int theta = (int)((Util.FORKLIFT_HEIGHT / Util.FORKLIFT_ROPE_RADIUS) * 180.0 / Math.PI);
-		forkliftMotor.rotateTo(theta);
+		forkliftMotor.rotateTo(-theta);
 	}
 
 	public void liftToTower(int towerHeight) { //Move lift to height defined by the current tower height

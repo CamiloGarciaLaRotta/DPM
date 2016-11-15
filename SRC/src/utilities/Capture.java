@@ -23,8 +23,8 @@ public class Capture extends Thread {
 	private double[] towerPosition;
 	
 	// states
-	public enum CaptureState {Disabled, Grab, Return, Stack, Iddle};
-	public static CaptureState captureState = CaptureState.Disabled;
+	public enum CaptureState {Grab, Return, Stack, Iddle};
+	public static CaptureState captureState = CaptureState.Iddle;
 
 	private EV3LargeRegulatedMotor clawMotor;
 	
@@ -61,11 +61,6 @@ public class Capture extends Thread {
 			if(Main.state == RobotState.Avoiding) Capture.captureState = CaptureState.Iddle;
 			
 			switch(captureState) {
-			case Disabled:
-				try {
-					Thread.sleep(500);
-				}catch(Exception ex) { ex.printStackTrace(); }
-				break;
 			case Grab:
 				//TODO: Make sure block is in range
 				Main.forklift.liftDown();
@@ -88,9 +83,8 @@ public class Capture extends Thread {
 				Main.forklift.liftToTower(towerHeight);
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
-				odo.moveCM(Odometer.LINEDIR.Backward, 5, true); //Back up to avoid bumping into tower
 				Search.searchState = SearchState.AtDropZone; //Pass control back to search
-				captureState = CaptureState.Disabled;
+				captureState = CaptureState.Iddle;
 				break;
 			case Iddle:
 				// iddle state, waiting for avoidance to return

@@ -18,7 +18,7 @@ public class Util {
 	// blocks
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
 	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks
-	public static final double WOOD_MIN_WIDTH		= 15;	//minimum distance to travel to avoid wooden block
+	public static final double WOOD_MIN_WIDTH		= 20.0;	//minimum distance to travel to avoid wooden block
 	
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
@@ -45,11 +45,12 @@ public class Util {
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 24.0;	//Length (in cm) of forklift 
-	public static final double FORKLIFT_ROPE_RADIUS	= 1.0; //Radius (in cm) of circle that the rope wraps around to lift the forklift
+	public static final double FORKLIFT_HEIGHT		= 23.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_ROPE_RADIUS	= 1.45; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
 	public static final int FORKLIFT_ACCEL			= 300; //Acceleration of forklift (deg/s^2) 
+	public static final int CLAW_ACCEL				= 500;
 	
 	// odometry
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};

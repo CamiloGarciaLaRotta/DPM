@@ -359,7 +359,7 @@ public class Search extends Thread {
 		} else {
 			// avoids latching the same object multiple times 
 			 isObject = (Odometer.euclideanDistance(new double[] {this.lastX, this.lastY},
-									new double[] {objX, objY}) > Util.FOAM_WIDTH);
+									new double[] {objX, objY}) > Util.WOOD_MIN_WIDTH);
 		}
 		
 		// latch all important information
