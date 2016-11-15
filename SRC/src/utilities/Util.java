@@ -90,5 +90,5 @@ public class Util {
 	//Wifi
 	public static final String IP_ADDR				= "192.168.2.32";
 	public static final int TEAM_NUMBER				= 15;
-	public static final boolean USE_WIFI			= true;
+	public static final boolean USE_WIFI			= false;
 }
