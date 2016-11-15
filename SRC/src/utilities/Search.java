@@ -112,10 +112,7 @@ public class Search extends Thread {
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
 									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
 						
-						// if not moving, travel to cardinal
-						if(odo.getMotors()[0].getRotationSpeed() < Util.MINIMAL_ROTATION_SPEED) { //adjust value during tests
 							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-						}
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {

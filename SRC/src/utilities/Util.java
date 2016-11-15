@@ -60,7 +60,6 @@ public class Util {
 	public static final double DEG_TOLERANCE		= 3.0; //degrees
 	public static final double CM_TOLERANCE			= 1.0; //cm
 	public static final double TRAVELTO_BW 			= 10;  //BW (in cm) at which it is safe to stop verifying for obstacles while traveling to a point
-	public static final int MINIMAL_ROTATION_SPEED 	= 5;   //minimal angular velocity (deg/sec) at which it is safe to say the robot is not moving
 	
 	// motors
 	public static final int MOTOR_FAST				= 200; //deg/sec
