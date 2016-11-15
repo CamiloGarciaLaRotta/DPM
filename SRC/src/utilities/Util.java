@@ -24,6 +24,10 @@ public class Util {
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
 	public final static float BLOCK_DISTANCE		= 9.0f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
+	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;		// max Y position (in cm) to search for items to avoid wall
+	public static final double SOUTH_MAX			= -0.5*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
+	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;		// max X position (in cm) to search for items to avoid wall
+	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	
