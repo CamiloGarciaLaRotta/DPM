@@ -23,6 +23,7 @@ public class Util {
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
 	public final static float BLOCK_DISTANCE		= 5.0f; //distance (in cm) to detect block type
+	public static final double BACKUP_DISTANCE		= 4.0;
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	

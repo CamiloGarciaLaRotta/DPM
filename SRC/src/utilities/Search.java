@@ -118,7 +118,11 @@ public class Search extends Thread {
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
 							// does the robot already have a block?
-							if(Capture.captureState == CaptureState.Disabled) testForObject();
+							if(testForStyrofoam()) {
+								searchState = SearchState.Iddle;
+								Main.state = RobotState.Capture;
+								Capture.captureState = CaptureState.Grab;
+							}
 							else {
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
@@ -128,7 +132,9 @@ public class Search extends Thread {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								while(Main.state == RobotState.Avoiding);
+								while(Main.state == RobotState.Avoiding) {
+									try{ Thread.sleep(500); }catch(Exception ex) {}
+								}
 								Avoider.avoidState = AvoidState.Disabled;
 							}
 						}	
@@ -245,6 +251,16 @@ public class Search extends Thread {
 			}
 		}
 		
+	}
+	
+	private boolean testForStyrofoam() {
+		odo.forwardMotors();
+		while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE);
+		odo.stopMotors();
+		Main.forklift.liftDown();
+		boolean styrofoam = isStyrofoamBlock();
+		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
+		return styrofoam;
 	}
 
 	// travel to correspondent axis of current cardinal point
