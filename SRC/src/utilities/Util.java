@@ -22,7 +22,7 @@ public class Util {
 	
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
-	public final static float BLOCK_DISTANCE		= 5.0f; //distance (in cm) to detect block type
+	public final static float BLOCK_DISTANCE		= 9.0f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
 	
 	// avoider
@@ -45,7 +45,7 @@ public class Util {
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 23.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_HEIGHT		= 22.0;	//Length (in cm) of forklift 
 	public static final double FORKLIFT_ROPE_RADIUS	= 1.45; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered

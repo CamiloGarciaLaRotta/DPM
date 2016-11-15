@@ -22,6 +22,8 @@ public class Capture extends Thread {
 	private double[][] GREEN;
 	private double[] towerPosition;
 	
+	private static double[] cardinalPoint;
+	
 	// states
 	public enum CaptureState {Grab, Return, Stack, Iddle};
 	public static CaptureState captureState = CaptureState.Iddle;
@@ -70,7 +72,13 @@ public class Capture extends Thread {
 				break;
 			case Return:
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
-				double targetHeading = Math.atan2(odo.getY() - towerPosition[1],odo.getX() - towerPosition[0]);
+				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
+				if(towerHeight == 0){
+					nav.travelTo(towerPosition[0], towerPosition[1]);
+					captureState = CaptureState.Stack;
+					break;
+				}
+				double targetHeading = Math.atan2(-odo.getY() + towerPosition[1],-odo.getX() + towerPosition[0]);
 				nav.turnTo(targetHeading,true); //Turn to face tower position, stop motors
 				odo.setMotorSpeed(Odometer.NAVIGATE_SPEED); //Move forward until the tower is detected.
 				odo.forwardMotors();
@@ -108,5 +116,9 @@ public class Capture extends Thread {
 	 */
 	public static boolean inBounds(double x,double y, double width, double height) {
 		return (x < width) && (y < height) && x > 0 && y > 0;
+	}
+	
+	public static void setContext(double[] cardinalPoint) {
+		Capture.cardinalPoint = cardinalPoint;
 	}
 }

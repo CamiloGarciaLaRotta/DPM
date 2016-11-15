@@ -120,9 +120,11 @@ public class Search extends Thread {
 							if(testForStyrofoam()) {
 								searchState = SearchState.Iddle;
 								Main.state = RobotState.Capture;
+								Capture.setContext(cardinals[currCardinal]);
 								Capture.captureState = CaptureState.Grab;
 							}
 							else {
+								Main.forklift.liftUp();
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
@@ -185,12 +187,12 @@ public class Search extends Thread {
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
 					// test for object
-					if (testForObject()) {
-
+					//if (testForObject()) {
+						testForObject();
 						// resume scatter search
 						odo.setMotorSpeed(Util.MOTOR_SLOW);
 						odo.spin(TURNDIR.CCW);
-					}
+					//}
 				}
 				
 				odo.stopMotors();
@@ -234,6 +236,8 @@ public class Search extends Thread {
 					this.objectLocations.remove(0);
 					
 					inspectObject(X, Y);
+					if(Main.state == RobotState.Capture) continue;
+					Main.forklift.liftUp();
 				} else {
 					searchState = SearchState.Default;
 				}
@@ -258,6 +262,7 @@ public class Search extends Thread {
 		odo.forwardMotors();
 		while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE);
 		odo.stopMotors();
+		Main.forklift.liftDown();
 		
 		boolean styrofoam = isStyrofoamBlock();
 		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
@@ -300,11 +305,14 @@ public class Search extends Thread {
 		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE ||
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
+		Main.forklift.liftDown();
 		
 		// inspect object
 		if(isStyrofoamBlock()) { 
 			searchState = SearchState.Iddle;
 			Main.state = Main.RobotState.Capture;
+			Capture.captureState = CaptureState.Grab;
+			Capture.setContext(cardinals[currCardinal]);
 		} else {
 			// back-off a little to avoid hitting the block while turning
 			odo.setMotorSpeed(Util.MOTOR_SLOW);

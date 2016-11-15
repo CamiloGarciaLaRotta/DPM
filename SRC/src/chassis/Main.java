@@ -112,8 +112,8 @@ public class Main {
 				transmissionParse(parameters);
 			}
 		} else {	//default parameters
-			GREEN = new double[][]{{10*Util.SQUARE_LENGTH,10*Util.SQUARE_LENGTH},
-				{30*Util.SQUARE_LENGTH,20*Util.SQUARE_LENGTH}};
+			GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+				{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 			startingCorner = 1;
@@ -159,6 +159,7 @@ public class Main {
 			break;
 		case SearchTest:
 			search.start();
+			capture.start();
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:
