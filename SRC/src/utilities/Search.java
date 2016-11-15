@@ -336,17 +336,23 @@ public class Search extends Thread {
 	 */
 	private boolean testForObject() {
 		
-		float currDistance = usSensor.getMedianSample(Util.US_SAMPLES);	
+		// object detected
+		odo.stopMotors();
+		
+		float currDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+		double currHeading = odo.getTheta();
+		double objX =  odo.getX() + currDistance*Math.cos(currHeading);
+		double objY = odo.getY() + currDistance*Math.sin(currHeading);
 		
 		// no object detected
 		if (currDistance > Util.SEARCH_DISTANCE) return false;
 		
-		// object detected
-		odo.stopMotors();
+		// make sure object in sight is not wall
+		if(objY < Util.SOUTH_MAX || objY > Util.NORTH_MAX || 
+				objX < Util.WEST_MAX || objX > Util.EAST_MAX) {
+			return false;
+		}
 		
-		double currHeading = odo.getTheta();
-		double objX =  odo.getX() + currDistance*Math.cos(currHeading);
-		double objY = odo.getY() + currDistance*Math.sin(currHeading);
 		
 		boolean isObject;
 		
