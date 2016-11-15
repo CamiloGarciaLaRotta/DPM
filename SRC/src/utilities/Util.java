@@ -17,11 +17,16 @@ public class Util {
 	// blocks
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
 	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks
-	public static final double WOOD_MIN_WIDTH		= 15;	//minimum distance to travel to avoid wooden block
+	public static final double WOOD_MIN_WIDTH		= 20.0;	//minimum distance to travel to avoid wooden block
 	
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
-	public final static float BLOCK_DISTANCE		= 5.0f; //distance (in cm) to detect block type
+	public final static float BLOCK_DISTANCE		= 9.0f; //distance (in cm) to detect block type
+	public static final double BACKUP_DISTANCE		= 4.0;
+	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;		// max Y position (in cm) to search for items to avoid wall
+	public static final double SOUTH_MAX			= -0.5*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
+	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;		// max X position (in cm) to search for items to avoid wall
+	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	
@@ -43,11 +48,12 @@ public class Util {
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 24.0;	//Length (in cm) of forklift 
-	public static final double FORKLIFT_ROPE_RADIUS	= 1.0; //Radius (in cm) of circle that the rope wraps around to lift the forklift
+	public static final double FORKLIFT_HEIGHT		= 22.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_ROPE_RADIUS	= 1.45; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
 	public static final int FORKLIFT_ACCEL			= 300; //Acceleration of forklift (deg/s^2) 
+	public static final int CLAW_ACCEL				= 500;
 	
 	// odometry
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
@@ -56,7 +62,12 @@ public class Util {
 	// navigation
 	public static final int NAV_ACCELERATION		= 900;
 	public static final double DEG_TOLERANCE		= 3.0; //degrees
+<<<<<<< HEAD
 	public static final double CM_TOLERANCE			= 0.5; //cm
+=======
+	public static final double CM_TOLERANCE			= 1.0; //cm
+	public static final double TRAVELTO_BW 			= 10;  //BW (in cm) at which it is safe to stop verifying for obstacles while traveling to a point
+>>>>>>> fix/Avoider
 	
 	// motors
 	public static final int MOTOR_FAST				= 200; //deg/sec

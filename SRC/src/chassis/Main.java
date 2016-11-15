@@ -100,6 +100,27 @@ public class Main {
 		startingCorner = 1;
 		task = RobotTask.Builder;
 		
+		if(Util.USE_WIFI) {
+			GREEN = new double[2][2];
+			RED = new double[2][2];
+			HashMap<String, Integer> parameters = null;
+			try {
+				parameters = wifiConnect();
+			} catch (IOException e) {	//failed to connect to wifi
+				System.err.println(e);
+				System.exit(-1);
+			}
+			if(parameters != null) {
+				transmissionParse(parameters);
+			}
+		} else {	//default parameters
+			GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+				{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+			startingCorner = 1;
+			task = RobotTask.Builder;
+		}
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, GREEN);
@@ -160,6 +181,7 @@ public class Main {
 			break;
 		case SearchTest:
 			search.start();
+			capture.start();
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:

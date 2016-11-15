@@ -94,6 +94,8 @@ public class Search extends Thread {
 		isStyrofoamBlock(); //Initialize rgb mode
 		
 		while(true){
+			if(Main.state == RobotState.Avoiding) Search.searchState = SearchState.Iddle;
+			
 			switch(searchState) {
 			
 			case Default: 
@@ -105,18 +107,21 @@ public class Search extends Thread {
 					
 					// until it arrives at current cardinal
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
-									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > 10){     //adjust value during tests
+									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
 						
-						// if not moving, travel to cardinal
-						if(odo.getMotors()[0].getRotationSpeed() < 5) { //adjust value during tests
 							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-						}
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
-							// does the robot already have a block?
-							if(Capture.captureState == CaptureState.Disabled) testForObject();
+							// is the block a target or an obstacle?
+							if(testForStyrofoam()) {
+								searchState = SearchState.Iddle;
+								Main.state = RobotState.Capture;
+								Capture.setContext(cardinals[currCardinal]);
+								Capture.captureState = CaptureState.Grab;
+							}
 							else {
+								Main.forklift.liftUp();
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
@@ -125,7 +130,9 @@ public class Search extends Thread {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								while(Main.state == RobotState.Avoiding);
+								while(Main.state == RobotState.Avoiding) {
+									try{ Thread.sleep(500); }catch(Exception ex) {}
+								}
 								Avoider.avoidState = AvoidState.Disabled;
 							}
 						}	
@@ -177,12 +184,12 @@ public class Search extends Thread {
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
 					// test for object
-					if (testForObject()) {
-
+					//if (testForObject()) {
+						testForObject();
 						// resume scatter search
 						odo.setMotorSpeed(Util.MOTOR_SLOW);
 						odo.spin(TURNDIR.CCW);
-					}
+					//}
 				}
 				
 				odo.stopMotors();
@@ -226,6 +233,8 @@ public class Search extends Thread {
 					this.objectLocations.remove(0);
 					
 					inspectObject(X, Y);
+					if(Main.state == RobotState.Capture) continue;
+					Main.forklift.liftUp();
 				} else {
 					searchState = SearchState.Default;
 				}
@@ -234,7 +243,7 @@ public class Search extends Thread {
 				
 			case Iddle:
 			
-				// iddle state, waiting for capture to return and stack block
+				// iddle state, waiting for capture or avoider to return
 				try{
 					Thread.sleep(Util.SLEEP_PERIOD);
 				} catch(Exception e) {}
@@ -242,6 +251,20 @@ public class Search extends Thread {
 			}
 		}
 		
+	}
+	
+	// approach an object to verify its nature
+	private boolean testForStyrofoam() {
+		odo.setMotorSpeed(Util.MOTOR_SLOW);
+		odo.forwardMotors();
+		while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE);
+		odo.stopMotors();
+		Main.forklift.liftDown();
+		
+		boolean styrofoam = isStyrofoamBlock();
+		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
+		
+		return styrofoam;
 	}
 
 	// travel to correspondent axis of current cardinal point
@@ -279,11 +302,14 @@ public class Search extends Thread {
 		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE ||
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
+		Main.forklift.liftDown();
 		
 		// inspect object
 		if(isStyrofoamBlock()) { 
 			searchState = SearchState.Iddle;
 			Main.state = Main.RobotState.Capture;
+			Capture.captureState = CaptureState.Grab;
+			Capture.setContext(cardinals[currCardinal]);
 		} else {
 			// back-off a little to avoid hitting the block while turning
 			odo.setMotorSpeed(Util.MOTOR_SLOW);
@@ -315,17 +341,23 @@ public class Search extends Thread {
 	 */
 	private boolean testForObject() {
 		
-		float currDistance = usSensor.getMedianSample(Util.US_SAMPLES);	
+		// object detected
+		odo.stopMotors();
+		
+		float currDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+		double currHeading = odo.getTheta();
+		double objX =  odo.getX() + currDistance*Math.cos(currHeading);
+		double objY = odo.getY() + currDistance*Math.sin(currHeading);
 		
 		// no object detected
 		if (currDistance > Util.SEARCH_DISTANCE) return false;
 		
-		// object detected
-		odo.stopMotors();
+		// make sure object in sight is not wall
+		if(objY < Util.SOUTH_MAX || objY > Util.NORTH_MAX || 
+				objX < Util.WEST_MAX || objX > Util.EAST_MAX) {
+			return false;
+		}
 		
-		double currHeading = odo.getTheta();
-		double objX =  odo.getX() + currDistance*Math.cos(currHeading);
-		double objY = odo.getY() + currDistance*Math.sin(currHeading);
 		
 		boolean isObject;
 		
@@ -338,7 +370,7 @@ public class Search extends Thread {
 		} else {
 			// avoids latching the same object multiple times 
 			 isObject = (Odometer.euclideanDistance(new double[] {this.lastX, this.lastY},
-									new double[] {objX, objY}) > Util.FOAM_WIDTH);
+									new double[] {objX, objY}) > Util.WOOD_MIN_WIDTH);
 		}
 		
 		// latch all important information

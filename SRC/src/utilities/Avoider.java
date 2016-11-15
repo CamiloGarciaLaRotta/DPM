@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import chassis.Main;
 import chassis.USSensor;
 import chassis.Main.RobotState;
+import utilities.Capture.CaptureState;
 import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
@@ -66,6 +67,9 @@ public class Avoider extends Thread{
 	public void run() {
 		while(true){
 			
+			CaptureState lastCaptureState = Capture.captureState;
+			SearchState lastSearchState = Search.searchState;
+			
 			distance = usSensor.getMedianSample(Util.US_SAMPLES);
 			
 			// build current position rectangle
@@ -79,7 +83,7 @@ public class Avoider extends Thread{
 				Main.state = RobotState.Avoiding;
 				
 				// check for physical obstacles
-				if(distance < Util.AVOID_DISTANCE){
+				//if(distance < Util.AVOID_DISTANCE){
 					odo.stopMotors();
 					
 					do{
@@ -88,22 +92,44 @@ public class Avoider extends Thread{
 					
 					// no more obstacle ahead, advance a bit before returning control to Search
 					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
-				}
-				
-				// check for RED zone
-				if(RED.contains(currRect)){
-					do{
-						linearAvoidance(CCW);
-					} while (RED.contains(currRect));
-				}
-				
-				// check for corners zones
-				if(x1.contains(currRect) || x2.contains(currRect) ||
-					x3.contains(currRect) || x4.contains(currRect)){
-					// return to GREEN, nothing to do in a corner
-					Search.searchState = SearchState.Default;
-				}
+				//}
 			}
+			
+			// check for RED zone
+			if(RED.contains(currRect)){
+				Main.state = RobotState.Avoiding;
+				odo.stopMotors();
+				// determine in which thread the robot was acting 
+				if(Capture.captureState != CaptureState.Iddle){
+					Capture.captureState = CaptureState.Iddle;
+				} else {
+					Search.searchState = SearchState.Iddle; 
+				}
+				redAvoidance();	
+				do{
+										
+				} while (RED.contains(currRect));
+			}
+			
+			// check for corners zones
+			if(x1.contains(currRect) || x2.contains(currRect) ||
+				x3.contains(currRect) || x4.contains(currRect)){
+				// return to GREEN, nothing to do in a corner
+				Search.searchState = SearchState.Default;
+				Main.state = RobotState.Search;
+				Capture.captureState = CaptureState.Iddle;
+				continue;
+			}
+			
+			if(lastCaptureState != CaptureState.Iddle) {
+				Main.state = RobotState.Capture;
+				Capture.captureState = lastCaptureState;
+			}
+			else {
+				Main.state = RobotState.Search;
+				Search.searchState = lastSearchState;
+			}
+			
 			
 			// lower stress on CPU
 			try {
@@ -112,6 +138,16 @@ public class Avoider extends Thread{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	// special set of instructions required to avoid RED zone
+	private void redAvoidance() {
+		double currX = this.currPos[0];
+		double currY = this.currPos[1];
+		double Heading = this.currPos[2];
+		
+		//TODO
+		
 	}
 
 	/**
