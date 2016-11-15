@@ -97,6 +97,8 @@ public class Search extends Thread {
 		isStyrofoamBlock(); //Initialize rgb mode
 		
 		while(true){
+			if(Main.state == RobotState.Avoiding) Search.searchState = SearchState.Iddle;
+			
 			switch(searchState) {
 			
 			case Default: 
@@ -117,7 +119,7 @@ public class Search extends Thread {
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
-							// does the robot already have a block?
+							// is the block a target or an obstacle?
 							if(testForStyrofoam()) {
 								searchState = SearchState.Iddle;
 								Main.state = RobotState.Capture;
@@ -243,7 +245,7 @@ public class Search extends Thread {
 				
 			case Iddle:
 			
-				// iddle state, waiting for capture to return and stack block
+				// iddle state, waiting for capture or avoider to return
 				try{
 					Thread.sleep(Util.SLEEP_PERIOD);
 				} catch(Exception e) {}
@@ -253,13 +255,16 @@ public class Search extends Thread {
 		
 	}
 	
+	// approach an object to verify its nature
 	private boolean testForStyrofoam() {
+		odo.setMotorSpeed(Util.MOTOR_SLOW);
 		odo.forwardMotors();
 		while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE);
 		odo.stopMotors();
-		Main.forklift.liftDown();
+		
 		boolean styrofoam = isStyrofoamBlock();
 		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
+		
 		return styrofoam;
 	}
 

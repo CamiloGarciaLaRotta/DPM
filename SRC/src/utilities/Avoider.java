@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import chassis.Main;
 import chassis.USSensor;
 import chassis.Main.RobotState;
+import utilities.Capture.CaptureState;
 import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
@@ -91,20 +92,35 @@ public class Avoider extends Thread{
 					// no more obstacle ahead, advance a bit before returning control to Search
 					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
 				}
-				
-				// check for RED zone
-				if(RED.contains(currRect)){
-					do{
-						linearAvoidance(CCW);
-					} while (RED.contains(currRect));
+			}
+			
+			// check for RED zone
+			if(RED.contains(currRect)){
+				Main.state = RobotState.Avoiding;
+				odo.stopMotors();
+				// determine in which thread the robot was acting 
+				if(Capture.captureState != CaptureState.Disabled){
+					CaptureState lastState = Capture.captureState;
+					Capture.captureState = CaptureState.Iddle;
+					redAvoidance();	
+					Capture.captureState = lastState;
+					Main.state = RobotState.Capture;
+				} else {
+					SearchState lastState = Search.searchState;
+					redAvoidance(); 
+					Search.searchState = lastState;
+					Main.state = RobotState.Search;
 				}
-				
-				// check for corners zones
-				if(x1.contains(currRect) || x2.contains(currRect) ||
-					x3.contains(currRect) || x4.contains(currRect)){
-					// return to GREEN, nothing to do in a corner
-					Search.searchState = SearchState.Default;
-				}
+				do{
+										
+				} while (RED.contains(currRect));
+			}
+			
+			// check for corners zones
+			if(x1.contains(currRect) || x2.contains(currRect) ||
+				x3.contains(currRect) || x4.contains(currRect)){
+				// return to GREEN, nothing to do in a corner
+				Search.searchState = SearchState.Default;
 			}
 			
 			// lower stress on CPU
@@ -114,6 +130,16 @@ public class Avoider extends Thread{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	// special set of instructions required to avoid RED zone
+	private void redAvoidance() {
+		double currX = this.currPos[0];
+		double currY = this.currPos[1];
+		double Heading = this.currPos[2];
+		
+		//TODO
+		
 	}
 
 	/**

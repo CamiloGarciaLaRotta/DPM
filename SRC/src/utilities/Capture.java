@@ -1,6 +1,7 @@
 package utilities;
 
 import chassis.Main;
+import chassis.Main.RobotState;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import utilities.Search.SearchState;
@@ -22,7 +23,7 @@ public class Capture extends Thread {
 	private double[] towerPosition;
 	
 	// states
-	public enum CaptureState {Disabled, Grab, Return, Stack};
+	public enum CaptureState {Disabled, Grab, Return, Stack, Iddle};
 	public static CaptureState captureState = CaptureState.Disabled;
 
 	private EV3LargeRegulatedMotor clawMotor;
@@ -57,6 +58,8 @@ public class Capture extends Thread {
 	@Override
 	public void run() {
 		while(true) {
+			if(Main.state == RobotState.Avoiding) Capture.captureState = CaptureState.Iddle;
+			
 			switch(captureState) {
 			case Disabled:
 				try {
@@ -88,6 +91,12 @@ public class Capture extends Thread {
 				odo.moveCM(Odometer.LINEDIR.Backward, 5, true); //Back up to avoid bumping into tower
 				Search.searchState = SearchState.AtDropZone; //Pass control back to search
 				captureState = CaptureState.Disabled;
+				break;
+			case Iddle:
+				// iddle state, waiting for avoidance to return
+				try{
+					Thread.sleep(Util.SLEEP_PERIOD);
+				} catch(Exception e) {}
 				break;
 			default:
 				break;
