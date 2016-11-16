@@ -299,7 +299,7 @@ public class Search extends Thread {
 		odo.forwardMotors(); 
 		
 		//wait until close enough to determine if it's a styrofoam block
-		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE ||
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE &&
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		Main.forklift.liftDown();
@@ -312,6 +312,7 @@ public class Search extends Thread {
 			Capture.setContext(cardinals[currCardinal]);
 		} else {
 			// back-off a little to avoid hitting the block while turning
+			Main.forklift.liftUp();
 			odo.setMotorSpeed(Util.MOTOR_SLOW);
 			odo.backwardMotors();
 			try {
