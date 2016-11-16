@@ -385,12 +385,27 @@ public class Search extends Thread {
 
 	
 	/**
-	 * 
 	 * @return if the detected object is a styrofoam block
 	 */
-	//TODO use complete RGB vector to compare
-	private boolean isStyrofoamBlock() {
-		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
+	protected static boolean isStyrofoamBlock() {
+		boolean isStyrofoam;
+		
+		float[] measuredRGB = Main.colorSensor.getColor();
+		//get unit vector
+		double magnitude = Math.sqrt(
+				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
+		double[] normRGB = new double[3];
+		normRGB[0] = (double)measuredRGB[0]/magnitude;
+		normRGB[1] = (double)measuredRGB[1]/magnitude;
+		normRGB[2] = (double)measuredRGB[2]/magnitude;
+		
+		//compare measurement to standard for styrofoam block
+		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
+			isStyrofoam = true;
+		} else {
+			isStyrofoam = false;
+		}
+		return isStyrofoam;
 	}
 	
 	/**

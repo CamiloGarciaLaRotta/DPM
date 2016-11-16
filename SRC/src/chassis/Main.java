@@ -67,7 +67,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, ObjectDiffTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	/**
 	 * Robot job. Either builder or garbage collector. Builder is default.
 	 */
@@ -195,6 +195,9 @@ public class Main {
 			Test.ForkliftTest();
 			break;
 		case Avoidance:
+			break;
+		case ObjectDiffTest:
+			Test.ObjectDiffTest();
 			break;
 		default:
 			System.exit(-1);

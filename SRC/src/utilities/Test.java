@@ -106,6 +106,20 @@ public class Test {
 		}
 	}
 	
+	public static void ObjectDiffTest() {
+		while(Button.readButtons() != Button.ID_ESCAPE) {
+			if(Main.usSensor.getMedianSample(Util.US_SAMPLES) <= Util.BLOCK_DISTANCE) {
+				if(Search.isStyrofoamBlock()) {
+					Sound.beepSequenceUp();
+					Main.lcd.setLine1("Styrofoam Block");
+				} else {
+					Sound.beep();
+					Main.lcd.setLine1("Not Styrofoam Block");
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Measure RGB unit vectors
 	 * @param color - ColorSensor object
