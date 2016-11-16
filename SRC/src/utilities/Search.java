@@ -322,6 +322,7 @@ public class Search extends Thread {
 				Capture.captureState = CaptureState.Grab;
 				Capture.setContext(cardinals[currCardinal]);
 			} else {
+				Main.forklift.liftUp();
 				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
 			}
 		} 
