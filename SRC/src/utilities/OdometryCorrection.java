@@ -46,26 +46,37 @@ public class OdometryCorrection extends Thread {
 		
 		while (true) {
 			float intensity;
+			float dI;
 			correctionStart = System.currentTimeMillis();
 			intensity = Main.gridLineDetector.getIntensity();
 			//Intensity at line is < 300.
 			if(intensity < LightIntensitySensor.LINE_DETECTED && lastIntensity < LightIntensitySensor.LINE_DETECTED) continue; //Only register line when the last measurement DID NOT measure a line
+			dI = lastIntensity - intensity;
 			lastIntensity = intensity;
 
 			// put your correction code here
 			
-			if(intensity < LightIntensitySensor.LINE_DETECTED) //Detected black
+			if(dI > LightIntensitySensor.LINE_DETECTED) //Detected black
 			{
 				double currentPosition[] = new double[3];
+				double sensorPosition[] = new double[2];
 				odometer.getPosition(currentPosition, Util.UPDATE_ALL);
+				sensorPosition[0] = currentPosition[0] - Util.INTENSITY_TO_CENTER * Math.cos(currentPosition[2]);
+				sensorPosition[1] = currentPosition[1] - Util.INTENSITY_TO_CENTER * Math.sin(currentPosition[2]);
 				
 				//check if vertical line...
-				double distanceX = (currentPosition[0]/Util.SQUARE_LENGTH) - Math.floor(currentPosition[0]/Util.SQUARE_LENGTH);
-				if(distanceX < Util.GRIDLINE_THRESHOLD) odometer.setX(Math.floor(currentPosition[0]/Util.SQUARE_LENGTH)*Util.SQUARE_LENGTH);
+				double distanceX = (sensorPosition[0]/Util.SQUARE_LENGTH) - Math.floor(sensorPosition[0]/Util.SQUARE_LENGTH);
+				if(distanceX < Util.GRIDLINE_THRESHOLD) {
+					double sensorX = Math.floor(sensorPosition[0]/Util.SQUARE_LENGTH) * Util.SQUARE_LENGTH;
+					odometer.setX(sensorX + Util.INTENSITY_TO_CENTER * Math.cos(currentPosition[0]));
+				}
 				
 				//check if horizontal line...
-				double distanceY = (currentPosition[1]/Util.SQUARE_LENGTH) - Math.floor(currentPosition[1]/Util.SQUARE_LENGTH);
-				if(distanceY < Util.GRIDLINE_THRESHOLD) odometer.setY(Math.floor(currentPosition[1]/Util.SQUARE_LENGTH)*Util.SQUARE_LENGTH);
+				double distanceY = (sensorPosition[1]/Util.SQUARE_LENGTH) - Math.floor(sensorPosition[1]/Util.SQUARE_LENGTH);
+				if(distanceX < Util.GRIDLINE_THRESHOLD) {
+					double sensorY = Math.floor(sensorPosition[1]/Util.SQUARE_LENGTH) * Util.SQUARE_LENGTH;
+					odometer.setY(sensorY + Util.INTENSITY_TO_CENTER * Math.sin(currentPosition[1]));
+				}
 			}
 			
 			// this ensure the odometry correction occurs only once every period
