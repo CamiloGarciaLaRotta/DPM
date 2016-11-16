@@ -177,7 +177,7 @@ public class Main {
 			break;
 		case NavigationTest:
 			// the given points test all major rotation angles: 45, 135, 180, 360. Modify as needed
-			Test.NavigationTest(odo, new int[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
+			Test.NavigationTest(odo, new double[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		case SearchTest:
 			avoid.start();
@@ -196,6 +196,8 @@ public class Main {
 			Test.ForkliftTest();
 			break;
 		case Avoidance:
+			avoid.start();
+			Test.AvoidanceTest(odo);
 			break;
 		default:
 			System.exit(-1);
