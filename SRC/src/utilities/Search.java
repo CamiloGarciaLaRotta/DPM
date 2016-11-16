@@ -384,14 +384,12 @@ public class Search extends Thread {
 	}
 	
 	/**
-	 * 
 	 * @return if the detected object is a styrofoam block
 	 */
-	//TODO use complete RGB vector to compare
-	private boolean isStyrofoamBlock() {
+	protected static boolean isStyrofoamBlock() {
 		boolean isStyrofoam;
 		
-		float[] measuredRGB = colorSensor.getColor();
+		float[] measuredRGB = Main.colorSensor.getColor();
 		//get unit vector
 		double magnitude = Math.sqrt(
 				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
