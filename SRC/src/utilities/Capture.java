@@ -87,7 +87,8 @@ public class Capture extends Thread {
 				break;
 			case Stack:
 				//TODO: Make sure tower is in range
-				Main.forklift.liftToTower(towerHeight);
+				odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);
+				Main.forklift.liftToTower(towerHeight++);
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
 				Search.searchState = SearchState.AtDropZone; //Pass control back to search
