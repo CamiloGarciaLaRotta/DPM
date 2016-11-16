@@ -26,7 +26,7 @@ public class Util {
 	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;		// max Y position (in cm) to search for items to avoid wall
 	public static final double SOUTH_MAX			= -0.5*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
 	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;		// max X position (in cm) to search for items to avoid wall
-	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
+	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid wall
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	

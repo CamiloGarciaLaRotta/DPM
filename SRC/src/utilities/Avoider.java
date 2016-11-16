@@ -100,10 +100,10 @@ public class Avoider extends Thread{
 				Main.state = RobotState.Avoiding;
 				odo.stopMotors();
 				// determine in which thread the robot was acting 
-				if(Capture.captureState != CaptureState.Iddle){
-					Capture.captureState = CaptureState.Iddle;
+				if(Capture.captureState != CaptureState.Idle){
+					Capture.captureState = CaptureState.Idle;
 				} else {
-					Search.searchState = SearchState.Iddle; 
+					Search.searchState = SearchState.Idle; 
 				}
 				redAvoidance();	
 				do{
@@ -117,11 +117,11 @@ public class Avoider extends Thread{
 				// return to GREEN, nothing to do in a corner
 				Search.searchState = SearchState.Default;
 				Main.state = RobotState.Search;
-				Capture.captureState = CaptureState.Iddle;
+				Capture.captureState = CaptureState.Idle;
 				continue;
 			}
 			
-			if(lastCaptureState != CaptureState.Iddle) {
+			if(lastCaptureState != CaptureState.Idle) {
 				Main.state = RobotState.Capture;
 				Capture.captureState = lastCaptureState;
 			}

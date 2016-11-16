@@ -42,7 +42,7 @@ public class Search extends Thread {
 	private double lastX, lastY;
 	
 	// states
-	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Iddle};
+	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Idle};
 	public static SearchState searchState;
 	
 	
@@ -109,7 +109,7 @@ public class Search extends Thread {
 		isStyrofoamBlock(); //Initialize rgb mode
 		
 		while(true){
-			if(Main.state == RobotState.Avoiding) Search.searchState = SearchState.Iddle;
+			if(Main.state == RobotState.Avoiding) Search.searchState = SearchState.Idle;
 			
 			switch(searchState) {
 			
@@ -130,7 +130,7 @@ public class Search extends Thread {
 						if (Navigation.PathBlocked) {
 							// is the block a target or an obstacle?
 							if(testForStyrofoam()) {
-								searchState = SearchState.Iddle;
+								searchState = SearchState.Idle;
 								Main.state = RobotState.Capture;
 								Capture.setContext(cardinals[currCardinal]);
 								Capture.captureState = CaptureState.Grab;
@@ -251,9 +251,9 @@ public class Search extends Thread {
 				
 				break;
 				
-			case Iddle:
+			case Idle:
 			
-				// iddle state, waiting for capture or avoider to return
+				// idle state, waiting for capture or avoider to return
 				try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
 				break;
 			}
@@ -273,62 +273,6 @@ public class Search extends Thread {
 		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
 		
 		return styrofoam;
-	}
-
-	// travel to correspondent axis of current cardinal point
-	private void travelToAxis(boolean frontwards) {
-		
-		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
-	
-		odo.setMotorSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
-		if (frontwards) odo.forwardMotors();
-		else odo.backwardMotors();
-		
-		switch(axis){
-		case "X": 
-			while(odo.getX() < cardinals[currCardinal][0] - Util.CM_TOLERANCE || 
-					odo.getX() > cardinals[currCardinal][0] + Util.CM_TOLERANCE);
-			break;
-		case "Y": 
-			while(odo.getY() < cardinals[currCardinal][1] - Util.CM_TOLERANCE ||
-					odo.getY() > cardinals[currCardinal][1] + Util.CM_TOLERANCE);
-			break;
-		}
-		
-		odo.stopMotors();
-		
-	}
-
-	/**
-	 * When object is in sight, approach slowly and inspect
-	 */
-	private void inspectObject(double X, double Y) {
-		odo.setMotorSpeed(Util.MOTOR_SLOW); 
-		odo.forwardMotors(); 
-		
-		//wait until close enough to determine if it's a styrofoam block
-		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE &&
-				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
-		odo.stopMotors();
-		
-		// avoid checking for false positves
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.BLOCK_DISTANCE) {
-			Main.forklift.liftDown();
-			
-			// inspect object
-			if(isStyrofoamBlock()) { 
-				searchState = SearchState.Iddle;
-				Main.state = Main.RobotState.Capture;
-				Capture.captureState = CaptureState.Grab;
-				Capture.setContext(cardinals[currCardinal]);
-			} else {
-				Main.forklift.liftUp();
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
-			}
-		} 
-		
-		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-		searchState = SearchState.Default;
 	}
 	
 	/**
@@ -354,7 +298,6 @@ public class Search extends Thread {
 			return false;
 		}
 		
-		
 		boolean isObject;
 		
 		// always latch first encountered object at each cardinal
@@ -377,6 +320,65 @@ public class Search extends Thread {
 		
 		return isObject;
 	}
+
+	/**
+	 * When object is in sight, approach slowly and inspect
+	 */
+	private void inspectObject(double X, double Y) {
+		odo.setMotorSpeed(Util.MOTOR_SLOW); 
+		odo.forwardMotors(); 
+		
+		//wait until close enough to determine if it's a styrofoam block
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE &&
+				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
+		odo.stopMotors();
+		
+		// avoid checking for false positives
+		if(usSensor.getMedianSample(Util.US_SAMPLES) < 1.5*Util.BLOCK_DISTANCE) {
+			Main.forklift.liftDown();
+			
+			// inspect object
+			if(isStyrofoamBlock()) { 
+				searchState = SearchState.Idle;
+				Main.state = Main.RobotState.Capture;
+				Capture.captureState = CaptureState.Grab;
+				Capture.setContext(cardinals[currCardinal]);
+				return;
+			} else {
+				Main.forklift.liftUp();
+				odo.moveCM(LINEDIR.Backward, 5, true);
+			}
+		} 
+		
+		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+		searchState = SearchState.Default;
+	}
+	
+
+	// travel to correspondent axis of current cardinal point
+	private void travelToAxis(boolean frontwards) {
+		
+		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
+	
+		odo.setMotorSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+		if (frontwards) odo.forwardMotors();
+		else odo.backwardMotors();
+		
+		switch(axis){
+		case "X": 
+			while(odo.getX() < cardinals[currCardinal][0] - Util.CM_TOLERANCE || 
+					odo.getX() > cardinals[currCardinal][0] + Util.CM_TOLERANCE);
+			break;
+		case "Y": 
+			while(odo.getY() < cardinals[currCardinal][1] - Util.CM_TOLERANCE ||
+					odo.getY() > cardinals[currCardinal][1] + Util.CM_TOLERANCE);
+			break;
+		}
+		
+		odo.stopMotors();
+		
+	}
+
 	
 	/**
 	 * 

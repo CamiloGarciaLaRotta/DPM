@@ -25,19 +25,12 @@ public class Capture extends Thread {
 	private static double[] cardinalPoint;
 	
 	// states
-	public enum CaptureState {Grab, Return, Stack, Iddle};
-	public static CaptureState captureState = CaptureState.Iddle;
+	public enum CaptureState {Grab, Return, Stack, Idle};
+	public static CaptureState captureState = CaptureState.Idle;
 
 	private EV3LargeRegulatedMotor clawMotor;
 	
 	private int towerHeight;
-	
-	//TODO TODO TODO TODO
-	// -  when retrieving: return with block to cardinal point
-	//					   turn to face center of GREEN
-	//					   advance till tower
-	//					   drop block
-	//					   set searchState.AtDropZones
 	
 	/**
 	 * Capture Thread Constructor
@@ -59,7 +52,7 @@ public class Capture extends Thread {
 	@Override
 	public void run() {
 		while(true) {
-			if(Main.state == RobotState.Avoiding) Capture.captureState = CaptureState.Iddle;
+			if(Main.state == RobotState.Avoiding) Capture.captureState = CaptureState.Idle;
 			
 			switch(captureState) {
 			case Grab:
@@ -92,9 +85,9 @@ public class Capture extends Thread {
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
 				Search.searchState = SearchState.AtDropZone; //Pass control back to search
-				captureState = CaptureState.Iddle;
+				captureState = CaptureState.Idle;
 				break;
-			case Iddle:
+			case Idle:
 				// iddle state, waiting for avoidance to return
 				try{
 					Thread.sleep(Util.SLEEP_PERIOD);
@@ -118,6 +111,7 @@ public class Capture extends Thread {
 		return (x < width) && (y < height) && x > 0 && y > 0;
 	}
 	
+	// sets the current cardinal point at which the robot is bound to
 	public static void setContext(double[] cardinalPoint) {
 		Capture.cardinalPoint = cardinalPoint;
 	}
