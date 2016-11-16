@@ -7,6 +7,7 @@ import java.util.Comparator;
 import chassis.ColorSensor;
 import chassis.Main;
 import chassis.Main.RobotState;
+import lejos.hardware.Sound;
 import chassis.USSensor;
 import utilities.Avoider.AvoidState;
 import utilities.Capture.CaptureState;
@@ -137,6 +138,7 @@ public class Search extends Thread {
 							}
 							else {
 								Main.forklift.liftUp();
+								odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
@@ -144,7 +146,7 @@ public class Search extends Thread {
 								while(Main.state == RobotState.Avoiding) {
 									try{Thread.sleep(Util.SLEEP_PERIOD);}catch(Exception ex) {}
 								}
-								Avoider.avoidState = AvoidState.Disabled;
+								//Avoider.avoidState = AvoidState.Disabled;
 							}
 						}	
 					}
@@ -157,6 +159,7 @@ public class Search extends Thread {
 					if(this.objectLocations.isEmpty()) {
 						// next cardinal, wrap around
 						currCardinal++; currCardinal %= 4;
+						Sound.beepSequence();
 						
 						// linear set of instructions to reach next cardinal
 						// at this step the robot is ensured to be on the old cardinal point
@@ -270,7 +273,6 @@ public class Search extends Thread {
 		Main.forklift.liftDown();
 		
 		boolean styrofoam = isStyrofoamBlock();
-		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
 		
 		return styrofoam;
 	}
@@ -312,7 +314,7 @@ public class Search extends Thread {
 		odo.stopMotors();
 		
 		// avoid checking for false positves
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.BLOCK_DISTANCE) {
+		if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
 			Main.forklift.liftDown();
 			
 			// inspect object
@@ -321,9 +323,10 @@ public class Search extends Thread {
 				Main.state = Main.RobotState.Capture;
 				Capture.captureState = CaptureState.Grab;
 				Capture.setContext(cardinals[currCardinal]);
+				return;
 			} else {
 				Main.forklift.liftUp();
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
+				odo.moveCM(LINEDIR.Backward, 5, true);
 			}
 		} 
 		
@@ -373,6 +376,8 @@ public class Search extends Thread {
 		if (isObject) {
 			this.objectLocations.add(new double[] {objX,objY,currDistance,currHeading});
 			this.lastDistanceDetected = currDistance;
+			this.lastX = objX;
+			this.lastY = objY;
 		}
 		
 		return isObject;
