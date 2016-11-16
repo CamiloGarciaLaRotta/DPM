@@ -7,6 +7,7 @@ import java.util.Comparator;
 import chassis.ColorSensor;
 import chassis.Main;
 import chassis.Main.RobotState;
+import lejos.hardware.Sound;
 import chassis.USSensor;
 import utilities.Avoider.AvoidState;
 import utilities.Capture.CaptureState;
@@ -157,6 +158,7 @@ public class Search extends Thread {
 					if(this.objectLocations.isEmpty()) {
 						// next cardinal, wrap around
 						currCardinal++; currCardinal %= 4;
+						Sound.beepSequence();
 						
 						// linear set of instructions to reach next cardinal
 						// at this step the robot is ensured to be on the old cardinal point
@@ -274,6 +276,63 @@ public class Search extends Thread {
 		
 		return styrofoam;
 	}
+
+	// travel to correspondent axis of current cardinal point
+	private void travelToAxis(boolean frontwards) {
+		
+		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
+	
+		odo.setMotorSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+		if (frontwards) odo.forwardMotors();
+		else odo.backwardMotors();
+		
+		switch(axis){
+		case "X": 
+			while(odo.getX() < cardinals[currCardinal][0] - Util.CM_TOLERANCE || 
+					odo.getX() > cardinals[currCardinal][0] + Util.CM_TOLERANCE);
+			break;
+		case "Y": 
+			while(odo.getY() < cardinals[currCardinal][1] - Util.CM_TOLERANCE ||
+					odo.getY() > cardinals[currCardinal][1] + Util.CM_TOLERANCE);
+			break;
+		}
+		
+		odo.stopMotors();
+		
+	}
+
+	/**
+	 * When object is in sight, approach slowly and inspect
+	 */
+	private void inspectObject(double X, double Y) {
+		odo.setMotorSpeed(Util.MOTOR_SLOW); 
+		odo.forwardMotors(); 
+		
+		//wait until close enough to determine if it's a styrofoam block
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE &&
+				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
+		odo.stopMotors();
+		
+		// avoid checking for false positves
+		if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
+			Main.forklift.liftDown();
+			
+			// inspect object
+			if(isStyrofoamBlock()) { 
+				searchState = SearchState.Iddle;
+				Main.state = Main.RobotState.Capture;
+				Capture.captureState = CaptureState.Grab;
+				Capture.setContext(cardinals[currCardinal]);
+				return;
+			} else {
+				Main.forklift.liftUp();
+				odo.moveCM(LINEDIR.Backward, 5, true);
+			}
+		} 
+		
+		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+		searchState = SearchState.Default;
+	}
 	
 	/**
 	 * 
@@ -316,6 +375,8 @@ public class Search extends Thread {
 		if (isObject) {
 			this.objectLocations.add(new double[] {objX,objY,currDistance,currHeading});
 			this.lastDistanceDetected = currDistance;
+			this.lastX = objX;
+			this.lastY = objY;
 		}
 		
 		return isObject;
