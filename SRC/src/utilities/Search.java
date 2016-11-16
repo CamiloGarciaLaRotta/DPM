@@ -313,7 +313,6 @@ public class Search extends Thread {
 		
 		// avoid checking for false positves
 		if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.BLOCK_DISTANCE) {
-			
 			Main.forklift.liftDown();
 			
 			// inspect object
@@ -323,6 +322,7 @@ public class Search extends Thread {
 				Capture.captureState = CaptureState.Grab;
 				Capture.setContext(cardinals[currCardinal]);
 			} else {
+				Main.forklift.liftUp();
 				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
 			}
 		} 
