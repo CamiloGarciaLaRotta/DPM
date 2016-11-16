@@ -31,9 +31,9 @@ public class Forklift {
 	}
 
 	public void liftToTower(int towerHeight) { //Move lift to height defined by the current tower height
-		double height = (towerHeight == 0) ? 0.0 : (double) towerHeight * Util.FOAM_HEIGHT + Util.DROP_SPACE;
+		double height = (double) towerHeight * Util.FOAM_HEIGHT;
 		int theta = (int)(((Util.FORKLIFT_HEIGHT - height)/Util.FORKLIFT_ROPE_RADIUS) * 180.0 / Math.PI);
-		forkliftMotor.rotateTo(-theta);
+		forkliftMotor.rotateTo(theta);
 	}
 	
 	public void toggleGrip() {
