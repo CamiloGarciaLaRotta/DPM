@@ -75,6 +75,8 @@ public class Capture extends Thread {
 				if(towerHeight == 0){
 					nav.travelTo(towerPosition[0], towerPosition[1]);
 					captureState = CaptureState.Stack;
+					odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);
+
 					break;
 				}
 				double targetHeading = Math.atan2(-odo.getY() + towerPosition[1],-odo.getX() + towerPosition[0]);
@@ -87,7 +89,6 @@ public class Capture extends Thread {
 				break;
 			case Stack:
 				//TODO: Make sure tower is in range
-				odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);
 				Main.forklift.liftToTower(towerHeight++);
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
