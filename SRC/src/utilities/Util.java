@@ -15,6 +15,7 @@ public class Util {
 	public static final double ZONE_THRESHOLD		= 1.0;	//Error margin (in cm) for position at the green/red zone
 	
 	// blocks
+	public static final double[] FOAM_RGB_VECTOR	= {0.4101, 0.5421, 0.7334}; //RGB normalized in lab lighting
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
 	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks
 	public static final double WOOD_MIN_WIDTH		= 20.0;	//minimum distance to travel to avoid wooden block
