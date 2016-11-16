@@ -10,7 +10,6 @@ import chassis.Main.RobotState;
 import chassis.USSensor;
 import utilities.Avoider.AvoidState;
 import utilities.Capture.CaptureState;
-import utilities.Odometer.LINEDIR;
 import utilities.Odometer.TURNDIR;
 
 /**
@@ -65,27 +64,11 @@ public class Search extends Thread {
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
 		double midY = (GREEN[0][1] + GREEN[1][1]) / 2;
 		
-		double diffX = GREEN[1][0] - GREEN[0][0];
-		double diffY = GREEN[1][1] - GREEN[0][1];
-		
-		double paddingX = 0;
-		double paddingY = 0;
-		
-		// make cardinal point further from the tower position
-		if (diffX == diffY) {
-			paddingX = Util.ROBOT_LENGTH;
-			paddingY = Util.ROBOT_LENGTH;
-		} else if (diffX > diffY) {
-			paddingY = Util.ROBOT_LENGTH;
-		} else {
-			paddingX = Util.ROBOT_LENGTH;
-		}
-		
 		// cardinal search points
-		this.S = new double[] {midX, GREEN[0][1]-paddingY};
-		this.N = new double[] {midX, GREEN[1][1]+paddingY};
-		this.W = new double[] {GREEN[0][0]-paddingX, midY};
-		this.E = new double[] {GREEN[1][0]+paddingX, midY};
+		this.S = new double[] {midX, GREEN[0][1]};
+		this.N = new double[] {midX, GREEN[1][1]};
+		this.W = new double[] {GREEN[0][0], midY};
+		this.E = new double[] {GREEN[1][0], midY};
 		
 		this.cardinals = new double[][] {N,W,S,E};
 		
@@ -103,7 +86,9 @@ public class Search extends Thread {
 			//check if interrupted
 			if(Thread.interrupted()) return;
 			//wait for localization to finish
-			try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
+			try {
+				Thread.sleep(300);
+			} catch (Exception e) {}
 		}
 		
 		isStyrofoamBlock(); //Initialize rgb mode
@@ -140,9 +125,13 @@ public class Search extends Thread {
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
-								try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
 								while(Main.state == RobotState.Avoiding) {
-									try{Thread.sleep(Util.SLEEP_PERIOD);}catch(Exception ex) {}
+									try{ Thread.sleep(500); }catch(Exception ex) {}
 								}
 								Avoider.avoidState = AvoidState.Disabled;
 							}
@@ -194,10 +183,13 @@ public class Search extends Thread {
 				odo.spin(TURNDIR.CCW);
 				double targetAngle = startAngle + Math.PI;
 				while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetAngle)) > Util.SCAN_THETA_THRESHOLD) {
-					testForObject();
-					// resume scatter search
-					odo.setMotorSpeed(Util.MOTOR_SLOW);
-					odo.spin(TURNDIR.CCW);
+					// test for object
+					//if (testForObject()) {
+						testForObject();
+						// resume scatter search
+						odo.setMotorSpeed(Util.MOTOR_SLOW);
+						odo.spin(TURNDIR.CCW);
+					//}
 				}
 				
 				odo.stopMotors();
@@ -221,9 +213,7 @@ public class Search extends Thread {
 			case AtDropZone:
 				
 				// back off until  to avoid colliding with tower
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
-				
-				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+				travelToAxis(false);
 				
 				searchState = SearchState.Default;
 				
@@ -254,13 +244,15 @@ public class Search extends Thread {
 			case Iddle:
 			
 				// iddle state, waiting for capture or avoider to return
-				try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
+				try{
+					Thread.sleep(Util.SLEEP_PERIOD);
+				} catch(Exception e) {}
 				break;
 			}
 		}
 		
 	}
-
+	
 	// approach an object to verify its nature
 	private boolean testForStyrofoam() {
 		odo.setMotorSpeed(Util.MOTOR_SLOW);
@@ -307,28 +299,40 @@ public class Search extends Thread {
 		odo.forwardMotors(); 
 		
 		//wait until close enough to determine if it's a styrofoam block
-		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE &&
+		while(usSensor.getMedianSample(Util.US_SAMPLES) > Util.BLOCK_DISTANCE ||
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
+		Main.forklift.liftDown();
 		
-		// avoid checking for false positves
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.BLOCK_DISTANCE) {
-			
-			Main.forklift.liftDown();
-			
-			// inspect object
-			if(isStyrofoamBlock()) { 
-				searchState = SearchState.Iddle;
-				Main.state = Main.RobotState.Capture;
-				Capture.captureState = CaptureState.Grab;
-				Capture.setContext(cardinals[currCardinal]);
-			} else {
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
+		// inspect object
+		if(isStyrofoamBlock()) { 
+			searchState = SearchState.Iddle;
+			Main.state = Main.RobotState.Capture;
+			Capture.captureState = CaptureState.Grab;
+			Capture.setContext(cardinals[currCardinal]);
+		} else {
+			// back-off a little to avoid hitting the block while turning
+			odo.setMotorSpeed(Util.MOTOR_SLOW);
+			odo.backwardMotors();
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		} 
-		
-		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
-		searchState = SearchState.Default;
+			
+			// return to cardinal point and inspect next object
+			nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+			searchState = SearchState.Default;
+		}	
+	}
+
+	/**
+	 * 
+	 * @return if the detected object is a styrofoam block
+	 */
+	//TODO use complete RGB vector to compare
+	private boolean isStyrofoamBlock() {
+		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
 	/**
@@ -376,15 +380,6 @@ public class Search extends Thread {
 		}
 		
 		return isObject;
-	}
-	
-	/**
-	 * 
-	 * @return if the detected object is a styrofoam block
-	 */
-	//TODO use complete RGB vector to compare
-	private boolean isStyrofoamBlock() {
-		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
 	/**
