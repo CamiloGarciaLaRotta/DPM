@@ -180,6 +180,7 @@ public class Main {
 			Test.NavigationTest(odo, new double[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		case SearchTest:
+			avoid.start();
 			search.start();
 			capture.start();
 			state = RobotState.Search;
