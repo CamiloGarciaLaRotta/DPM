@@ -10,6 +10,7 @@ import chassis.Main.RobotState;
 import chassis.USSensor;
 import utilities.Avoider.AvoidState;
 import utilities.Capture.CaptureState;
+import utilities.Odometer.LINEDIR;
 import utilities.Odometer.TURNDIR;
 
 /**
@@ -220,7 +221,7 @@ public class Search extends Thread {
 			case AtDropZone:
 				
 				// back off until  to avoid colliding with tower
-				backOff();
+				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
 				
 				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 				
@@ -258,17 +259,6 @@ public class Search extends Thread {
 			}
 		}
 		
-	}
-	
-	private void backOff() {
-		odo.setMotorSpeed(Util.MOTOR_SLOW);
-		odo.backwardMotors();
-		try {
-			Thread.sleep(Util.SLEEP_PERIOD);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		odo.stopMotors();
 	}
 
 	// approach an object to verify its nature
@@ -333,21 +323,12 @@ public class Search extends Thread {
 				Capture.captureState = CaptureState.Grab;
 				Capture.setContext(cardinals[currCardinal]);
 			} else {
-				backOff();
+				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
 			}
 		} 
 		
 		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 		searchState = SearchState.Default;
-	}
-
-	/**
-	 * 
-	 * @return if the detected object is a styrofoam block
-	 */
-	//TODO use complete RGB vector to compare
-	private boolean isStyrofoamBlock() {
-		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
 	/**
@@ -395,6 +376,15 @@ public class Search extends Thread {
 		}
 		
 		return isObject;
+	}
+	
+	/**
+	 * 
+	 * @return if the detected object is a styrofoam block
+	 */
+	//TODO use complete RGB vector to compare
+	private boolean isStyrofoamBlock() {
+		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
 	/**
