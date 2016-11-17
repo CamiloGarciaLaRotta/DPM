@@ -138,6 +138,7 @@ public class Search extends Thread {
 							}
 							else {
 								Main.forklift.liftUp();
+								odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
@@ -145,7 +146,7 @@ public class Search extends Thread {
 								while(Main.state == RobotState.Avoiding) {
 									try{Thread.sleep(Util.SLEEP_PERIOD);}catch(Exception ex) {}
 								}
-								Avoider.avoidState = AvoidState.Disabled;
+								//Avoider.avoidState = AvoidState.Disabled;
 							}
 						}	
 					}
@@ -272,11 +273,9 @@ public class Search extends Thread {
 		Main.forklift.liftDown();
 		
 		boolean styrofoam = isStyrofoamBlock();
-		if(!styrofoam) odo.moveCM(Odometer.LINEDIR.Backward,Util.BACKUP_DISTANCE,true);
 		
 		return styrofoam;
 	}
-	
 	/**
 	 * 
 	 * @return if there is an object that can be detected by the robot

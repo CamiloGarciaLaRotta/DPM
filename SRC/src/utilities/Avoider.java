@@ -92,6 +92,11 @@ public class Avoider extends Thread{
 					
 					// no more obstacle ahead, advance a bit before returning control to Search
 					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+					if(lastCaptureState != CaptureState.Iddle) Main.state = RobotState.Capture;
+					else Main.state = RobotState.Search;
+					Capture.captureState = lastCaptureState;
+					Search.searchState = lastSearchState;
+					avoidState = AvoidState.Disabled;
 				//}
 			}
 			
