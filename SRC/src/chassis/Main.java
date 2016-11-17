@@ -2,6 +2,8 @@ package chassis;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
@@ -15,10 +17,12 @@ import utilities.Capture;
 import utilities.Navigation;
 import utilities.Odometer;
 import utilities.Search;
+import utilities.Search.SearchState;
 import utilities.Test;
 import utilities.ThreadEnder;
 import utilities.USLocalizer;
 import utilities.Util;
+import utilities.Capture.CaptureState;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
@@ -55,13 +59,14 @@ public class Main {
 	public static DemoState demo = DemoState.Default;
 	public static RobotTask task;
 	public static int startingCorner;
+	public static double[] startingCornerCoord = new double[3];
 	public static double[][] GREEN;
 	public static double[][] RED;
 	
 	/**
 	 * Current action the robot is doing
 	 */
-	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
+	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding, Finished};
 	/**
 	 * 
 	 * @author juliette
@@ -86,7 +91,7 @@ public class Main {
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
-		Navigation nav = new Navigation(odo);
+		final Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
@@ -205,16 +210,28 @@ public class Main {
 		default:
 			System.exit(-1);
 		}
-		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
 		
-		//TODO if setting interrupt flag doesn't stop Threads,
-		//	   add while(!Thread.interrupted()) at the 
-		//	   beggining of each Thread's run() method
+		Timer timer = new Timer();
+		
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Main.state = RobotState.Finished;
+				Search.searchState = SearchState.Idle;
+				Capture.captureState = CaptureState.Idle;
+				nav.travelTo(startingCornerCoord[0], startingCornerCoord[1]);
+			}	  
+		}, 5*60*1000);
+		
+		//wait for escape key to end program
+		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	
+		
 		odo.interrupt();
 		search.interrupt();
 		avoid.interrupt();
 		capture.interrupt();
 		localizer.interrupt();
+		
 		System.exit(0);
 	}
 	
@@ -266,6 +283,25 @@ public class Main {
 				startingCorner = transmission.get("BSC");
 			} else {
 				startingCorner = transmission.get("CSC");
+			}
+			
+			// store starting corner coordinates
+			switch (Main.startingCorner) {
+			case 2:
+				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = Math.PI;
+					break;
+			case 3:
+				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[2] = 3/4*Math.PI;
+					break;
+			case 4:
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[2] = 0;
+					break;
 			}
 			
 			//Get zone coordinates

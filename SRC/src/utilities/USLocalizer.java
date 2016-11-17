@@ -118,17 +118,7 @@ public class USLocalizer extends Thread {
 		Sound.beepSequenceUp();
 		
 		// adjust coordinates and heading depending on the starting corner
-		switch (Main.startingCorner) {
-		case 2:
-			odo.setPosition(new double [] {10*Util.SQUARE_LENGTH,0,Math.PI}, Util.UPDATE_ALL);
-			break;
-		case 3:
-			odo.setPosition(new double [] {10*Util.SQUARE_LENGTH,10*Util.SQUARE_LENGTH,3/4*Math.PI}, Util.UPDATE_ALL);
-			break;
-		case 4:
-			odo.setPosition(new double [] {0,10*Util.SQUARE_LENGTH,0}, Util.UPDATE_ALL);
-			break;
-		}
+		odo.setPosition(new double [] {Main.startingCornerCoord[0], Main.startingCornerCoord[1], Main.startingCornerCoord[2]}, Util.UPDATE_ALL);
 		
 		//slight pause to show localization is complete
 		try {
