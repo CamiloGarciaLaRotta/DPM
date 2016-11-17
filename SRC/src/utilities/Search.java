@@ -336,8 +336,31 @@ public class Search extends Thread {
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		
-		// avoid checking for false positives
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < 1.5*Util.BLOCK_DISTANCE) {
+		// avoid checking for false positves
+		if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
+			double minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+			double minHeading = odo.getTheta();
+			double ccwHeading = odo.getTheta() + Util.SEARCH_FOV/2;
+			double cwHeading = odo.getTheta() - Util.SEARCH_FOV/2;
+			odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+			odo.spin(Odometer.TURNDIR.CCW);
+			while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) < Util.SCAN_THETA_THRESHOLD) {
+				if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
+					minHeading = odo.getTheta();
+					minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+				}
+			}
+			odo.stopMotors();
+			odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+			odo.spin(Odometer.TURNDIR.CW);
+			while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) < Util.SCAN_THETA_THRESHOLD) {
+				if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
+					minHeading = odo.getTheta();
+					minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+				}
+			}
+			nav.turnTo(minHeading, true);
+			odo.moveCM(Odometer.LINEDIR.Backward, Util.BLOCK_DISTANCE - minDistance, true);
 			Main.forklift.liftDown();
 			
 			// inspect object
