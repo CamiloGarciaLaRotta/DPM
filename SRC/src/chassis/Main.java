@@ -211,8 +211,8 @@ public class Main {
 			System.exit(-1);
 		}
 		
+		// 5 minute timer
 		Timer timer = new Timer();
-		
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -287,6 +287,11 @@ public class Main {
 			
 			// store starting corner coordinates
 			switch (Main.startingCorner) {
+			case 1:
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = Math.PI/2;
+					break;
 			case 2:
 				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
 				startingCornerCoord[1] = 0;
