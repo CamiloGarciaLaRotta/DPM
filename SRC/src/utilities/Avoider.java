@@ -225,6 +225,6 @@ public class Avoider extends Thread{
 		double[] pos = new double[3];
 		odo.getPosition(pos);
 		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path
-		nav.turnBy(-1*coeff*90);
+		nav.turnBy(-1*coeff*Math.PI/2);
 	}
 }

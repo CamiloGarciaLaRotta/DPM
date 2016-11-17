@@ -112,7 +112,7 @@ public class Navigation {
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
-			if(Main.usSensor.getFilteredDataBasic() < 10) {
+			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
 				Sound.beepSequence();
 				break;
