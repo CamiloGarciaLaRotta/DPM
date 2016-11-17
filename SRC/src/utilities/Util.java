@@ -47,7 +47,7 @@ public class Util {
 	 *         +WIDTH+
 	 */
 	
-	public static final int ROBOT_WIDTH				= 20;	//width (in cm) of collision rectangle around robot
+	public static final int ROBOT_WIDTH				= 25;	//width (in cm) of collision rectangle around robot
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
