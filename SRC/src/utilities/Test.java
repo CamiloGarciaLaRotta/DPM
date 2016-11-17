@@ -161,7 +161,7 @@ public class Test {
 		}while(option != Button.ID_ESCAPE);
 	}
 	
-	/*public static void AvoidanceTest(Odometer odometer) {
+	public static void FullAvoidanceTest(Odometer odometer) {
 		//set up
 		Navigation nav = new Navigation(odometer);
 		Main.lcd.setLine1("Put robot at origin");
@@ -174,6 +174,7 @@ public class Test {
 		
 		Main.lcd.setLine1("Will now treat next zone as RED");
 		Main.lcd.setLine2("Press a button");
+		Button.waitForAnyPress();
 		
 		//Red zone
 		Main.RED = new double[][] {{odometer.getX() + 20, odometer.getY() - 20}, {odometer.getX() + 50, odometer.getY() + 20}};
@@ -181,6 +182,7 @@ public class Test {
 		
 		Main.lcd.setLine1("Will attempt to go to corner");
 		Main.lcd.setLine2("Should actually go to green zone");
+		Button.waitForAnyPress();
 		
 		//Corner
 		StartCorner corner = StartCorner.BOTTOM_LEFT;
@@ -188,7 +190,7 @@ public class Test {
 		
 		Main.lcd.setLine1("Record results for all tests then exit");
 		
-	}*/
+	}
 	
 	public static void AvoidanceTest(Odometer odo) {
 		Navigation nav = new Navigation(odo);
