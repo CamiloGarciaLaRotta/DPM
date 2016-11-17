@@ -13,6 +13,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
 import utilities.Avoider;
+import utilities.Avoider.AvoidState;
 import utilities.Capture;
 import utilities.Navigation;
 import utilities.Odometer;
@@ -97,36 +98,6 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		forklift = new Forklift(forkliftMotor,clawMotor);
 		
-		// Default values for these - could be changed by wifi if enabled
-		GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
-		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
-				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
-		startingCorner = 1;
-		task = RobotTask.Builder;
-		
-		if(Util.USE_WIFI) {
-			GREEN = new double[2][2];
-			RED = new double[2][2];
-			HashMap<String, Integer> parameters = null;
-			try {
-				parameters = wifiConnect();
-			} catch (IOException e) {	//failed to connect to wifi
-				System.err.println(e);
-				System.exit(-1);
-			}
-			if(parameters != null) {
-				transmissionParse(parameters);
-			}
-		} else {	//default parameters
-			GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-				{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
-			RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
-					{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
-			startingCorner = 1;
-			task = RobotTask.Builder;
-		}
-		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
@@ -159,14 +130,27 @@ public class Main {
 					Sound.beepSequenceUp();
 				}
 			} else {	//default parameters
-
+				// Default values for these - could be changed by wifi if enabled
+				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+					{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+				
+				startingCorner = 1;
+				task = RobotTask.Builder;
+				
+				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[2] = 3/4*Math.PI;
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
 			lcd.resume();
+			state = RobotState.Localization;
 			localizer.doLocalization();
-			search.start();
+			state = Main.RobotState.Search;
 			avoid.start();
 			capture.start();
+			search.start();
 			break;
 			
 		// Tests need to be verified in this order, 
@@ -211,17 +195,18 @@ public class Main {
 			System.exit(-1);
 		}
 		
-		// 5 minute timer
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				Main.state = RobotState.Finished;
-				Search.searchState = SearchState.Idle;
-				Capture.captureState = CaptureState.Idle;
-				nav.travelTo(startingCornerCoord[0], startingCornerCoord[1]);
-			}	  
-		}, 5*60*1000);
+//		// 5 minute timer
+//		Timer timer = new Timer();
+//		timer.schedule(new TimerTask() {
+//			@Override
+//			public void run() {
+//				Main.state = RobotState.Finished;
+//				Search.searchState = SearchState.Idle;
+//				Capture.captureState = CaptureState.Idle;
+//				Avoider.avoidState = AvoidState.Enabled;
+//				nav.travelTo(startingCornerCoord[0], startingCornerCoord[1]);
+//			}	  
+//		}, 5*60*1000);
 		
 		//wait for escape key to end program
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	

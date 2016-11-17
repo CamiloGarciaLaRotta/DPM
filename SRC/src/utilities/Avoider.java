@@ -93,45 +93,44 @@ public class Avoider extends Thread{
 			
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
-				Main.state = RobotState.Avoiding;
+				if(Main.state != RobotState.Finished) Main.state = RobotState.Avoiding;
 				
-				// check for physical obstacles
-				//if(distance < Util.AVOID_DISTANCE){
-					odo.stopMotors();
-					
-					do{
-						linearAvoidance(CCW);
-					} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
-					
-					// no more obstacle ahead, advance a bit before returning control to Search
-					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+				odo.stopMotors();
+				
+				do{
+					linearAvoidance(CCW);
+				} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
+				
+				// no more obstacle ahead, advance a bit before returning control to Search
+				odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+
+				if(Main.state != RobotState.Finished) {
 					if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
 					else Main.state = RobotState.Search;
 					Capture.captureState = lastCaptureState;
 					Search.searchState = lastSearchState;
 					avoidState = AvoidState.Disabled;
-				//}
+				}
 			}
 			
 			// check for RED zone
 			if(RED.contains(currRect)){
-				Main.state = RobotState.Avoiding;
 				odo.stopMotors();
-				// determine in which thread the robot was acting 
-				if(Capture.captureState != CaptureState.Idle){
-					Capture.captureState = CaptureState.Idle;
-				} else {
-					Search.searchState = SearchState.Idle; 
+				if(Main.state != RobotState.Finished) { 
+					Main.state = RobotState.Avoiding;
+					// determine in which thread the robot was acting 
+					if(Capture.captureState != CaptureState.Idle){
+						Capture.captureState = CaptureState.Idle;
+					} else {
+						Search.searchState = SearchState.Idle; 
+					}
 				}
 				redAvoidance();	
-				do{
-										
-				} while (RED.contains(currRect));
 			}
 			
 			// check for corners zones
-			if(Search.searchState != SearchState.Default && (x1.contains(currRect) || x2.contains(currRect) ||
-				x3.contains(currRect) || x4.contains(currRect))){
+			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
+					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
 				// return to GREEN, nothing to do in a corner
 				Search.searchState = SearchState.Default;
 				Main.state = RobotState.Search;
@@ -139,13 +138,15 @@ public class Avoider extends Thread{
 				continue;
 			}
 			
-			if(lastCaptureState != CaptureState.Idle) {
-				Main.state = RobotState.Capture;
-				Capture.captureState = lastCaptureState;
-			}
-			else {
-				Main.state = RobotState.Search;
-				Search.searchState = lastSearchState;
+			if(Main.state != RobotState.Finished) {
+				if(lastCaptureState != CaptureState.Idle) {
+					Main.state = RobotState.Capture;
+					Capture.captureState = lastCaptureState;
+				}
+				else {
+					Main.state = RobotState.Search;
+					Search.searchState = lastSearchState;
+				}
 			}
 			
 			
