@@ -24,6 +24,8 @@ public class Avoider extends Thread{
 	// coordinates
 	private double[] currPos = new double[3];
 	private Rectangle RED;
+	private double RED_N, RED_S, RED_W, RED_E;
+	private double[] red_cardinals = new double[4];
 	private Rectangle currRect = new Rectangle();
 	
 	// corners
@@ -54,10 +56,21 @@ public class Avoider extends Thread{
 	public Avoider(Odometer odo, Navigation nav, USSensor usSensor, double[][] RED) {
 		this.odo = odo;
 		this.nav = nav;
-		this.usSensor = usSensor;
-		int red_width = (int)(RED[1][0] - RED[0][0]); 
-		int red_height = (int)(RED[1][1] - RED[0][1]);	
-		this.RED = new Rectangle((int)(RED[0][0]*40), (int)(RED[1][1]*40), red_width*40, red_height*40);
+		this.usSensor = usSensor;	
+		
+		// X, Y axis which mark the borders of the RED zone
+		this.RED_N = RED[1][1];
+		this.RED_S = RED[0][1];
+		this.RED_W = RED[0][0];
+		this.RED_E = RED[1][0];
+		
+		this.red_cardinals = new double[] {RED_N,RED_W,RED_S,RED_E};
+		
+		int red_width = (int)(this.RED_E - this.RED_W); 
+		int red_height = (int)(this.RED_N - this.RED_S);
+		
+		// RED awt.rectangle
+		this.RED = new Rectangle((int)(this.RED_W*40), (int)(this.RED_N*40), red_width*40, red_height*40);
 	}
 
 	/**
@@ -117,8 +130,8 @@ public class Avoider extends Thread{
 			}
 			
 			// check for corners zones
-			if(x1.contains(currRect) || x2.contains(currRect) ||
-				x3.contains(currRect) || x4.contains(currRect)){
+			if(Search.searchState != SearchState.Default && (x1.contains(currRect) || x2.contains(currRect) ||
+				x3.contains(currRect) || x4.contains(currRect))){
 				// return to GREEN, nothing to do in a corner
 				Search.searchState = SearchState.Default;
 				Main.state = RobotState.Search;
@@ -149,10 +162,34 @@ public class Avoider extends Thread{
 	private void redAvoidance() {
 		double currX = this.currPos[0];
 		double currY = this.currPos[1];
-		double Heading = this.currPos[2];
 		
-		//TODO
+		int currCardinal = 0;
+		double distanceToNextAxis = 0;
 		
+		// TODO HANDLE SPECIAL CASE -> WHAT IF ROBOT ARRIVES AT CORNER
+		
+		// identify which side of RED zone we are facing
+		if(currY < this.RED_N+5 && currY > this.RED_N-5){
+			currCardinal = 0;
+		} else if(currX < this.RED_W+5 && currX > this.RED_W-5){
+			currCardinal = 1;
+		} else if(currY < this.RED_S+5 && currX > this.RED_S-5){
+			currCardinal = 2;
+		} else if(currX < this.RED_E+5 && currX > this.RED_E-5){
+			currCardinal = 3;
+		}
+		
+		// go around it (by default CCW)
+		for(int i = 0; i < 2; i++){
+			currCardinal++; currCardinal %= 4;
+			nav.turnTo(currCardinal*Math.PI/2 + Math.PI/2, true);
+			distanceToNextAxis = (currCardinal % 2 == 0) ? Math.abs(currY-red_cardinals[currCardinal]) :
+															Math.abs(currX-red_cardinals[currCardinal]);
+			odo.moveCM(LINEDIR.Forward, distanceToNextAxis , true);
+		}	
+		
+		// face away from the RED zone
+		nav.turnTo(currCardinal*Math.PI/2, true);
 	}
 
 	/**
@@ -188,7 +225,7 @@ public class Avoider extends Thread{
 	 */
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
-		nav.turnBy(coeff*90);
+		nav.turnBy(coeff*Math.PI/2);
 		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * Util.WOOD_MIN_WIDTH, odo.getY() + Math.sin(odo.getTheta()) * Util.WOOD_MIN_WIDTH);
 		double[] pos = new double[3];
 		odo.getPosition(pos);

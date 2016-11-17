@@ -4,6 +4,7 @@ import chassis.ColorSensor;
 import chassis.LCDInfo;
 import chassis.Main;
 import chassis.USSensor;
+import wifi.StartCorner;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 
@@ -87,7 +88,7 @@ public class Test {
 	 * @param points Waypoints
 	 * @param stop Stop robot at each point to measure error
 	 */
-	public static void NavigationTest(Odometer odo, int[][] points, boolean stop) {
+	public static void NavigationTest(Odometer odo, double[][] points, boolean stop) {
 		Navigation nav = new Navigation(odo);
 
 		for(int i = 0; i < points.length; i++) {
@@ -170,6 +171,35 @@ public class Test {
 				break;
 			}
 		}while(option != Button.ID_ESCAPE);
+	}
+	
+	public static void AvoidanceTest(Odometer odometer) {
+		//set up
+		Navigation nav = new Navigation(odometer);
+		Main.lcd.setLine1("Put robot at origin");
+		Main.lcd.setLine2("Place obstacle directly ahead");
+		Button.waitForAnyPress();
+		odometer.setPosition(new double[] {0, 0, Math.PI/2}, new boolean[] {true, true, true});
+		
+		//obstacle avoidance
+		nav.travelTo(0, 60);	//should cross paths with block
+		
+		Main.lcd.setLine1("Will now treat next zone as RED");
+		Main.lcd.setLine2("Press a button");
+		
+		//Red zone
+		Main.RED = new double[][] {{odometer.getX() + 20, odometer.getY() - 20}, {odometer.getX() + 50, odometer.getY() + 20}};
+		nav.travelTo(70, 60);
+		
+		Main.lcd.setLine1("Will attempt to go to corner");
+		Main.lcd.setLine2("Should actually go to green zone");
+		
+		//Corner
+		StartCorner corner = StartCorner.BOTTOM_LEFT;
+		nav.travelTo(corner.getX(), corner.getY());
+		
+		Main.lcd.setLine1("Record results for all tests then exit");
+		
 	}
 	
 }

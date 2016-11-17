@@ -142,7 +142,7 @@ public class Search extends Thread {
 								Avoider.avoidState = AvoidState.Enabled;
 								// wait for avoider to finish
 								//avoid race condition
-								try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
+								try {Thread.sleep(2*Util.SLEEP_PERIOD);} catch (Exception ex) {}
 								while(Main.state == RobotState.Avoiding) {
 									try{Thread.sleep(Util.SLEEP_PERIOD);}catch(Exception ex) {}
 								}
