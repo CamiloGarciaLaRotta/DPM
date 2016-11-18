@@ -27,7 +27,7 @@ public class Search extends Thread {
 	private Odometer odo;	
 	private Navigation nav;
 	private USSensor usSensor;
-	private ColorSensor colorSensor;
+	private static ColorSensor colorSensor;
 	
 	// Coordinates
 	private double[] N = new double[2];
@@ -73,6 +73,7 @@ public class Search extends Thread {
 		double paddingY = 0;
 		
 		// make cardinal point further from the tower position
+		// TODO handle no padding when too close to wall
 //		if (diffX == diffY) {
 //			paddingX = Util.ROBOT_LENGTH;
 //			paddingY = Util.ROBOT_LENGTH;
@@ -337,7 +338,7 @@ public class Search extends Thread {
 		odo.stopMotors();
 		
 		// avoid checking for false positves
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
+		//if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
 			double minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
 			double minHeading = odo.getTheta();
 			double ccwHeading = odo.getTheta() + Util.SEARCH_FOV/2;
@@ -374,7 +375,7 @@ public class Search extends Thread {
 				Main.forklift.liftUp();
 				odo.moveCM(LINEDIR.Backward, 5, true);
 			}
-		} 
+		//} 
 		
 		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 		searchState = SearchState.Default;
@@ -410,24 +411,7 @@ public class Search extends Thread {
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
-		boolean isStyrofoam;
-		
-		float[] measuredRGB = Main.colorSensor.getColor();
-		//get unit vector
-		double magnitude = Math.sqrt(
-				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
-		double[] normRGB = new double[3];
-		normRGB[0] = (double)measuredRGB[0]/magnitude;
-		normRGB[1] = (double)measuredRGB[1]/magnitude;
-		normRGB[2] = (double)measuredRGB[2]/magnitude;
-		
-		//compare measurement to standard for styrofoam block
-		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
-			isStyrofoam = true;
-		} else {
-			isStyrofoam = false;
-		}
-		return isStyrofoam;
+		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 	}
 	
 	/**

@@ -113,41 +113,41 @@ public class Avoider extends Thread{
 				}
 			}
 			
-			// check for RED zone
-			if(RED.contains(currRect)){
-				odo.stopMotors();
-				if(Main.state != RobotState.Finished) { 
-					Main.state = RobotState.Avoiding;
-					// determine in which thread the robot was acting 
-					if(Capture.captureState != CaptureState.Idle){
-						Capture.captureState = CaptureState.Idle;
-					} else {
-						Search.searchState = SearchState.Idle; 
-					}
-				}
-				redAvoidance();	
-			}
-			
-			// check for corners zones
-			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
-					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
-				// return to GREEN, nothing to do in a corner
-				Search.searchState = SearchState.Default;
-				Main.state = RobotState.Search;
-				Capture.captureState = CaptureState.Idle;
-				continue;
-			}
-			
-			if(Main.state != RobotState.Finished) {
-				if(lastCaptureState != CaptureState.Idle) {
-					Main.state = RobotState.Capture;
-					Capture.captureState = lastCaptureState;
-				}
-				else {
-					Main.state = RobotState.Search;
-					Search.searchState = lastSearchState;
-				}
-			}
+//			// check for RED zone
+//			if(RED.contains(currRect)){
+//				odo.stopMotors();
+//				if(Main.state != RobotState.Finished) { 
+//					Main.state = RobotState.Avoiding;
+//					// determine in which thread the robot was acting 
+//					if(Capture.captureState != CaptureState.Idle){
+//						Capture.captureState = CaptureState.Idle;
+//					} else {
+//						Search.searchState = SearchState.Idle; 
+//					}
+//				}
+//				redAvoidance();	
+//			}
+//			
+//			// check for corners zones
+//			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
+//					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
+//				// return to GREEN, nothing to do in a corner
+//				Search.searchState = SearchState.Default;
+//				Main.state = RobotState.Search;
+//				Capture.captureState = CaptureState.Idle;
+//				continue;
+//			}
+//			
+//			if(Main.state != RobotState.Finished) {
+//				if(lastCaptureState != CaptureState.Idle) {
+//					Main.state = RobotState.Capture;
+//					Capture.captureState = lastCaptureState;
+//				}
+//				else {
+//					Main.state = RobotState.Search;
+//					Search.searchState = lastSearchState;
+//				}
+//			}
 			
 			
 			// lower stress on CPU

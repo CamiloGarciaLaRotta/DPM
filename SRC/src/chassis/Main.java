@@ -100,17 +100,17 @@ public class Main {
 		
 		
 		// Default values for these - could be changed by wifi if enabled
-		GREEN = new double[][]{{7*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-			{9*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+		GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 		
 		startingCorner = 1;
 		task = RobotTask.Builder;
 		
-		startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
-		startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
-		startingCornerCoord[2] = Math.PI;
+		startingCornerCoord[0] = 0;
+		startingCornerCoord[1] = 0;
+		startingCornerCoord[2] = (Math.PI/2.0);
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, GREEN);
@@ -145,17 +145,17 @@ public class Main {
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{7*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-					{9*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+					{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 				
-				startingCorner = 2;
+				startingCorner = 1;
 				task = RobotTask.Builder;
 				
-				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
-				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
-				startingCornerCoord[2] = Math.PI;
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = (Math.PI/2.0);
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
 			lcd.resume();
