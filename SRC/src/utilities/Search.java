@@ -128,9 +128,10 @@ public class Search extends Thread {
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
 									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
 						
-						double cardinalHeading = Math.atan2(odo.getY() - cardinals[currCardinal][1], odo.getX() - cardinals[currCardinal][0]);
-						double targetHeading = cardinalHeading + 5.0 * Math.PI / 180.0;
-						odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+						double cardinalHeading = Math.atan2(cardinals[currCardinal][1] - odo.getY(), cardinals[currCardinal][0] - odo.getX());
+						double targetHeading = cardinalHeading ;//+ 5.0 * Math.PI / 180.0;
+
+						odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
 						odo.spin(Odometer.TURNDIR.CW);
 						double minHeading = odo.getTheta();
 						double minDistance = Main.usSensor.getMedianSample(Util.US_SAMPLES);
@@ -142,8 +143,16 @@ public class Search extends Thread {
 							}
 						}
 						odo.stopMotors();
-						if(minDistance < Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, cardinals[currCardinal]))
+						//just to make sure we get the last heading
+						if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+							minDistance = distance;
+							minHeading = odo.getTheta();
+						}
+						
+						if(minDistance < Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, cardinals[currCardinal])) {
+							Sound.twoBeeps();
 							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
+						}
 						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						// verify if navigation was interrupted
