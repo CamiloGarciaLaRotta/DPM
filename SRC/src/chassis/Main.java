@@ -98,6 +98,20 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		forklift = new Forklift(forkliftMotor,clawMotor);
 		
+		
+		// Default values for these - could be changed by wifi if enabled
+		GREEN = new double[][]{{7*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+			{9*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+		
+		startingCorner = 1;
+		task = RobotTask.Builder;
+		
+		startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+		startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+		startingCornerCoord[2] = Math.PI;
+		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
@@ -131,23 +145,27 @@ public class Main {
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-					{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+				GREEN = new double[][]{{7*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
+					{9*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
 				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 				
-				startingCorner = 1;
+				startingCorner = 2;
 				task = RobotTask.Builder;
 				
 				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
 				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
-				startingCornerCoord[2] = 3/4*Math.PI;
+				startingCornerCoord[2] = Math.PI;
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
 			lcd.resume();
 			state = RobotState.Localization;
 			localizer.doLocalization();
-			state = Main.RobotState.Search;
+			while(state != RobotState.Search){try {
+				Thread.sleep(Util.SLEEP_PERIOD);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}}
 			avoid.start();
 			capture.start();
 			search.start();
@@ -275,7 +293,7 @@ public class Main {
 			case 1:
 				startingCornerCoord[0] = 0;
 				startingCornerCoord[1] = 0;
-				startingCornerCoord[2] = Math.PI/2;
+				startingCornerCoord[2] = (Math.PI/2.0);
 					break;
 			case 2:
 				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
@@ -285,7 +303,7 @@ public class Main {
 			case 3:
 				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
 				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
-				startingCornerCoord[2] = 3/4*Math.PI;
+				startingCornerCoord[2] = (3.0/2.0)*Math.PI;
 					break;
 			case 4:
 				startingCornerCoord[0] = 0;

@@ -124,6 +124,8 @@ public class USLocalizer extends Thread {
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {	}
+		
+		Main.state = Main.RobotState.Search;
 	}
 	
 	/**
