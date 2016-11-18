@@ -23,7 +23,7 @@ public class Util {
 	
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
-	public final static float BLOCK_DISTANCE		= 6.0f; //distance (in cm) to detect block type
+	public final static float BLOCK_DISTANCE		= 7.5f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
 	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;	// max Y position (in cm) to search for items to avoid wall
 	public static final double SOUTH_MAX			= 0*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
@@ -51,7 +51,7 @@ public class Util {
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 23.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_HEIGHT		= 20.0;	//Length (in cm) of forklift 
 	public static final double FORKLIFT_ROPE_RADIUS	= 1.45; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
@@ -95,5 +95,5 @@ public class Util {
 	//Wifi
 	public static final String IP_ADDR				= "192.168.2.10";
 	public static final int TEAM_NUMBER				= 15;
-	public static final boolean USE_WIFI			= false;
+	public static final boolean USE_WIFI			= true;
 }

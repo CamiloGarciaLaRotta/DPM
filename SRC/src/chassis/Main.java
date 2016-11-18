@@ -98,24 +98,6 @@ public class Main {
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
 		forklift = new Forklift(forkliftMotor,clawMotor);
 		
-		
-		// Default values for these - could be changed by wifi if enabled
-		GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-			{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
-		RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
-				{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
-		
-		startingCorner = 1;
-		task = RobotTask.Builder;
-		
-		startingCornerCoord[0] = 0;
-		startingCornerCoord[1] = 0;
-		startingCornerCoord[2] = (Math.PI/2.0);
-		
-		Search search = new Search(odo, colorSensor, usSensor, GREEN);
-		Capture capture = new Capture(odo, GREEN);
-		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
-		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
 		
@@ -145,8 +127,8 @@ public class Main {
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-					{3*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH}};
+				GREEN = new double[][]{{0*Util.SQUARE_LENGTH,0*Util.SQUARE_LENGTH},
+					{2*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH}};
 				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 				
@@ -159,6 +141,11 @@ public class Main {
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
 			lcd.resume();
+			
+			Search search = new Search(odo, colorSensor, usSensor, GREEN);
+			Capture capture = new Capture(odo, GREEN);
+			Avoider avoid = new Avoider(odo, nav, usSensor, RED);
+			
 			state = RobotState.Localization;
 			localizer.doLocalization();
 			while(state != RobotState.Search){try {
@@ -187,9 +174,9 @@ public class Main {
 			Test.NavigationTest(odo, new double[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		case SearchTest:
-			avoid.start();
-			search.start();
-			capture.start();
+//			avoid.start();
+//			search.start();
+//			capture.start();
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:
@@ -203,7 +190,7 @@ public class Main {
 			Test.ForkliftTest();
 			break;
 		case Avoidance:
-			avoid.start();
+//			avoid.start();
 			Test.AvoidanceTest(odo);
 			break;
 		case ObjectDiffTest:
@@ -229,11 +216,11 @@ public class Main {
 		//wait for escape key to end program
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	
 		
-		odo.interrupt();
-		search.interrupt();
-		avoid.interrupt();
-		capture.interrupt();
-		localizer.interrupt();
+//		odo.interrupt();
+//		search.interrupt();
+//		avoid.interrupt();
+//		capture.interrupt();
+//		localizer.interrupt();
 		
 		System.exit(0);
 	}
