@@ -128,7 +128,23 @@ public class Search extends Thread {
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
 									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
 						
-							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+						double cardinalHeading = Math.atan2(odo.getY() - cardinals[currCardinal][1], odo.getX() - cardinals[currCardinal][0]);
+						double targetHeading = cardinalHeading + 5.0 * Math.PI / 180.0;
+						odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+						odo.spin(Odometer.TURNDIR.CW);
+						double minHeading = odo.getTheta();
+						double minDistance = Main.usSensor.getMedianSample(Util.US_SAMPLES);
+						double distance;
+						while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetHeading)) > Util.SCAN_THETA_THRESHOLD) {
+							if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+								minDistance = distance;
+								minHeading = odo.getTheta();
+							}
+						}
+						odo.stopMotors();
+						if(minDistance < Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, cardinals[currCardinal]))
+							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
+						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
@@ -138,6 +154,12 @@ public class Search extends Thread {
 								Main.state = RobotState.Capture;
 								Capture.setContext(cardinals[currCardinal]);
 								Capture.captureState = CaptureState.Grab;
+								while(Main.state != RobotState.Search) {
+									try {
+										Thread.sleep(500);
+									}catch(Exception ex) {}
+								}
+								searchState = SearchState.Default;
 							}
 							else {
 								Main.forklift.liftUp();
@@ -297,8 +319,8 @@ public class Search extends Thread {
 		if (currDistance > Util.SEARCH_DISTANCE) return false;
 		
 		// make sure object in sight is not wall
-		if(objY < Util.SOUTH_MAX || objY > Util.NORTH_MAX || 
-				objX < Util.WEST_MAX || objX > Util.EAST_MAX) {
+		if(objY <= Util.SOUTH_MAX || objY >= Util.NORTH_MAX || 
+				objX <= Util.WEST_MAX || objX >= Util.EAST_MAX) {
 			return false;
 		}
 		

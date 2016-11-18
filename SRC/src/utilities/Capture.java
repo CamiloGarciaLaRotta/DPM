@@ -67,6 +67,14 @@ public class Capture extends Thread {
 				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
 				if(towerHeight == 0){
 					nav.travelTo(towerPosition[0], towerPosition[1]);
+					while(Navigation.PathBlocked) {
+						Avoider.avoidState = Avoider.AvoidState.Enabled;
+						try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+						while(Main.state == RobotState.Avoiding) {
+							try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+						}
+						nav.travelTo(towerPosition[0],towerPosition[1]);
+					}
 					captureState = CaptureState.Stack;
 					odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);
 
@@ -85,7 +93,7 @@ public class Capture extends Thread {
 				Main.forklift.liftToTower(towerHeight++);
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
-				Search.searchState = SearchState.AtDropZone; //Pass control back to search
+				if(Search.searchState != SearchState.Default) Search.searchState = SearchState.AtDropZone; //Pass control back to search
 				captureState = CaptureState.Idle;
 				break;
 			case Idle:

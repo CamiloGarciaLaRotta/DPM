@@ -89,6 +89,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
+		Search.searchState = SearchState.Idle;
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
@@ -122,13 +123,15 @@ public class Main {
 				}
 				Sound.beep();
 				if(parameters != null) {
+					GREEN = new double[2][2];
+					RED = new double[2][2];
 					transmissionParse(parameters);
 					Sound.beepSequenceUp();
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{0*Util.SQUARE_LENGTH,0*Util.SQUARE_LENGTH},
-					{2*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH}};
+				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH},
+					{3*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH}};
 				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
 						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 				
@@ -140,7 +143,7 @@ public class Main {
 				startingCornerCoord[2] = (Math.PI/2.0);
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
-			lcd.resume();
+			//lcd.resume();
 			
 			Search search = new Search(odo, colorSensor, usSensor, GREEN);
 			Capture capture = new Capture(odo, GREEN);
@@ -156,6 +159,7 @@ public class Main {
 			avoid.start();
 			capture.start();
 			search.start();
+			lcd.resume();
 			break;
 			
 		// Tests need to be verified in this order, 
@@ -300,15 +304,15 @@ public class Main {
 			}
 			
 			//Get zone coordinates
-			RED[0][0] = transmission.get("LRZx");
-			RED[0][1] = transmission.get("LRZy");
-			RED[1][0] = transmission.get("URZx");
-			RED[1][1] = transmission.get("URZy");
+			RED[0][0] = transmission.get("LRZx") * Util.SQUARE_LENGTH;
+			RED[0][1] = transmission.get("LRZy") * Util.SQUARE_LENGTH;
+			RED[1][0] = transmission.get("URZx") * Util.SQUARE_LENGTH;
+			RED[1][1] = transmission.get("URZy") * Util.SQUARE_LENGTH;
 			
-			GREEN[0][0] = transmission.get("LGZx");
-			GREEN[0][1] = transmission.get("LGZy");
-			GREEN[1][0] = transmission.get("UGZx");
-			GREEN[1][1] = transmission.get("UGZy");
+			GREEN[0][0] = transmission.get("LGZx") * Util.SQUARE_LENGTH;
+			GREEN[0][1] = transmission.get("LGZy") * Util.SQUARE_LENGTH;
+			GREEN[1][0] = transmission.get("UGZx") * Util.SQUARE_LENGTH;
+			GREEN[1][1] = transmission.get("UGZy") * Util.SQUARE_LENGTH;
 		}
 	}
 	

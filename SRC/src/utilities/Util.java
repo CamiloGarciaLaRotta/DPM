@@ -26,9 +26,9 @@ public class Util {
 	public final static float BLOCK_DISTANCE		= 7.5f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
 	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;	// max Y position (in cm) to search for items to avoid wall
-	public static final double SOUTH_MAX			= 0*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
+	public static final double SOUTH_MAX			= -0.5*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
 	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;	// max X position (in cm) to search for items to avoid wall
-	public static final double WEST_MAX 			= 0*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
+	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
 	public static final double SEARCH_FOV			= 60.0 * Math.PI / 180;
 	
 	// avoider
@@ -93,7 +93,7 @@ public class Util {
 	}
 	
 	//Wifi
-	public static final String IP_ADDR				= "192.168.2.10";
+	public static final String IP_ADDR				= "192.168.2.6";
 	public static final int TEAM_NUMBER				= 15;
-	public static final boolean USE_WIFI			= true;
+	public static final boolean USE_WIFI			= false;
 }
