@@ -13,6 +13,7 @@ import lejos.hardware.Sound;
  * Movement control class (turnTo, travelTo, flt, localize)
  */
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import utilities.Odometer.TURNDIR;
 
 /**
  * Helpful tools to control robot navigation
@@ -122,7 +123,49 @@ public class Navigation {
 	}
 	
 	public void travelTo(double x, double y, boolean checkSides) {
-		
+		Navigation.PathBlocked = false;
+		double minAng;
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+		double error = minAng - this.odometer.getTheta();
+		if(error > Math.PI) error -= 2*Math.PI;
+		else if(error < -Math.PI) error += 2 * Math.PI;
+		turnBy(-error);
+		double distance;
+		double[] lastPos = new double[] {odometer.getX(), odometer.getY()};
+		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
+											new double[] {x,y})) > Util.CM_TOLERANCE) {
+			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+			//minAng = minimalAngle(odometer.getTheta(),minAng);
+			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
+			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
+			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
+				Navigation.PathBlocked = true;
+				Sound.beepSequence();
+				break;
+			}
+			
+			if(checkSides && Odometer.euclideanDistance(new double[] {odometer.getX(), odometer.getY()}, lastPos) > Util.TRAVELTO_BW) {	//check fov
+				this.setSpeeds(0, 0);
+				lastPos = new double[] {odometer.getX(), odometer.getY()};
+				double currentHeading = odometer.getTheta();
+				//always use avoid distance or travelto bandwidth - larger of the two
+				double relativeAngle = Math.atan2(Util.AVOID_DISTANCE > Util.TRAVELTO_BW ? Util.AVOID_DISTANCE : Util.TRAVELTO_BW, Util.ROBOT_WIDTH/2);
+				odometer.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+				this.turnTo(currentHeading + relativeAngle, true);	//total field of view to rotate through is 2*relativeAngle
+				odometer.spin(TURNDIR.CW);
+				while(Math.abs(odometer.getTheta() - (currentHeading - relativeAngle)) > Util.DEG_TOLERANCE) {
+					if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
+						this.setSpeeds(0, 0);
+						Navigation.PathBlocked = true;
+						Sound.beepSequence();
+						return;
+					}
+				}
+				this.setSpeeds(0, 0);
+			}
+		}
+		this.setSpeeds(0,0);
 	}
 
 	/**
