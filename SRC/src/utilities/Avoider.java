@@ -101,15 +101,30 @@ public class Avoider extends Thread{
 					linearAvoidance(CCW);
 				} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
 				
-				// no more obstacle ahead, advance a bit before returning control to Search
-				odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
-
-				if(Main.state != RobotState.Finished) {
-					if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
-					else Main.state = RobotState.Search;
-					Capture.captureState = lastCaptureState;
-					Search.searchState = lastSearchState;
-					avoidState = AvoidState.Disabled;
+				//check to make sure wheels won't swipe the obstacle
+				double initialHeading = odo.getTheta();
+				//distance robot avoids to and distance from CoR to outer bound
+				double absoluteTurnAngle = initialHeading - Math.atan2(Util.AVOID_DISTANCE, Util.ROBOT_WIDTH/2);
+				boolean pathClear = true;
+				odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+				odo.spin(CCW ? Odometer.TURNDIR.CW : Odometer.TURNDIR.CCW);   //spin in direction opposite of linearAvoidance
+				while(Math.abs(odo.getTheta() - absoluteTurnAngle) > Util.DEG_TOLERANCE) {
+					if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE) pathClear = false;
+				}
+				odo.stopMotors();
+				nav.turnTo(initialHeading, true);
+				
+				if(pathClear) {
+					// no more obstacle ahead, advance a bit before returning control to Search
+					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+	
+					if(Main.state != RobotState.Finished) {
+						if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
+						else Main.state = RobotState.Search;
+						Capture.captureState = lastCaptureState;
+						Search.searchState = lastSearchState;
+						avoidState = AvoidState.Disabled;
+					}
 				}
 			}
 			
