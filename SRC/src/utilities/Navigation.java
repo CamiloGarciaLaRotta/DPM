@@ -120,6 +120,10 @@ public class Navigation {
 		}
 		this.setSpeeds(0,0);
 	}
+	
+	public void travelTo(double x, double y, boolean checkSides) {
+		
+	}
 
 	/**
 	 * TurnTo function which takes an angle and boolean as arguments

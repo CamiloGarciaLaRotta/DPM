@@ -93,60 +93,76 @@ public class Avoider extends Thread{
 			
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
-				Main.state = RobotState.Avoiding;
+				if(Main.state != RobotState.Finished) Main.state = RobotState.Avoiding;
 				
-				// check for physical obstacles
-				//if(distance < Util.AVOID_DISTANCE){
-					odo.stopMotors();
-					
-					do{
-						linearAvoidance(CCW);
-					} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
-					
+				odo.stopMotors();
+				
+				do{
+					linearAvoidance(CCW);
+				} while (usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE);
+				
+				//check to make sure wheels won't swipe the obstacle
+				double initialHeading = odo.getTheta();
+				//distance robot avoids to and distance from CoR to outer bound
+				double absoluteTurnAngle = initialHeading - Math.atan2(Util.AVOID_DISTANCE, Util.ROBOT_WIDTH/2);
+				boolean pathClear = true;
+				odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+				odo.spin(CCW ? Odometer.TURNDIR.CW : Odometer.TURNDIR.CCW);   //spin in direction opposite of linearAvoidance
+				while(Math.abs(odo.getTheta() - absoluteTurnAngle) > Util.DEG_TOLERANCE) {
+					if(usSensor.getMedianSample(Util.US_SAMPLES) < Util.AVOID_DISTANCE) pathClear = false;
+				}
+				odo.stopMotors();
+				nav.turnTo(initialHeading, true);
+				
+				if(pathClear) {
 					// no more obstacle ahead, advance a bit before returning control to Search
 					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
-					if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
-					else Main.state = RobotState.Search;
-					Capture.captureState = lastCaptureState;
-					Search.searchState = lastSearchState;
-					avoidState = AvoidState.Disabled;
-				//}
-			}
-			
-			// check for RED zone
-			if(RED.contains(currRect)){
-				Main.state = RobotState.Avoiding;
-				odo.stopMotors();
-				// determine in which thread the robot was acting 
-				if(Capture.captureState != CaptureState.Idle){
-					Capture.captureState = CaptureState.Idle;
-				} else {
-					Search.searchState = SearchState.Idle; 
+	
+					if(Main.state != RobotState.Finished) {
+						if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
+						else Main.state = RobotState.Search;
+						Capture.captureState = lastCaptureState;
+						Search.searchState = lastSearchState;
+						avoidState = AvoidState.Disabled;
+					}
 				}
-				redAvoidance();	
-				do{
-										
-				} while (RED.contains(currRect));
 			}
 			
-			// check for corners zones
-			if(Search.searchState != SearchState.Default && (x1.contains(currRect) || x2.contains(currRect) ||
-				x3.contains(currRect) || x4.contains(currRect))){
-				// return to GREEN, nothing to do in a corner
-				Search.searchState = SearchState.Default;
-				Main.state = RobotState.Search;
-				Capture.captureState = CaptureState.Idle;
-				continue;
-			}
-			
-			if(lastCaptureState != CaptureState.Idle) {
-				Main.state = RobotState.Capture;
-				Capture.captureState = lastCaptureState;
-			}
-			else {
-				Main.state = RobotState.Search;
-				Search.searchState = lastSearchState;
-			}
+//			// check for RED zone
+//			if(RED.contains(currRect)){
+//				odo.stopMotors();
+//				if(Main.state != RobotState.Finished) { 
+//					Main.state = RobotState.Avoiding;
+//					// determine in which thread the robot was acting 
+//					if(Capture.captureState != CaptureState.Idle){
+//						Capture.captureState = CaptureState.Idle;
+//					} else {
+//						Search.searchState = SearchState.Idle; 
+//					}
+//				}
+//				redAvoidance();	
+//			}
+//			
+//			// check for corners zones
+//			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
+//					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
+//				// return to GREEN, nothing to do in a corner
+//				Search.searchState = SearchState.Default;
+//				Main.state = RobotState.Search;
+//				Capture.captureState = CaptureState.Idle;
+//				continue;
+//			}
+//			
+//			if(Main.state != RobotState.Finished) {
+//				if(lastCaptureState != CaptureState.Idle) {
+//					Main.state = RobotState.Capture;
+//					Capture.captureState = lastCaptureState;
+//				}
+//				else {
+//					Main.state = RobotState.Search;
+//					Search.searchState = lastSearchState;
+//				}
+//			}
 			
 			
 			// lower stress on CPU
@@ -226,7 +242,7 @@ public class Avoider extends Thread{
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*Math.PI/2);
-		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK/2), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK/2));
+		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK));
 		double[] pos = new double[3];
 		odo.getPosition(pos);
 		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path
