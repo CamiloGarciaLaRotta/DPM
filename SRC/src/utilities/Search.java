@@ -363,7 +363,7 @@ public class Search extends Thread {
 		double cwHeading = odo.getTheta() - angle/2;
 		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
 		odo.spin(Odometer.TURNDIR.CCW);
-		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) < Util.SCAN_THETA_THRESHOLD) {
+		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) > Util.SCAN_THETA_THRESHOLD) {
 			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
 				minHeading = odo.getTheta();
 				minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
@@ -372,7 +372,7 @@ public class Search extends Thread {
 		odo.stopMotors();
 		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
 		odo.spin(Odometer.TURNDIR.CW);
-		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) < Util.SCAN_THETA_THRESHOLD) {
+		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) > Util.SCAN_THETA_THRESHOLD) {
 			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
 				minHeading = odo.getTheta();
 				minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
