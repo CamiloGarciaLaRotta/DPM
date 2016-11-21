@@ -73,7 +73,7 @@ public class Capture extends Thread {
 					    while(Capture.captureState == CaptureState.Return){
 					    	// obtain color samples
 					    	int negatives = 0;
-					    	for(int i = 0; i < Util.US_SAMPLES; i++){
+					    	for(int i = 0; i < 10*Util.US_SAMPLES; i++){
 					    		// TODO #TESTING as of now I check if the colorsensor sees a RGB[0] > 0.01
 					    		// as it was the value i got while dryrunning. I leave it to y'all to choose the
 					    		// RGB threshod that works best to detect when the block is no longuer in the claw
@@ -105,6 +105,13 @@ public class Capture extends Thread {
 				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
 				if(towerHeight == 0){
 					nav.travelTo(towerPosition[0], towerPosition[1]);
+					while(Navigation.PathBlocked) {
+						Avoider.avoidState = Avoider.AvoidState.Enabled;
+						try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+						while(Main.state == RobotState.Avoiding) {
+							try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+						}
+					}
 					captureState = CaptureState.Stack;
 					odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);
 
@@ -123,7 +130,7 @@ public class Capture extends Thread {
 				Main.forklift.liftToTower(towerHeight++);
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
-				Search.searchState = SearchState.AtDropZone; //Pass control back to search
+				if(Search.searchState != SearchState.Default) Search.searchState = SearchState.AtDropZone; //Pass control back to search
 				captureState = CaptureState.Idle;
 				break;
 			case Idle:

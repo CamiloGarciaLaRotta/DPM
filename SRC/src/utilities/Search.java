@@ -135,6 +135,10 @@ public class Search extends Thread {
 								Main.state = RobotState.Capture;
 								Capture.setContext(cardinals[currCardinal]);
 								Capture.captureState = CaptureState.Grab;
+								while(Main.state != RobotState.Search) {
+									try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+								}
+								searchState = SearchState.Default;
 							}
 							else {
 								Main.forklift.liftUp();
