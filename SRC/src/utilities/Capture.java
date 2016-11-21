@@ -63,6 +63,23 @@ public class Capture extends Thread {
 				captureState = CaptureState.Return;
 				break;
 			case Return:
+				// Thread to verify claw still has block
+				(new Thread() {
+					  public void run() {
+					    while(Capture.captureState == CaptureState.Return){
+					    	int negatives = 0;
+					    	for(int i = 0; i < Util.US_SAMPLES; i++){
+					    		if(!Search.isStyrofoamBlock()) negatives++;	
+					    	}
+					    	if (negatives > Util.US_SAMPLES/2) {
+					    		odo.stopMotors();
+					    		// TODO MAKE THE ROBOT DO FOV AT THAT POINT TO SAFELY REGRAB BLOCK
+					    		Capture.captureState = CaptureState.Grab;
+					    	}
+					    }
+					    try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
+					  }
+				}).start();
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
 				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
 				if(towerHeight == 0){
