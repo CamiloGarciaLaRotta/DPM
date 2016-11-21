@@ -61,7 +61,7 @@ public class Main {
 	/**
 	 * Current action the robot is doing
 	 */
-	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding};
+	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding, Finished};
 	/**
 	 * 
 	 * @author juliette
