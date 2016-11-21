@@ -4,6 +4,7 @@ import chassis.Main;
 import chassis.Main.RobotState;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
 /**
@@ -17,6 +18,7 @@ public class Capture extends Thread {
 	// instances
 	private Odometer odo;
 	private Navigation nav;
+	private Search search;
 	
 	// coordinates
 	private double[][] GREEN;
@@ -37,9 +39,10 @@ public class Capture extends Thread {
 	 * @param odometer Odometer Object
 	 * @param GREEN green scoring zone coordinates
 	 */
-	public Capture(Odometer odometer, double[][] GREEN) {
+	public Capture(Odometer odometer, Search search, double[][] GREEN) {
 		this.odo = odometer;
 		this.nav = new Navigation(this.odo);
+		this.search = search;
 		this.GREEN = GREEN;
 		this.towerHeight = 0;
 		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2};
@@ -66,17 +69,31 @@ public class Capture extends Thread {
 				// Thread to verify claw still has block
 				(new Thread() {
 					  public void run() {
+						  // only active during the return state
 					    while(Capture.captureState == CaptureState.Return){
+					    	// obtain color samples
 					    	int negatives = 0;
 					    	for(int i = 0; i < Util.US_SAMPLES; i++){
 					    		if(!Search.isStyrofoamBlock()) negatives++;	
 					    	}
+					    	// more than half negative samples => lost block 
 					    	if (negatives > Util.US_SAMPLES/2) {
+					    		Main.forklift.ungrip();
 					    		odo.stopMotors();
-					    		// TODO MAKE THE ROBOT DO FOV AT THAT POINT TO SAFELY REGRAB BLOCK
-					    		Capture.captureState = CaptureState.Grab;
-					    	}
-					    }
+					    		// back off to avoid dropping the claw on top of the block
+					    		odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH/2, true);
+					    		// 360 no scope
+					    		search.FOV(Math.PI);
+					    		// found lost block
+					    		if(Search.isStyrofoamBlock()) Capture.captureState = CaptureState.Grab;
+					    		else { 
+					    			// give up on finding block, 
+					    			Capture.captureState = CaptureState.Idle;
+					    			nav.travelTo(search.cardinals[search.currCardinal][0], search.cardinals[search.currCardinal][1]);
+					    			Search.searchState = SearchState.Default;
+				    			}
+				    		}
+				    	}
 					    try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
 					  }
 				}).start();
