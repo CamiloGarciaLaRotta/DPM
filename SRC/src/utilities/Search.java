@@ -74,12 +74,12 @@ public class Search extends Thread {
 		
 		// make cardinal point further from the tower position
 		if (diffX == diffY) {
-			paddingX = Util.ROBOT_LENGTH;
-			paddingY = Util.ROBOT_LENGTH;
+			paddingX = Util.ROBOT_LENGTH/2;
+			paddingY = Util.ROBOT_LENGTH/2;
 		} else if (diffX > diffY) {
-			paddingY = Util.ROBOT_LENGTH;
+			paddingY = Util.ROBOT_LENGTH/2;
 		} else {
-			paddingX = Util.ROBOT_LENGTH;
+			paddingX = Util.ROBOT_LENGTH/2;
 		}
 		
 		// cardinal search points
@@ -184,7 +184,13 @@ public class Search extends Thread {
 				break;
 				
 			case AtCardinal:
-				
+				if(	cardinals[currCardinal][0] < 0.0 || cardinals[currCardinal][1] > 10.0 * Util.SQUARE_LENGTH ||
+					cardinals[currCardinal][1] < 0.0 || cardinals[currCardinal][1] > 10.0 * Util.SQUARE_LENGTH) 
+				{
+					Search.searchState = SearchState.Default;
+					break;
+				}
+
 				// turn to start scanning angle
 				double startAngle = Math.PI/2 * currCardinal;
 				nav.turnTo(startAngle, true);
