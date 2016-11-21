@@ -74,10 +74,14 @@ public class Capture extends Thread {
 					    	// obtain color samples
 					    	int negatives = 0;
 					    	for(int i = 0; i < Util.US_SAMPLES; i++){
-					    		if(!Search.isStyrofoamBlock()) negatives++;	
+					    		// TODO #TESTING as of now I check if the colorsensor sees a RGB[0] > 0.01
+					    		// as it was the value i got while dryrunning. I leave it to y'all to choose the
+					    		// RGB threshod that works best to detect when the block is no longuer in the claw
+					    		if(Main.colorSensor.getColor()[0] < Util.FOAM_RGB_VECTOR[0]-Util.COLOR_BW) negatives++;	
 					    	}
 					    	// more than half negative samples => lost block 
 					    	if (negatives > Util.US_SAMPLES/2) {
+					    		Capture.captureState = CaptureState.Idle;
 					    		Main.forklift.ungrip();
 					    		odo.stopMotors();
 					    		// back off to avoid dropping the claw on top of the block

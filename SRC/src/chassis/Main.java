@@ -186,7 +186,6 @@ public class Main {
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:
-			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
 			break;
 		case TrackTest:
