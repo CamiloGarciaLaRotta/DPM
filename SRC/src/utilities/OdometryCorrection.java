@@ -19,7 +19,7 @@ public class OdometryCorrection extends Thread {
 	public static int count;
 	private double lastPosition[];
 	private float lastIntensity;
-	private final boolean useCorrection = false;
+	private final boolean useCorrection = true;
 
 	/**
 	 * 
@@ -58,6 +58,7 @@ public class OdometryCorrection extends Thread {
 			
 			if(dI > LightIntensitySensor.LINE_DETECTED) //Detected black
 			{
+				Sound.beep();
 				double currentPosition[] = new double[3];
 				double sensorPosition[] = new double[2];
 				odometer.getPosition(currentPosition, Util.UPDATE_ALL);
@@ -73,7 +74,7 @@ public class OdometryCorrection extends Thread {
 				
 				//check if horizontal line...
 				double distanceY = (sensorPosition[1]/Util.SQUARE_LENGTH) - Math.floor(sensorPosition[1]/Util.SQUARE_LENGTH);
-				if(distanceX < Util.GRIDLINE_THRESHOLD) {
+				if(distanceY < Util.GRIDLINE_THRESHOLD) {
 					double sensorY = Math.floor(sensorPosition[1]/Util.SQUARE_LENGTH) * Util.SQUARE_LENGTH;
 					odometer.setY(sensorY + Util.INTENSITY_TO_CENTER * Math.sin(currentPosition[1]));
 				}

@@ -170,6 +170,7 @@ public class Main {
 			Test.StraightLineTest(odo, Util.SQUARE_LENGTH); // test tachometer/odometer
 			break;
 		case SquareTest:
+			gridLineDetector = new LightIntensitySensor(intensityPort);
 			Test.SquareTest(odo, 3, 2 * Util.SQUARE_LENGTH); //test rotation
 			break;
 		case LocalizationTest:
