@@ -117,11 +117,14 @@ public class USLocalizer extends Thread {
 		nav.turnTo(Math.PI/2, true);
 		Sound.beepSequenceUp();
 		
+		// adjust coordinates and heading depending on the starting corner
+		odo.setPosition(new double [] {Main.startingCornerCoord[0], Main.startingCornerCoord[1], Main.startingCornerCoord[2]}, Util.UPDATE_ALL);
+		
 		//slight pause to show localization is complete
 		try {
 			Thread.sleep(2000);
 		} catch (Exception e) {	}
-	
+		
 		Main.state = Main.RobotState.Search;
 	}
 	

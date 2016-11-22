@@ -27,7 +27,7 @@ public class Search extends Thread {
 	private Odometer odo;	
 	private Navigation nav;
 	private USSensor usSensor;
-	private ColorSensor colorSensor;
+	private static ColorSensor colorSensor;
 	
 	// Coordinates
 	private double[] N = new double[2];
@@ -46,6 +46,8 @@ public class Search extends Thread {
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Idle};
 	public static SearchState searchState;
 	
+	// TODO TODO TODO TODO
+	// - setter for GREEN/RED on all classes
 	
 	/**
 	 * Constructor for Search Class
@@ -66,8 +68,8 @@ public class Search extends Thread {
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
 		double midY = (GREEN[0][1] + GREEN[1][1]) / 2;
 		
-		double diffX = GREEN[1][0] - GREEN[0][0];
-		double diffY = GREEN[1][1] - GREEN[0][1];
+//		double diffX = GREEN[1][0] - GREEN[0][0];
+//		double diffY = GREEN[1][1] - GREEN[0][1];
 		
 		double paddingX = 0;
 		double paddingY = 0;
@@ -125,7 +127,32 @@ public class Search extends Thread {
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
 									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
 						
-							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+						double cardinalHeading = Math.atan2(cardinals[currCardinal][1] - odo.getY(), cardinals[currCardinal][0] - odo.getX());
+						double targetHeading = cardinalHeading ;//+ 5.0 * Math.PI / 180.0;
+
+						odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+						odo.spin(Odometer.TURNDIR.CW);
+						double minHeading = odo.getTheta();
+						double minDistance = Main.usSensor.getMedianSample(Util.US_SAMPLES);
+						double distance;
+						while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetHeading)) > Util.SCAN_THETA_THRESHOLD) {
+							if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+								minDistance = distance;
+								minHeading = odo.getTheta();
+							}
+						}
+						odo.stopMotors();
+						//just to make sure we get the last heading
+						if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+							minDistance = distance;
+							minHeading = odo.getTheta();
+						}
+						
+						if(minDistance < Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, cardinals[currCardinal])) {
+							Sound.twoBeeps();
+							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
+						}
+						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
@@ -304,8 +331,8 @@ public class Search extends Thread {
 		if (currDistance > Util.SEARCH_DISTANCE) return false;
 		
 		// make sure object in sight is not wall
-		if(objY < Util.SOUTH_MAX || objY > Util.NORTH_MAX || 
-				objX < Util.WEST_MAX || objX > Util.EAST_MAX) {
+		if(objY <= Util.SOUTH_MAX || objY >= Util.NORTH_MAX || 
+				objX <= Util.WEST_MAX || objX >= Util.EAST_MAX) {
 			return false;
 		}
 		
@@ -423,24 +450,25 @@ public class Search extends Thread {
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
-		boolean isStyrofoam;
-		
-		float[] measuredRGB = Main.colorSensor.getColor();
-		//get unit vector
-		double magnitude = Math.sqrt(
-				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
-		double[] normRGB = new double[3];
-		normRGB[0] = (double)measuredRGB[0]/magnitude;
-		normRGB[1] = (double)measuredRGB[1]/magnitude;
-		normRGB[2] = (double)measuredRGB[2]/magnitude;
-		
-		//compare measurement to standard for styrofoam block
-		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
-			isStyrofoam = true;
-		} else {
-			isStyrofoam = false;
-		}
-		return isStyrofoam;
+		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
+//		boolean isStyrofoam;
+//		
+//		float[] measuredRGB = Main.colorSensor.getColor();
+//		//get unit vector
+//		double magnitude = Math.sqrt(
+//				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
+//		double[] normRGB = new double[3];
+//		normRGB[0] = (double)measuredRGB[0]/magnitude;
+//		normRGB[1] = (double)measuredRGB[1]/magnitude;
+//		normRGB[2] = (double)measuredRGB[2]/magnitude;
+//		
+//		//compare measurement to standard for styrofoam block
+//		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
+//			isStyrofoam = true;
+//		} else {
+//			isStyrofoam = false;
+//		}
+//		return isStyrofoam;
 	}
 	
 	/**

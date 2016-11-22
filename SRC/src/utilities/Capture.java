@@ -112,6 +112,7 @@ public class Capture extends Thread {
 						while(Main.state == RobotState.Avoiding) {
 							try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
 						}
+						nav.travelTo(towerPosition[0],towerPosition[1]);
 					}
 					captureState = CaptureState.Stack;
 					odo.moveCM(Odometer.LINEDIR.Backward, Util.CLAW_TO_CENTER, true);

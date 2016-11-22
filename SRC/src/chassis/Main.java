@@ -2,6 +2,8 @@ package chassis;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
@@ -11,14 +13,17 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
 import utilities.Avoider;
+import utilities.Avoider.AvoidState;
 import utilities.Capture;
 import utilities.Navigation;
 import utilities.Odometer;
 import utilities.Search;
+import utilities.Search.SearchState;
 import utilities.Test;
 import utilities.ThreadEnder;
 import utilities.USLocalizer;
 import utilities.Util;
+import utilities.Capture.CaptureState;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
@@ -55,6 +60,7 @@ public class Main {
 	public static DemoState demo = DemoState.Default;
 	public static RobotTask task;
 	public static int startingCorner;
+	public static double[] startingCornerCoord = new double[3];
 	public static double[][] GREEN;
 	public static double[][] RED;
 	
@@ -83,10 +89,11 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
+		Search.searchState = SearchState.Idle;
 		
 		//Setup threads
 		Odometer odo = new Odometer(leftMotor, rightMotor);
-		Navigation nav = new Navigation(odo);
+		final Navigation nav = new Navigation(odo);
 		lcd = new LCDInfo(odo, textLCD, false);	//do not start on creation
 		ThreadEnder ender = new ThreadEnder();
 		USLocalizer localizer = new USLocalizer(odo, usSensor, Util.US_TO_CENTER);
@@ -150,18 +157,43 @@ public class Main {
 				}
 				Sound.beep();
 				if(parameters != null) {
+					GREEN = new double[2][2];
+					RED = new double[2][2];
 					transmissionParse(parameters);
 					Sound.beepSequenceUp();
 				}
 			} else {	//default parameters
-
+				// Default values for these - could be changed by wifi if enabled
+				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH},
+					{3*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH}};
+				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
+				
+				startingCorner = 1;
+				task = RobotTask.Builder;
+				
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = (Math.PI/2.0);
 			}
 			System.out.print("\n\n\n\n\n\n\n\n");
-			lcd.resume();
+			//lcd.resume();
+			
+			Search search = new Search(odo, colorSensor, usSensor, GREEN);
+			Capture capture = new Capture(odo, GREEN);
+			Avoider avoid = new Avoider(odo, nav, usSensor, RED);
+			
+			state = RobotState.Localization;
 			localizer.doLocalization();
-			search.start();
+			while(state != RobotState.Search){try {
+				Thread.sleep(Util.SLEEP_PERIOD);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}}
 			avoid.start();
 			capture.start();
+			search.start();
+			lcd.resume();
 			break;
 			
 		// Tests need to be verified in this order, 
@@ -180,9 +212,9 @@ public class Main {
 			Test.NavigationTest(odo, new double[][] {{60, 60}, {60,0}, {30,30}, {60,0}}, true); 
 			break;
 		case SearchTest:
-			avoid.start();
-			search.start();
-			capture.start();
+//			avoid.start();
+//			search.start();
+//			capture.start();
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:
@@ -195,7 +227,7 @@ public class Main {
 			Test.ForkliftTest();
 			break;
 		case Avoidance:
-			avoid.start();
+//			avoid.start();
 			Test.AvoidanceTest(odo);
 			break;
 		case ObjectDiffTest:
@@ -204,16 +236,29 @@ public class Main {
 		default:
 			System.exit(-1);
 		}
-		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	//wait for escape key to end program
 		
-		//TODO if setting interrupt flag doesn't stop Threads,
-		//	   add while(!Thread.interrupted()) at the 
-		//	   beggining of each Thread's run() method
-		odo.interrupt();
-		search.interrupt();
-		avoid.interrupt();
-		capture.interrupt();
-		localizer.interrupt();
+//		// 5 minute timer
+//		Timer timer = new Timer();
+//		timer.schedule(new TimerTask() {
+//			@Override
+//			public void run() {
+//				Main.state = RobotState.Finished;
+//				Search.searchState = SearchState.Idle;
+//				Capture.captureState = CaptureState.Idle;
+//				Avoider.avoidState = AvoidState.Enabled;
+//				nav.travelTo(startingCornerCoord[0], startingCornerCoord[1]);
+//			}	  
+//		}, 5*60*1000);
+		
+		//wait for escape key to end program
+		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	
+		
+//		odo.interrupt();
+//		search.interrupt();
+//		avoid.interrupt();
+//		capture.interrupt();
+//		localizer.interrupt();
+		
 		System.exit(0);
 	}
 	
@@ -267,16 +312,40 @@ public class Main {
 				startingCorner = transmission.get("CSC");
 			}
 			
-			//Get zone coordinates
-			RED[0][0] = transmission.get("LRZx");
-			RED[0][1] = transmission.get("LRZy");
-			RED[1][0] = transmission.get("URZx");
-			RED[1][1] = transmission.get("URZy");
+			// store starting corner coordinates
+			switch (Main.startingCorner) {
+			case 1:
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = (Math.PI/2.0);
+					break;
+			case 2:
+				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[1] = 0;
+				startingCornerCoord[2] = Math.PI;
+					break;
+			case 3:
+				startingCornerCoord[0] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[2] = (3.0/2.0)*Math.PI;
+					break;
+			case 4:
+				startingCornerCoord[0] = 0;
+				startingCornerCoord[1] = 10*Util.SQUARE_LENGTH;
+				startingCornerCoord[2] = 0;
+					break;
+			}
 			
-			GREEN[0][0] = transmission.get("LGZx");
-			GREEN[0][1] = transmission.get("LGZy");
-			GREEN[1][0] = transmission.get("UGZx");
-			GREEN[1][1] = transmission.get("UGZy");
+			//Get zone coordinates
+			RED[0][0] = transmission.get("LRZx") * Util.SQUARE_LENGTH;
+			RED[0][1] = transmission.get("LRZy") * Util.SQUARE_LENGTH;
+			RED[1][0] = transmission.get("URZx") * Util.SQUARE_LENGTH;
+			RED[1][1] = transmission.get("URZy") * Util.SQUARE_LENGTH;
+			
+			GREEN[0][0] = transmission.get("LGZx") * Util.SQUARE_LENGTH;
+			GREEN[0][1] = transmission.get("LGZy") * Util.SQUARE_LENGTH;
+			GREEN[1][0] = transmission.get("UGZx") * Util.SQUARE_LENGTH;
+			GREEN[1][1] = transmission.get("UGZy") * Util.SQUARE_LENGTH;
 		}
 	}
 	

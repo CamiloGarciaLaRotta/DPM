@@ -24,11 +24,11 @@ public class Util {
 	
 	// search
 	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
-	public final static float BLOCK_DISTANCE		= 9.0f; //distance (in cm) to detect block type
+	public final static float BLOCK_DISTANCE		= 8.0f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
-	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;		// max Y position (in cm) to search for items to avoid wall
+	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;	// max Y position (in cm) to search for items to avoid wall
 	public static final double SOUTH_MAX			= -0.5*SQUARE_LENGTH;	// min Y position (in cm) to search for items to avoid wall
-	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;		// max X position (in cm) to search for items to avoid wall
+	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;	// max X position (in cm) to search for items to avoid wall
 	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
 	public static final double SEARCH_FOV			= 60 * Math.PI / 180;
 	public static final double APPROACH_BLOCK		= 1.5; //Extra distance to move toward styrofoam block to ensure that it isn't too far to reliably grab
@@ -53,7 +53,7 @@ public class Util {
 	public static final int ROBOT_LENGTH			= 30;   //length (in cm) of collision rectangle around robot
 	
 	// capture
-	public static final double FORKLIFT_HEIGHT		= 22.0;	//Length (in cm) of forklift 
+	public static final double FORKLIFT_HEIGHT		= 20.0;	//Length (in cm) of forklift 
 	public static final double FORKLIFT_ROPE_RADIUS	= 1.45; //Radius (in cm) of circle that the rope wraps around to lift the forklift
 	public static final int GRIP_STRENGTH			= 180; //Angle by which to rotate claw motor. In degrees because the lejos rotate functions are.
 	public static final double TOWER_DISTANCE		= 8.0; //Distance (in cm) from tower before forklift is lowered
@@ -95,7 +95,7 @@ public class Util {
 	}
 	
 	//Wifi
-	public static final String IP_ADDR				= "192.168.2.32";
+	public static final String IP_ADDR				= "192.168.2.6";
 	public static final int TEAM_NUMBER				= 15;
 	public static final boolean USE_WIFI			= false;
 }

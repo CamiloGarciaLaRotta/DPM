@@ -89,7 +89,6 @@ public class Avoider extends Thread{
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
 				if(Main.state != RobotState.Finished) Main.state = RobotState.Avoiding;
-				
 				odo.stopMotors();
 				
 				do{
