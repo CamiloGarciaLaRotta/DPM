@@ -68,21 +68,13 @@ public class Capture extends Thread {
 				break;
 			case Return:
 				// Thread to verify claw still has block
-				/*
+				
 				(new Thread() {
 					  public void run() {
 						  // only active during the return state
 					    while(Capture.captureState == CaptureState.Return){
-					    	// obtain color samples
-					    	int negatives = 0;
-					    	for(int i = 0; i < 10*Util.US_SAMPLES; i++){
-					    		// TODO #TESTING as of now I check if the colorsensor sees a RGB[0] > 0.01
-					    		// as it was the value i got while dryrunning. I leave it to y'all to choose the
-					    		// RGB threshod that works best to detect when the block is no longuer in the claw
-					    		if(Main.colorSensor.getColor()[0] < Util.FOAM_RGB_VECTOR[0]-Util.COLOR_BW) negatives++;	
-					    	}
-					    	// more than half negative samples => lost block 
-					    	if (negatives > Util.US_SAMPLES/2) {
+					    	//If claw tacho count is too close to -180 degrees, block was dropped
+					    	if (Main.forklift.getGrip() < Util.GRIP_THRESHOLD) {
 					    		Capture.captureState = CaptureState.Idle;
 					    		Main.forklift.ungrip();
 					    		odo.stopMotors();
@@ -103,7 +95,7 @@ public class Capture extends Thread {
 					    try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
 					  }
 				}).start();
-				*/
+				
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
 				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
 				if(towerHeight == 0){

@@ -61,6 +61,7 @@ public class Util {
 	public static final int CLAW_ACCEL				= 500;
 	public static final double CLAW_TO_CENTER		= 27.5;
 	public static final double DROP_SPACE			= 1.0; //Distance above tower to drop next block from when stacking
+	public static final double GRIP_THRESHOLD		= -150.5; //If tacho count of claw motor is greater than this, it is holding a block
 	
 	// odometry
 	public static final boolean[] UPDATE_ALL = new boolean[] {true,true,true};
