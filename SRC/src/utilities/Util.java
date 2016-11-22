@@ -31,6 +31,7 @@ public class Util {
 	public static final double EAST_MAX 			= 10*SQUARE_LENGTH;		// max X position (in cm) to search for items to avoid wall
 	public static final double WEST_MAX 			= -0.5*SQUARE_LENGTH;	// min X position (in cm) to search for items to avoid walls
 	public static final double SEARCH_FOV			= 60 * Math.PI / 180;
+	public static final double APPROACH_BLOCK		= 1.5; //Extra distance to move toward styrofoam block to ensure that it isn't too far to reliably grab
 	
 	// avoider
 	public static final double AVOID_DISTANCE		= 15; 	//distance (in cm) to avoid object	
