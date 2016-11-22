@@ -86,7 +86,7 @@ public class Capture extends Thread {
 					    		odo.stopMotors();
 					    		// back off to avoid dropping the claw on top of the block
 					    		odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH/2, true);
-					    		// 360 no scope
+					    		// 180 no scope
 					    		search.FOV(Math.PI);
 					    		// found lost block
 					    		if(Search.isStyrofoamBlock()) Capture.captureState = CaptureState.Grab;
