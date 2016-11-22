@@ -74,12 +74,12 @@ public class Search extends Thread {
 		
 		// make cardinal point further from the tower position
 		if (diffX == diffY) {
-			paddingX = Util.ROBOT_LENGTH;
-			paddingY = Util.ROBOT_LENGTH;
+			paddingX = Util.ROBOT_LENGTH/2;
+			paddingY = Util.ROBOT_LENGTH/2;
 		} else if (diffX > diffY) {
-			paddingY = Util.ROBOT_LENGTH;
+			paddingY = Util.ROBOT_LENGTH/2;
 		} else {
-			paddingX = Util.ROBOT_LENGTH;
+			paddingX = Util.ROBOT_LENGTH/2;
 		}
 		
 		// cardinal search points
