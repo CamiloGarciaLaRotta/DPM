@@ -123,7 +123,7 @@ public class Main {
 		}
 		
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
-		Capture capture = new Capture(odo, GREEN);
+		Capture capture = new Capture(odo, search, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		
 		textLCD.clear(); //blank display before selection
@@ -186,7 +186,6 @@ public class Main {
 			state = RobotState.Search;
 			break;
 		case RGBVectorTest:
-			colorSensor = new ColorSensor(colorPort);
 			Test.RGBUnitVectorTest(colorSensor);
 			break;
 		case TrackTest:

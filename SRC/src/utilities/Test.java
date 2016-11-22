@@ -132,9 +132,9 @@ public class Test {
 		while(Button.readButtons() != Button.ID_ESCAPE) {
 			rgbRaw = color.getColor();
 			double magnitude = Math.sqrt(rgbRaw[0]*rgbRaw[0] + rgbRaw[1]*rgbRaw[1] + rgbRaw[2]*rgbRaw[2]);
-			rgbRaw[0] /= magnitude;
-			rgbRaw[1] /= magnitude;
-			rgbRaw[2] /= magnitude;
+			rgbRaw[0] = (int) (10*rgbRaw[0]/magnitude);
+			rgbRaw[1] = (int) (10*rgbRaw[1]/magnitude);
+			rgbRaw[2] = (int) (10*rgbRaw[2]/magnitude);
 			LCDInfo.displayMessage(rgbRaw[0] + " " + rgbRaw[1] + " " + rgbRaw[2]);
 		}
 	}

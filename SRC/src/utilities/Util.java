@@ -16,6 +16,7 @@ public class Util {
 	
 	// blocks
 	public static final double[] FOAM_RGB_VECTOR	= {0.4101, 0.5421, 0.7334}; //RGB normalized in lab lighting
+	protected static final double COLOR_BW 			= 0.2;	// Bandwidth before a RGB value is no longuer the one expected
 	public static final double VECTOR_TOLERANCE		= 0.95; //Minimum value of cross product between detected vector and FOAM_RGB_VECTOR
 	public static final double FOAM_HEIGHT			= 4.9;	//Height of the styrofoam blocks
 	public static final double FOAM_WIDTH			= 10;	//Height of the styrofoam blocks

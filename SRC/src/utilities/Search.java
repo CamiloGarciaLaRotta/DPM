@@ -34,8 +34,8 @@ public class Search extends Thread {
 	private double[] W = new double[2];
 	private double[] S = new double[2];
 	private double[] E = new double[2];
-	private double[][] cardinals = new double[4][2];
-	private int currCardinal;
+	public double[][] cardinals = new double[4][2];
+	public int currCardinal;
 	
 	// object detection
 	private ArrayList<double[]> objectLocations = new ArrayList<double[]>();
@@ -135,6 +135,10 @@ public class Search extends Thread {
 								Main.state = RobotState.Capture;
 								Capture.setContext(cardinals[currCardinal]);
 								Capture.captureState = CaptureState.Grab;
+								while(Main.state != RobotState.Search) {
+									try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
+								}
+								searchState = SearchState.Default;
 							}
 							else {
 								Main.forklift.liftUp();
@@ -336,48 +340,51 @@ public class Search extends Thread {
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		
-		// avoid checking for false positves
-		if(usSensor.getMedianSample(Util.US_SAMPLES) < 2*Util.BLOCK_DISTANCE) {
-			double minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
-			double minHeading = odo.getTheta();
-			double ccwHeading = odo.getTheta() + Util.SEARCH_FOV/2;
-			double cwHeading = odo.getTheta() - Util.SEARCH_FOV/2;
-			odo.setMotorSpeed(Odometer.ROTATE_SPEED);
-			odo.spin(Odometer.TURNDIR.CCW);
-			while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) < Util.SCAN_THETA_THRESHOLD) {
-				if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
-					minHeading = odo.getTheta();
-					minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
-				}
-			}
-			odo.stopMotors();
-			odo.setMotorSpeed(Odometer.ROTATE_SPEED);
-			odo.spin(Odometer.TURNDIR.CW);
-			while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) < Util.SCAN_THETA_THRESHOLD) {
-				if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
-					minHeading = odo.getTheta();
-					minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
-				}
-			}
-			nav.turnTo(minHeading, true);
-			odo.moveCM(Odometer.LINEDIR.Backward, Util.BLOCK_DISTANCE - minDistance, true);
-			Main.forklift.liftDown();
-			
-			// inspect object
-			if(isStyrofoamBlock()) { 
-				searchState = SearchState.Idle;
-				Main.state = Main.RobotState.Capture;
-				Capture.captureState = CaptureState.Grab;
-				Capture.setContext(cardinals[currCardinal]);
-				return;
-			} else {
-				Main.forklift.liftUp();
-				odo.moveCM(LINEDIR.Backward, 5, true);
-			}
+		FOV(Util.SEARCH_FOV);
+		
+		// inspect object
+		if(isStyrofoamBlock()) { 
+			searchState = SearchState.Idle;
+			Main.state = Main.RobotState.Capture;
+			Capture.captureState = CaptureState.Grab;
+			Capture.setContext(cardinals[currCardinal]);
+			return;
+		} else {
+			Main.forklift.liftUp();
+			odo.moveCM(LINEDIR.Backward, 5, true);
 		} 
 		
 		nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 		searchState = SearchState.Default;
+	}
+	
+	// perform a swipe scan of a certain aperture angle to precisely identify block
+	// at this stage the robot is ensured to be in close proximity of block
+	protected void FOV(double angle) {
+		double minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+		double minHeading = odo.getTheta();
+		double ccwHeading = odo.getTheta() + angle/2;
+		double cwHeading = odo.getTheta() - angle/2;
+		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+		odo.spin(Odometer.TURNDIR.CCW);
+		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) > Util.SCAN_THETA_THRESHOLD) {
+			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
+				minHeading = odo.getTheta();
+				minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+			}
+		}
+		odo.stopMotors();
+		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+		odo.spin(Odometer.TURNDIR.CW);
+		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) > Util.SCAN_THETA_THRESHOLD) {
+			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
+				minHeading = odo.getTheta();
+				minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
+			}
+		}
+		nav.turnTo(minHeading, true);
+		odo.moveCM(Odometer.LINEDIR.Backward, Util.BLOCK_DISTANCE - minDistance, true);
+		Main.forklift.liftDown();
 	}
 	
 
