@@ -188,7 +188,13 @@ public class Search extends Thread {
 				break;
 				
 			case AtCardinal:
-				
+				if(	cardinals[currCardinal][0] < 0.0 || cardinals[currCardinal][1] > 10.0 * Util.SQUARE_LENGTH ||
+					cardinals[currCardinal][1] < 0.0 || cardinals[currCardinal][1] > 10.0 * Util.SQUARE_LENGTH) 
+				{
+					Search.searchState = SearchState.Default;
+					break;
+				}
+
 				// turn to start scanning angle
 				double startAngle = Math.PI/2 * currCardinal;
 				nav.turnTo(startAngle, true);
