@@ -44,7 +44,6 @@ public class Avoider extends Thread{
 	//TODO TODO TODO TODO
 	// - find more elegant way of choosing CW or CCW for obstacle avoidance
 	// - Discuss with Software if use of java.awt.rectangle is pertinent
-	// - Is it alright to hardcode corner values? they are absolute and final regardless anything
 	
 	/**
 	 * 
