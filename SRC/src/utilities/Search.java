@@ -68,8 +68,8 @@ public class Search extends Thread {
 		double midX = (GREEN[0][0] + GREEN[1][0]) / 2;
 		double midY = (GREEN[0][1] + GREEN[1][1]) / 2;
 		
-//		double diffX = GREEN[1][0] - GREEN[0][0];
-//		double diffY = GREEN[1][1] - GREEN[0][1];
+		double diffX = GREEN[1][0] - GREEN[0][0];
+		double diffY = GREEN[1][1] - GREEN[0][1];
 		
 		double paddingX = 0;
 		double paddingY = 0;

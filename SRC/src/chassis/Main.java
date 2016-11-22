@@ -179,9 +179,6 @@ public class Main {
 			System.out.print("\n\n\n\n\n\n\n\n");
 			//lcd.resume();
 			
-			Search search = new Search(odo, colorSensor, usSensor, GREEN);
-			Capture capture = new Capture(odo, GREEN);
-			Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 			
 			state = RobotState.Localization;
 			localizer.doLocalization();
