@@ -228,4 +228,14 @@ public class Test {
 		Main.lcd.setLine1("Done");
 	}
 	
+	public static void GripTest() {
+		Main.forklift.grip();
+		while(Button.waitForAnyPress() != Button.ID_ESCAPE) {
+			Main.lcd.getLCD().clear();
+			//Main.lcd.setLine2("Angle: " + Main.forklift.getGrip());
+			System.out.println("Angle: " + Main.forklift.getGrip());
+		}
+		Main.forklift.ungrip();
+	}
+	
 }

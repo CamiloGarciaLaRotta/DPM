@@ -68,6 +68,7 @@ public class Capture extends Thread {
 				break;
 			case Return:
 				// Thread to verify claw still has block
+				/*
 				(new Thread() {
 					  public void run() {
 						  // only active during the return state
@@ -102,6 +103,7 @@ public class Capture extends Thread {
 					    try {Thread.sleep(Util.SLEEP_PERIOD);} catch (Exception ex) {}
 					  }
 				}).start();
+				*/
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
 				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
 				if(towerHeight == 0){

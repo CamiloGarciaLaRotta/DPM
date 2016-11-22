@@ -49,4 +49,8 @@ public class Forklift {
 	public void ungrip() {
 		clawMotor.rotateTo(0);
 	}
+	
+	public double getGrip() {
+		return clawMotor.getTachoCount();
+	}
 }

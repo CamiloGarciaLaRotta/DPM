@@ -73,7 +73,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, ObjectDiffTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, ObjectDiffTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance, GripTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	/**
 	 * Robot job. Either builder or garbage collector. Builder is default.
 	 */
@@ -139,7 +139,7 @@ public class Main {
 		//threads intrinsic to all processes
 		odo.start();
 		ender.start();
-		lcd.resume();
+		//lcd.resume();
 		
 		switch (demo) {
 		case Default: //regular robot operation
@@ -229,6 +229,9 @@ public class Main {
 			break;
 		case ObjectDiffTest:
 			Test.ObjectDiffTest();
+			break;
+		case GripTest:
+			Test.GripTest();
 			break;
 		default:
 			System.exit(-1);

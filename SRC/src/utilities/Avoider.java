@@ -234,7 +234,7 @@ public class Avoider extends Thread{
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*Math.PI/2);
-		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK));
+		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK),true);
 		double[] pos = new double[3];
 		odo.getPosition(pos);
 		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path
