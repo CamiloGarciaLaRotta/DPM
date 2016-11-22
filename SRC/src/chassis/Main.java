@@ -43,7 +43,7 @@ public class Main {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 	private static final EV3LargeRegulatedMotor forkliftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3MediumRegulatedMotor clawMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("A"));
+	public static final EV3MediumRegulatedMotor clawMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");
 	private static final Port colorPort = LocalEV3.get().getPort("S2");
 	private static final Port intensityPort = LocalEV3.get().getPort("S3");
@@ -164,9 +164,9 @@ public class Main {
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{1*Util.SQUARE_LENGTH,2*Util.SQUARE_LENGTH},
+				GREEN = new double[][]{{0*Util.SQUARE_LENGTH,0*Util.SQUARE_LENGTH},
 					{3*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH}};
-				RED = new double[][]{{0*Util.SQUARE_LENGTH,5*Util.SQUARE_LENGTH},
+				RED = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
 						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
 				
 				startingCorner = 1;
@@ -181,7 +181,9 @@ public class Main {
 			
 			
 			state = RobotState.Localization;
-			localizer.doLocalization();
+			//localizer.doLocalization();
+			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
+			state = RobotState.Search;
 			while(state != RobotState.Search){try {
 				Thread.sleep(Util.SLEEP_PERIOD);
 			} catch (InterruptedException e) {

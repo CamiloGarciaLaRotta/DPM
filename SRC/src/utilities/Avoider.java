@@ -110,7 +110,7 @@ public class Avoider extends Thread{
 				
 				if(pathClear) {
 					// no more obstacle ahead, advance a bit before returning control to Search
-					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+					odo.moveCM(LINEDIR.Forward, Util.ROBOT_LENGTH, true);
 	
 					if(Main.state != RobotState.Finished) {
 						if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
@@ -234,7 +234,7 @@ public class Avoider extends Thread{
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*Math.PI/2);
-		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK),true);
+		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK),false);
 		double[] pos = new double[3];
 		odo.getPosition(pos);
 		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path

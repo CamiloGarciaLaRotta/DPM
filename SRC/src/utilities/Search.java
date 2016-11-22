@@ -125,12 +125,12 @@ public class Search extends Thread {
 					
 					// until it arrives at current cardinal
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
-									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
+									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){ 
 						
-						double cardinalHeading = Math.atan2(cardinals[currCardinal][1] - odo.getY(), cardinals[currCardinal][0] - odo.getX());
-						double targetHeading = cardinalHeading ;//+ 5.0 * Math.PI / 180.0;
+						double targetHeading = Math.atan2(cardinals[currCardinal][1] - odo.getY(), cardinals[currCardinal][0] - odo.getX());
 
 						odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+						// will always be CW because localization will always end with the robot with the wall on its left
 						odo.spin(Odometer.TURNDIR.CW);
 						double minHeading = odo.getTheta();
 						double minDistance = Main.usSensor.getMedianSample(Util.US_SAMPLES);
@@ -142,13 +142,15 @@ public class Search extends Thread {
 							}
 						}
 						odo.stopMotors();
+						
 						//just to make sure we get the last heading
 						if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
 							minDistance = distance;
 							minHeading = odo.getTheta();
 						}
 						
-						if(minDistance < Odometer.euclideanDistance(new double[] {odo.getX(),odo.getY()}, cardinals[currCardinal])) {
+						// if there's an approachable block in sight
+						if(minDistance < Util.SEARCH_DISTANCE) {
 							Sound.twoBeeps();
 							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
 						}
@@ -165,7 +167,7 @@ public class Search extends Thread {
 								while(Main.state != RobotState.Search) {
 									try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
 								}
-								searchState = SearchState.Default;
+								//searchState = SearchState.Default;
 							}
 							else {
 								Main.forklift.liftUp();
@@ -261,7 +263,7 @@ public class Search extends Thread {
 			case AtDropZone:
 				
 				// back off until  to avoid colliding with tower
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
+				odo.moveCM(LINEDIR.Backward, Util.ROBOT_WIDTH/2, true);
 				
 				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 				
@@ -450,25 +452,25 @@ public class Search extends Thread {
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
-		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
-//		boolean isStyrofoam;
-//		
-//		float[] measuredRGB = Main.colorSensor.getColor();
-//		//get unit vector
-//		double magnitude = Math.sqrt(
-//				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
-//		double[] normRGB = new double[3];
-//		normRGB[0] = (double)measuredRGB[0]/magnitude;
-//		normRGB[1] = (double)measuredRGB[1]/magnitude;
-//		normRGB[2] = (double)measuredRGB[2]/magnitude;
-//		
-//		//compare measurement to standard for styrofoam block
-//		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
-//			isStyrofoam = true;
-//		} else {
-//			isStyrofoam = false;
-//		}
-//		return isStyrofoam;
+//		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
+		boolean isStyrofoam;
+		
+		float[] measuredRGB = Main.colorSensor.getColor();
+		//get unit vector
+		double magnitude = Math.sqrt(
+				(double)(measuredRGB[0]*measuredRGB[0]) + (double)(measuredRGB[1]*measuredRGB[1]) + (double)(measuredRGB[2]*measuredRGB[2]));
+		double[] normRGB = new double[3];
+		normRGB[0] = (double)measuredRGB[0]/magnitude;
+		normRGB[1] = (double)measuredRGB[1]/magnitude;
+		normRGB[2] = (double)measuredRGB[2]/magnitude;
+		
+		//compare measurement to standard for styrofoam block
+		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
+			isStyrofoam = true;
+		} else {
+			isStyrofoam = false;
+		}
+		return isStyrofoam;
 	}
 	
 	/**

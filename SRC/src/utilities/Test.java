@@ -158,6 +158,7 @@ public class Test {
 	public static void ForkliftTest() {
 		int option;
 		do {
+			double tacho = Main.clawMotor.getTachoCount();
 			option = Button.waitForAnyPress();
 			switch(option) {
 			case Button.ID_UP:
@@ -171,7 +172,7 @@ public class Test {
 				break;
 			default:
 				break;
-			}
+			}		
 		}while(option != Button.ID_ESCAPE);
 	}
 	
