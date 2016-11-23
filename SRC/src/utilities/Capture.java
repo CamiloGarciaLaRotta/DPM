@@ -63,7 +63,7 @@ public class Capture extends Thread {
 			case Grab:
 				//TODO: Make sure block is in range
 				Main.forklift.liftDown();
-				odo.moveCM(Odometer.LINEDIR.Forward, Util.APPROACH_BLOCK, true);
+				//odo.moveCM(Odometer.LINEDIR.Forward, Util.APPROACH_BLOCK, true);
 				Main.forklift.grip();
 				Main.forklift.liftUp();
 				captureState = CaptureState.Return;
