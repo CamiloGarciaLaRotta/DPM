@@ -74,19 +74,19 @@ public class Avoider extends Thread{
 	@Override
 	public void run() {
 		while(true){
-			
-			CaptureState lastCaptureState = Capture.captureState;
+			//Save the last states of Capture and Search, so we can set them to Idle temporarily during Avoider operation
+			CaptureState lastCaptureState = Capture.captureState; 
 			SearchState lastSearchState = Search.searchState;
 			
-			distance = usSensor.getMedianSample(Util.US_SAMPLES);
+			distance = usSensor.getMedianSample(Util.US_SAMPLES); //Current observed distance to an object
 			
 			// build current position rectangle
 			odo.getPosition(this.currPos);
 			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH), Util.ROBOT_WIDTH, Util.ROBOT_LENGTH);
 			
-			boolean CCW = chooseOrientation(currPos);
+			boolean CCW = chooseOrientation(currPos); //Chooses if it is more appropriate to turn CCW or CW
 			
-			if(Avoider.avoidState == AvoidState.Enabled) {			
+			if(Avoider.avoidState == AvoidState.Enabled) {
 				
 				if(Main.state != RobotState.Finished) Main.state = RobotState.Avoiding;
 				odo.stopMotors();
@@ -148,6 +148,7 @@ public class Avoider extends Thread{
 			}
 			
 			if(Main.state != RobotState.Finished) {
+				//Reset Search and Capture to appropriate states
 				if(lastCaptureState != CaptureState.Idle) {
 					Main.state = RobotState.Capture;
 					Capture.captureState = lastCaptureState;

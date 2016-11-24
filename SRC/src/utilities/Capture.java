@@ -61,19 +61,17 @@ public class Capture extends Thread {
 			
 			switch(captureState) {
 			case Grab:
-				//TODO: Make sure block is in range
-				Main.forklift.liftDown();
-				//odo.moveCM(Odometer.LINEDIR.Forward, Util.APPROACH_BLOCK, true);
+				Main.forklift.liftDown(); //Descend forklift. 
 				Main.forklift.grip();
 				Main.forklift.liftUp();
-				captureState = CaptureState.Return;
+				captureState = CaptureState.Return; //Move on to Return
 				break;
 			case Return:
-				// Thread to verify claw still has block
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
-				nav.travelTo(cardinalPoint[0], cardinalPoint[1]);
+				nav.travelTo(cardinalPoint[0], cardinalPoint[1]); //Travel back to last cardinal point, this path is guaranteed to be clear
 				//if(dc.dropped){
 					if(towerHeight == 0){
+						//If towerHeight is 0, travel to a predetermined stacking area and drop the block
 						nav.travelTo(towerPosition[0], towerPosition[1]);
 						while(Navigation.PathBlocked) {
 							Avoider.avoidState = Avoider.AvoidState.Enabled;
@@ -88,6 +86,7 @@ public class Capture extends Thread {
 		
 						break;
 					}
+					//If there is already a tower, travel towards towerPosition until the tower is detected.
 					double targetHeading = Math.atan2(-odo.getY() + towerPosition[1],-odo.getX() + towerPosition[0]);
 					nav.turnTo(targetHeading,true); //Turn to face tower position, stop motors
 					odo.setMotorSpeed(Odometer.NAVIGATE_SPEED); //Move forward until the tower is detected.
@@ -98,8 +97,7 @@ public class Capture extends Thread {
 				//}
 				break;
 			case Stack:
-				//TODO: Make sure tower is in range
-				Main.forklift.liftToTower(towerHeight++);
+				Main.forklift.liftToTower(towerHeight++); //Descend lift to height of tower, increase towerHeight
 				Main.forklift.ungrip();
 				Main.forklift.liftUp();
 				if(Search.searchState != SearchState.Default) Search.searchState = SearchState.AtDropZone; //Pass control back to search

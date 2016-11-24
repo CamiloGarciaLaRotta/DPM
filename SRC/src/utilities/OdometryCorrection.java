@@ -46,21 +46,19 @@ public class OdometryCorrection extends Thread {
 		
 		while (true) {
 			float intensity;
-			float dI;
+			float dI; //Stores the difference in intensity relative to last measurement
 			correctionStart = System.currentTimeMillis();
 			intensity = Main.gridLineDetector.getIntensity();
-			//Intensity at line is < 300.
-			if(intensity < LightIntensitySensor.LINE_DETECTED && lastIntensity < LightIntensitySensor.LINE_DETECTED) continue; //Only register line when the last measurement DID NOT measure a line
+//			if(intensity < LightIntensitySensor.LINE_DETECTED && lastIntensity < LightIntensitySensor.LINE_DETECTED) continue; //Only register line when the last measurement DID NOT measure a line
 			dI = lastIntensity - intensity;
 			lastIntensity = intensity;
 
-			// put your correction code here
-			
 			if(dI > LightIntensitySensor.LINE_DETECTED) //Detected black
 			{
-				Sound.beep();
+//				Sound.beep();
 				double currentPosition[] = new double[3];
 				double sensorPosition[] = new double[2];
+				//Use trig to find current position of light sensor
 				odometer.getPosition(currentPosition, Util.UPDATE_ALL);
 				sensorPosition[0] = currentPosition[0] - Util.INTENSITY_TO_CENTER * Math.cos(currentPosition[2]);
 				sensorPosition[1] = currentPosition[1] - Util.INTENSITY_TO_CENTER * Math.sin(currentPosition[2]);

@@ -155,6 +155,10 @@ public class Test {
 		search.interrupt();
 	}
 	
+	/**
+	 * Test for controlling the operation of the forklift
+	 * @see chassis.Forklift
+	 */
 	public static void ForkliftTest() {
 		int option;
 		do {
@@ -229,6 +233,7 @@ public class Test {
 		Main.lcd.setLine1("Done");
 	}
 	
+	//Test for finding the threshold of motor angle for dropped block
 	public static void GripTest() {
 		Main.forklift.grip();
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE) {

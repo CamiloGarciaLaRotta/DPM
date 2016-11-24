@@ -43,7 +43,7 @@ public class Forklift {
 	}
 
 	public void grip() {
-		clawMotor.rotateTo(-Util.GRIP_STRENGTH);
+		clawMotor.rotateTo(-Util.GRIP_STRENGTH); //Rotate to an absolute position to apply continous force on block
 	}
 
 	public void ungrip() {

@@ -375,6 +375,7 @@ public class Search extends Thread {
 				Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, new double[] {X,Y}) > Util.BLOCK_DISTANCE); 
 		odo.stopMotors();
 		
+		//Scan left and right to find minimum distance to object. This should reduce the frequency of the robot detecting the block at a bad angle
 		FOV(Util.SEARCH_FOV);
 		
 		// inspect object
@@ -401,6 +402,7 @@ public class Search extends Thread {
 		double ccwHeading = odo.getTheta() + angle/2;
 		double cwHeading = odo.getTheta() - angle/2;
 		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+		//Rotate counterclockwise by angle/2
 		odo.spin(Odometer.TURNDIR.CCW);
 		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), ccwHeading)) > Util.SCAN_THETA_THRESHOLD) {
 			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
@@ -410,6 +412,7 @@ public class Search extends Thread {
 		}
 		odo.stopMotors();
 		odo.setMotorSpeed(Odometer.ROTATE_SPEED);
+		//Rotate clockwise by angle/2
 		odo.spin(Odometer.TURNDIR.CW);
 		while(Math.abs(Navigation.minimalAngle(odo.getTheta(), cwHeading)) > Util.SCAN_THETA_THRESHOLD) {
 			if(usSensor.getMedianSample(Util.US_SAMPLES) < minDistance)  {
@@ -464,7 +467,7 @@ public class Search extends Thread {
 		normRGB[1] = (double)measuredRGB[1]/magnitude;
 		normRGB[2] = (double)measuredRGB[2]/magnitude;
 		
-		//compare measurement to standard for styrofoam block
+		//compare measurement to standard for styrofoam block with a dot product
 		if(normRGB[0]*Util.FOAM_RGB_VECTOR[0] + normRGB[1]*Util.FOAM_RGB_VECTOR[1] + normRGB[2]*Util.FOAM_RGB_VECTOR[2] > Util.VECTOR_TOLERANCE) {
 			isStyrofoam = true;
 		} else {
