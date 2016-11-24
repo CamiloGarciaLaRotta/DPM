@@ -27,7 +27,7 @@ public class Search extends Thread {
 	private Odometer odo;	
 	private Navigation nav;
 	private USSensor usSensor;
-	private ColorSensor colorSensor;
+	private static ColorSensor colorSensor;
 	
 	// Coordinates
 	private double[] N = new double[2];
@@ -46,6 +46,8 @@ public class Search extends Thread {
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Idle};
 	public static SearchState searchState;
 	
+	// TODO TODO TODO TODO
+	// - setter for GREEN/RED on all classes
 	
 	/**
 	 * Constructor for Search Class
@@ -123,9 +125,36 @@ public class Search extends Thread {
 					
 					// until it arrives at current cardinal
 					while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, 
-									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){     //adjust value during tests
+									new double[] {cardinals[currCardinal][0], cardinals[currCardinal][1]}) > Util.TRAVELTO_BW){ 
 						
-							nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
+						double targetHeading = Math.atan2(cardinals[currCardinal][1] - odo.getY(), cardinals[currCardinal][0] - odo.getX());
+
+						odo.setMotorSpeed(USLocalizer.ROTATION_SPEED);
+						// will always be CW because localization will always end with the robot with the wall on its left
+						odo.spin(Odometer.TURNDIR.CW);
+						double minHeading = odo.getTheta();
+						double minDistance = Main.usSensor.getMedianSample(Util.US_SAMPLES);
+						double distance;
+						while(Math.abs(Navigation.minimalAngle(odo.getTheta(), targetHeading)) > Util.SCAN_THETA_THRESHOLD) {
+							if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+								minDistance = distance;
+								minHeading = odo.getTheta();
+							}
+						}
+						odo.stopMotors();
+						
+						//just to make sure we get the last heading
+						if((distance = Main.usSensor.getMedianSample(Util.US_SAMPLES)) < minDistance){ 
+							minDistance = distance;
+							minHeading = odo.getTheta();
+						}
+						
+						// if there's an approachable block in sight
+						if(minDistance < Util.SEARCH_DISTANCE) {
+							Sound.twoBeeps();
+							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
+						}
+						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 						
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
@@ -138,7 +167,7 @@ public class Search extends Thread {
 								while(Main.state != RobotState.Search) {
 									try { Thread.sleep(2*Util.SLEEP_PERIOD); } catch(Exception ex) {}
 								}
-								searchState = SearchState.Default;
+								//searchState = SearchState.Default;
 							}
 							else {
 								Main.forklift.liftUp();
@@ -234,7 +263,7 @@ public class Search extends Thread {
 			case AtDropZone:
 				
 				// back off until  to avoid colliding with tower
-				odo.moveCM(LINEDIR.Backward, Util.ROBOT_LENGTH, true);
+				odo.moveCM(LINEDIR.Backward, Util.ROBOT_WIDTH/2, true);
 				
 				nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
 				
@@ -304,8 +333,8 @@ public class Search extends Thread {
 		if (currDistance > Util.SEARCH_DISTANCE) return false;
 		
 		// make sure object in sight is not wall
-		if(objY < Util.SOUTH_MAX || objY > Util.NORTH_MAX || 
-				objX < Util.WEST_MAX || objX > Util.EAST_MAX) {
+		if(objY <= Util.SOUTH_MAX || objY >= Util.NORTH_MAX || 
+				objX <= Util.WEST_MAX || objX >= Util.EAST_MAX) {
 			return false;
 		}
 		
@@ -423,6 +452,7 @@ public class Search extends Thread {
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
+//		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
 		boolean isStyrofoam;
 		
 		float[] measuredRGB = Main.colorSensor.getColor();

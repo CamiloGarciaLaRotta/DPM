@@ -41,11 +41,6 @@ public class Avoider extends Thread{
 	private double distance;
 
 	
-	//TODO TODO TODO TODO
-	// - find more elegant way of choosing CW or CCW for obstacle avoidance
-	// - Discuss with Software if use of java.awt.rectangle is pertinent
-	// - Is it alright to hardcode corner values? they are absolute and final regardless anything
-	
 	/**
 	 * 
 	 * @param odo - Odometer object
@@ -94,7 +89,6 @@ public class Avoider extends Thread{
 			if(Avoider.avoidState == AvoidState.Enabled) {			
 				
 				if(Main.state != RobotState.Finished) Main.state = RobotState.Avoiding;
-				
 				odo.stopMotors();
 				
 				do{
@@ -116,7 +110,7 @@ public class Avoider extends Thread{
 				
 				if(pathClear) {
 					// no more obstacle ahead, advance a bit before returning control to Search
-					odo.moveCM(LINEDIR.Forward, Util.ROBOT_WIDTH, true);
+					odo.moveCM(LINEDIR.Forward, Util.ROBOT_LENGTH, true);
 	
 					if(Main.state != RobotState.Finished) {
 						if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
@@ -128,41 +122,41 @@ public class Avoider extends Thread{
 				}
 			}
 			
-//			// check for RED zone
-//			if(RED.contains(currRect)){
-//				odo.stopMotors();
-//				if(Main.state != RobotState.Finished) { 
-//					Main.state = RobotState.Avoiding;
-//					// determine in which thread the robot was acting 
-//					if(Capture.captureState != CaptureState.Idle){
-//						Capture.captureState = CaptureState.Idle;
-//					} else {
-//						Search.searchState = SearchState.Idle; 
-//					}
-//				}
-//				redAvoidance();	
-//			}
-//			
-//			// check for corners zones
-//			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
-//					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
-//				// return to GREEN, nothing to do in a corner
-//				Search.searchState = SearchState.Default;
-//				Main.state = RobotState.Search;
-//				Capture.captureState = CaptureState.Idle;
-//				continue;
-//			}
-//			
-//			if(Main.state != RobotState.Finished) {
-//				if(lastCaptureState != CaptureState.Idle) {
-//					Main.state = RobotState.Capture;
-//					Capture.captureState = lastCaptureState;
-//				}
-//				else {
-//					Main.state = RobotState.Search;
-//					Search.searchState = lastSearchState;
-//				}
-//			}
+			// check for RED zone
+			if(RED.contains(currRect)){
+				odo.stopMotors();
+				if(Main.state != RobotState.Finished) { 
+					Main.state = RobotState.Avoiding;
+					// determine in which thread the robot was acting 
+					if(Capture.captureState != CaptureState.Idle){
+						Capture.captureState = CaptureState.Idle;
+					} else {
+						Search.searchState = SearchState.Idle; 
+					}
+				}
+				redAvoidance();	
+			}
+			
+			// check for corners zones
+			if(Main.state != RobotState.Finished && Search.searchState != SearchState.Default &&
+					(x1.contains(currRect) || x2.contains(currRect) || x3.contains(currRect) || x4.contains(currRect))){
+				// return to GREEN, nothing to do in a corner
+				Search.searchState = SearchState.Default;
+				Main.state = RobotState.Search;
+				Capture.captureState = CaptureState.Idle;
+				continue;
+			}
+			
+			if(Main.state != RobotState.Finished) {
+				if(lastCaptureState != CaptureState.Idle) {
+					Main.state = RobotState.Capture;
+					Capture.captureState = lastCaptureState;
+				}
+				else {
+					Main.state = RobotState.Search;
+					Search.searchState = lastSearchState;
+				}
+			}
 			
 			
 			// lower stress on CPU
@@ -182,8 +176,6 @@ public class Avoider extends Thread{
 		int currCardinal = 0;
 		double distanceToNextAxis = 0;
 		
-		// TODO HANDLE SPECIAL CASE -> WHAT IF ROBOT ARRIVES AT CORNER
-		
 		// identify which side of RED zone we are facing
 		if(currY < this.RED_N+5 && currY > this.RED_N-5){
 			currCardinal = 0;
@@ -196,7 +188,7 @@ public class Avoider extends Thread{
 		}
 		
 		// go around it (by default CCW)
-		for(int i = 0; i < 2; i++){
+		for(int i = 0; i < 1; i++){
 			currCardinal++; currCardinal %= 4;
 			nav.turnTo(currCardinal*Math.PI/2 + Math.PI/2, true);
 			distanceToNextAxis = (currCardinal % 2 == 0) ? Math.abs(currY-red_cardinals[currCardinal]) :
@@ -204,8 +196,8 @@ public class Avoider extends Thread{
 			odo.moveCM(LINEDIR.Forward, distanceToNextAxis , true);
 		}	
 		
-		// face away from the RED zone
-		nav.turnTo(currCardinal*Math.PI/2, true);
+		// at this position the robot is on the opposite end of the RED rectangle, 
+		// it can safely continue its path
 	}
 
 	/**
@@ -242,7 +234,7 @@ public class Avoider extends Thread{
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
 		nav.turnBy(coeff*Math.PI/2);
-		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK));
+		nav.travelTo(odo.getX() + Math.cos(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK), odo.getY() + Math.sin(odo.getTheta()) * (Util.WOOD_MIN_WIDTH + Util.TRACK),false);
 		double[] pos = new double[3];
 		odo.getPosition(pos);
 		if(Navigation.PathBlocked) linearAvoidance(CCW); //Recursively avoid obstacles if there's an obstacle in the avoidance path

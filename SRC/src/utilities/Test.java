@@ -158,6 +158,7 @@ public class Test {
 	public static void ForkliftTest() {
 		int option;
 		do {
+			double tacho = Main.clawMotor.getTachoCount();
 			option = Button.waitForAnyPress();
 			switch(option) {
 			case Button.ID_UP:
@@ -171,7 +172,7 @@ public class Test {
 				break;
 			default:
 				break;
-			}
+			}		
 		}while(option != Button.ID_ESCAPE);
 	}
 	
@@ -226,6 +227,16 @@ public class Test {
 			}
 		}
 		Main.lcd.setLine1("Done");
+	}
+	
+	public static void GripTest() {
+		Main.forklift.grip();
+		while(Button.waitForAnyPress() != Button.ID_ESCAPE) {
+			Main.lcd.getLCD().clear();
+			//Main.lcd.setLine2("Angle: " + Main.forklift.getGrip());
+			System.out.println("Angle: " + Main.forklift.getGrip());
+		}
+		Main.forklift.ungrip();
 	}
 	
 }
