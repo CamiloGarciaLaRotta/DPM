@@ -7,18 +7,20 @@ import utilities.Odometer.LINEDIR;
 
 public class Clock extends Thread{
 	public static boolean GAME_OVER = false;
-	private static final long FIVE_MINUTES = 1000*60*5;	//game length in milliseconds
+	public static final long FIVE_MINUTES = 1000*60*5;	//game length in milliseconds
 	private static final long TIME_THRESHOLD = 1000 * 30;
 	private Odometer odo;
 	private Navigation nav;
+	public long startTime;	//public for testing purposes
 	
 	public Clock(Odometer odo) {
 		this.odo = odo;
 		this.nav = new Navigation(this.odo);
 	}
 	
+	@Override
 	public void run() {
-		long startTime = System.currentTimeMillis();
+		startTime = System.currentTimeMillis();
 		while(true) {
 			if(System.currentTimeMillis() - startTime >= FIVE_MINUTES - TIME_THRESHOLD) {
 				//TODO Stop flow, travelTo starting corner

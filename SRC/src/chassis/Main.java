@@ -24,6 +24,7 @@ import utilities.ThreadEnder;
 import utilities.USLocalizer;
 import utilities.Util;
 import utilities.Capture.CaptureState;
+import utilities.Clock;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
@@ -72,7 +73,7 @@ public class Main {
 	 * @author juliette
 	 * Select test to run or run in match mode (Default).
 	 */
-	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, ObjectDiffTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance, GripTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
+	public enum DemoState {Default, StraightLineTest, SquareTest, LocalizationTest, NavigationTest, SearchTest, ObjectDiffTest, RGBVectorTest, TrackTest, ForkliftTest, Avoidance, GripTest, ReturnTest};	//can be expanded to include alternate options, debugging, hardware tests, etc.
 	/**
 	 * Robot job. Either builder or garbage collector. Builder is default.
 	 */
@@ -131,6 +132,7 @@ public class Main {
 		Search search = new Search(odo, colorSensor, usSensor, GREEN);
 		Capture capture = new Capture(odo, search, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
+		Clock clock = new Clock(odo);
 		
 		textLCD.clear(); //blank display before selection
 		demo = stateSelect();	//select state
@@ -175,6 +177,7 @@ public class Main {
 				startingCornerCoord[1] = 0;
 				startingCornerCoord[2] = (Math.PI/2.0);
 			}
+			clock.start();
 			System.out.print("\n\n\n\n\n\n\n\n");
 			//lcd.resume();
 			
@@ -234,6 +237,11 @@ public class Main {
 			break;
 		case GripTest:
 			Test.GripTest();
+			break;
+		case ReturnTest:
+			clock.start();
+			avoid.start();
+			Test.ReturnTest(odo, clock);
 			break;
 		default:
 			System.exit(-1);
