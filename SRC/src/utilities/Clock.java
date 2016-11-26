@@ -5,10 +5,17 @@ import chassis.Main.RobotState;
 import utilities.Avoider.AvoidState;
 import utilities.Odometer.LINEDIR;
 
+/**
+ * Returns the robot to the starting corner before the match ends.
+ * Should be started when parameters are set.
+ * @version 3.0
+ * @author juliette
+ *
+ */
 public class Clock extends Thread{
 	public static boolean GAME_OVER = false;
 	public static final long FIVE_MINUTES = 1000*60*5;	//game length in milliseconds
-	private static final long TIME_THRESHOLD = 1000 * 30;
+	private static final long TIME_THRESHOLD = 1000 * 30;	//time allowed to return to the starting corner
 	private Odometer odo;
 	private Navigation nav;
 	public long startTime;	//public for testing purposes
@@ -18,6 +25,10 @@ public class Clock extends Thread{
 		this.nav = new Navigation(this.odo);
 	}
 	
+	/**
+	 * Clock thread
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
 		startTime = System.currentTimeMillis();
