@@ -245,7 +245,7 @@ public class Test {
 	}
 	
 	public static void ReturnTest(Odometer odo, Clock clock) {
-		odo.setPosition(new double[] {60,  60, Math.PI/2}, new boolean[] {true, true, true});
+		odo.setPosition(new double[] {90,  90, Math.PI/2}, new boolean[] {true, true, true});
 		clock.startTime = System.currentTimeMillis() - Clock.FIVE_MINUTES;
 		while(Main.state != Main.RobotState.Finished);
 	}

@@ -241,6 +241,7 @@ public class Main {
 		case ReturnTest:
 			clock.start();
 			avoid.start();
+			lcd.resume();
 			Test.ReturnTest(odo, clock);
 			break;
 		default:

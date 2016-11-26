@@ -28,7 +28,7 @@ public class Clock extends Thread{
 				Main.state = Main.RobotState.Returning;	//prevents other threads from acting (except avoidance)
 				double[] startingCorner = new double[] { Main.startingCornerCoord[0], Main.startingCornerCoord[1] };
 				//navigate to first cardinal point
-				while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, startingCorner) < Util.CM_TOLERANCE) {
+				while(Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, startingCorner) > Util.CM_TOLERANCE) {
 					nav.travelTo(startingCorner[0], startingCorner[1]);
 					
 					if(Navigation.PathBlocked) {
