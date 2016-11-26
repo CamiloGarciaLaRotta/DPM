@@ -244,6 +244,11 @@ public class Test {
 		Main.forklift.ungrip();
 	}
 	
+	/**
+	 * Test for the robot returning to the starting corner (default corner)
+	 * @param odo Odometer object
+	 * @param clock Clock thread
+	 */
 	public static void ReturnTest(Odometer odo, Clock clock) {
 		odo.setPosition(new double[] {90,  90, Math.PI/2}, new boolean[] {true, true, true});
 		clock.startTime = System.currentTimeMillis() - Clock.FIVE_MINUTES;

@@ -2,12 +2,16 @@ package utilities;
 
 import chassis.Main;
 import chassis.Main.RobotState;
-import lejos.hardware.Button;
 import utilities.Capture.CaptureState;
 import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
-
+/**
+ * @version 3.0
+ * @author juliette
+ * Runs during capture to make sure the block was not dropped.
+ * Tries to retrieve the block if it is dropped.
+ */
 public class DropCheck extends Thread{
 
 	private Odometer odo;
@@ -16,6 +20,11 @@ public class DropCheck extends Thread{
 	public boolean dropped;
 	private Object dropMutex;
 	
+	/**
+	 * DropCheck Constructor
+	 * @param odo Odometer object
+	 * @param search Search thread (to access and set states)
+	 */
 	public DropCheck(Odometer odo, Search search){
 		this.odo = odo;
 		this.nav = new Navigation(this.odo);
@@ -55,12 +64,21 @@ public class DropCheck extends Thread{
     	}
 	}
 	
+	/**
+	 * If the robot has dropped the block.
+	 * Uses mutual exclusion since Capture and DropCheck will both be polling dropped.
+	 * @return if the block is dropped
+	 */
 	public boolean getDropped() {
 		synchronized(dropMutex) {
 			return dropped;
 		}
 	}
 	
+	/**
+	 * Sets the drop state of the block. Uses mutual exclusion.
+	 * @param dropped if the block should be set to dropped
+	 */
 	private void setDropped(boolean dropped) {
 		synchronized(dropMutex) {
 			this.dropped = dropped;
