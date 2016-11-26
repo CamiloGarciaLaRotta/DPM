@@ -8,7 +8,7 @@ import lejos.hardware.Sound;
 
 /**
  * @version 3.0
- * Localize the robot in the first square to (0, 0, 90-degrees)
+ * Localize the robot in the starting square to (0, 0, 90-degrees for first corner)
  *
  */
 public class USLocalizer extends Thread {
@@ -25,9 +25,9 @@ public class USLocalizer extends Thread {
 	
 	/**
 	 * USLocalizer Constructor
-	 * @param odometer - Odometer object
-	 * @param usSensor - USSensor object
-	 * @param distanceUSSensor - distance of sensor from center of rotation (in cm)
+	 * @param odometer Odometer object
+	 * @param usSensor USSensor object
+	 * @param distanceUSSensor distance of sensor from center of rotation (in cm)
 	 */
 	public USLocalizer(Odometer odometer,  USSensor usSensor, double distanceUSSensor) {
 		this.odo = odometer;
@@ -46,6 +46,8 @@ public class USLocalizer extends Thread {
 	}
 	
 	/**
+	 * Called by doLocalization()
+	 * Do not call directly
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -129,8 +131,8 @@ public class USLocalizer extends Thread {
 	}
 	
 	/**
-	 * Checks if the robot sees a wall for localizing
-	 * @return - if a wall is seen
+	 * Checks if the robot sees a wall during localizing
+	 * @return if a wall is seen
 	 */
 	private boolean seesWall() {
 		float sample = usSensor.getMedianSample(10);

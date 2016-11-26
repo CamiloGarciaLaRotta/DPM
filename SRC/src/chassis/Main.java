@@ -32,6 +32,7 @@ import wifi.WifiConnection;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
+ * Handles demo mode selection, initializes objects, starts other threads
  * @version 3.0
  * @author juliette
  *
@@ -85,7 +86,7 @@ public class Main {
 
 	/**
 	 * Main execution thread.
-	 * @param args - None used
+	 * @param args None used
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -376,6 +377,7 @@ public class Main {
 	
 	/**
 	 * Connects to wifi and waits for information to be transmitted.
+	 * IP address of server is statically set
 	 * @return Transmission parameters to be parsed
 	 * @throws IOException Fails if robot cannot connect to server.
 	 * @see Util#IP_ADDR

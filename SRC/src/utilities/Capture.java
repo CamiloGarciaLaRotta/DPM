@@ -8,10 +8,9 @@ import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
 /**
- * Thread that runs when capturing a styrofoam block
+ * Thread that runs when capturing a styrofoam block.
+ * Called by and returns control to Search
  * @version 3.0
- * 
- *
  */
 public class Capture extends Thread {
 	
@@ -131,7 +130,10 @@ public class Capture extends Thread {
 		return (x < width) && (y < height) && x > 0 && y > 0;
 	}
 	
-	// sets the current cardinal point at which the robot is bound to
+	/**
+	 * Sets the current cardinal point at which the robot is bound to
+	 * @param cardinalPoint x and y coordinates of the current cardinal point
+	 */
 	public static void setContext(double[] cardinalPoint) {
 		Capture.cardinalPoint = cardinalPoint;
 	}

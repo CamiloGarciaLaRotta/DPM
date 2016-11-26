@@ -16,10 +16,9 @@ import utilities.Odometer.TURNDIR;
 
 /**
  * Blue styrofoam block search functionality for the robot
+ * Goes to cardinal points on the field and searches for blocks at each
  * @author juliette
  * @version 3.0
- * 
- *
  */
 public class Search extends Thread {
 	
@@ -51,10 +50,10 @@ public class Search extends Thread {
 	
 	/**
 	 * Constructor for Search Class
-	 * @param odometer - Odometer object
-	 * @param colorSensor - ColorSensor object
-	 * @param usSensor - USSensor object
-	 * @param GREEN - coordinates of the green scoring zone
+	 * @param odometer Odometer object
+	 * @param colorSensor ColorSensor object
+	 * @param usSensor USSensor object
+	 * @param GREEN coordinates of the green scoring zone
 	 */
 	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		this.odo = odometer;
@@ -303,7 +302,10 @@ public class Search extends Thread {
 		
 	}
 
-	// approach an object to verify its nature
+	/**
+	 * Approach an object to verify its nature
+	 * @return if the object is a styrofoam block
+	 */
 	private boolean testForStyrofoam() {
 		odo.setMotorSpeed(Util.MOTOR_SLOW);
 		odo.forwardMotors();
@@ -316,7 +318,7 @@ public class Search extends Thread {
 		return styrofoam;
 	}
 	/**
-	 * 
+	 * Checks if there is an object that can be detected by the robot
 	 * @return if there is an object that can be detected by the robot
 	 */
 	private boolean testForObject() {
@@ -394,8 +396,11 @@ public class Search extends Thread {
 		searchState = SearchState.Default;
 	}
 	
-	// perform a swipe scan of a certain aperture angle to precisely identify block
-	// at this stage the robot is ensured to be in close proximity of block
+	/**
+	 *  Perform a swipe scan of a certain aperture angle to precisely identify block
+	 *  At this stage the robot is ensured to be in close proximity of block
+	 * @param angle the field of view (FOV) to scan
+	 */
 	protected void FOV(double angle) {
 		double minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
 		double minHeading = odo.getTheta();
@@ -426,7 +431,11 @@ public class Search extends Thread {
 	}
 	
 
-	// travel to correspondent axis of current cardinal point
+	/**
+	 * Travel to the corresponding axis
+	 * Axis based on current cardinal point.
+	 * @param frontwards direction to move in relative to robot
+	 */
 	private void travelToAxis(boolean frontwards) {
 		
 		String axis = (currCardinal % 2 == 0) ? "Y" : "X";
@@ -452,6 +461,7 @@ public class Search extends Thread {
 
 	
 	/**
+	 * Checks if the oject in front of the robot is a styrofoam block
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
