@@ -7,10 +7,10 @@ import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
 /**
- * @version 3.0
- * @author juliette
  * Runs during capture to make sure the block was not dropped.
  * Tries to retrieve the block if it is dropped.
+ * @version 3.0
+ * @author juliette
  */
 public class DropCheck extends Thread{
 
