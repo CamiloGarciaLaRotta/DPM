@@ -34,7 +34,7 @@ public class Search extends Thread {
 	private double[] W = new double[2];
 	private double[] S = new double[2];
 	private double[] E = new double[2];
-	public double[][] cardinals = new double[4][2];
+	public static double[][] cardinals = new double[4][2];
 	public int currCardinal;
 	
 	// object detection

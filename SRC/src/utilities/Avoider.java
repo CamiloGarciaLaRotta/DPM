@@ -78,6 +78,9 @@ public class Avoider extends Thread{
 			CaptureState lastCaptureState = Capture.captureState; 
 			SearchState lastSearchState = Search.searchState;
 			
+			//Save last robot state
+			int lastRobotState = Main.state.ordinal();
+			
 			distance = usSensor.getMedianSample(Util.US_SAMPLES); //Current observed distance to an object
 			
 			// build current position rectangle
@@ -114,7 +117,8 @@ public class Avoider extends Thread{
 	
 					if(Main.state != RobotState.Finished) {
 						if(lastCaptureState != CaptureState.Idle) Main.state = RobotState.Capture;
-						else Main.state = RobotState.Search;
+						else if(lastSearchState != SearchState.Idle) Main.state = RobotState.Search;
+						else Main.state = RobotState.values()[lastRobotState];
 						Capture.captureState = lastCaptureState;
 						Search.searchState = lastSearchState;
 						avoidState = AvoidState.Disabled;
@@ -153,9 +157,12 @@ public class Avoider extends Thread{
 					Main.state = RobotState.Capture;
 					Capture.captureState = lastCaptureState;
 				}
-				else {
+				else if(lastSearchState != SearchState.Idle) {
 					Main.state = RobotState.Search;
 					Search.searchState = lastSearchState;
+				}
+				else {
+					Main.state = RobotState.values()[lastRobotState];
 				}
 			}
 			
