@@ -153,16 +153,16 @@ public class Main {
 				try {
 					parameters = wifiConnect();
 				} catch (IOException e) {	//failed to connect to wifi
-					Sound.beepSequence();
+//					Sound.beepSequence();
 					System.err.println(e);
 					System.exit(-1);
 				}
-				Sound.beep();
+//				Sound.beep();
 				if(parameters != null) {
 					GREEN = new double[2][2];
 					RED = new double[2][2];
 					transmissionParse(parameters);
-					Sound.beepSequenceUp();
+//					Sound.beepSequenceUp();
 				}
 			} else {	//default parameters
 				// Default values for these - could be changed by wifi if enabled

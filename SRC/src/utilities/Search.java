@@ -150,7 +150,7 @@ public class Search extends Thread {
 						
 						// if there's an approachable block in sight
 						if(minDistance < Util.SEARCH_DISTANCE) {
-							Sound.twoBeeps();
+//							Sound.twoBeeps();
 							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
 						}
 						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
@@ -191,7 +191,7 @@ public class Search extends Thread {
 					if(this.objectLocations.isEmpty()) {
 						// next cardinal, wrap around
 						currCardinal++; currCardinal %= 4;
-						Sound.beepSequence();
+//						Sound.beepSequence();
 						
 						// linear set of instructions to reach next cardinal
 						// at this step the robot is ensured to be on the old cardinal point

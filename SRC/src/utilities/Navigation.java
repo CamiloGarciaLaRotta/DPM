@@ -97,7 +97,7 @@ public class Navigation {
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
-				Sound.beepSequence();
+//				Sound.beepSequence();
 				break;
 			}
 		}
@@ -130,7 +130,7 @@ public class Navigation {
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
-				Sound.beepSequence();
+//				Sound.beepSequence();
 				break;
 			}
 			
@@ -147,7 +147,7 @@ public class Navigation {
 					if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 						this.setSpeeds(0, 0);
 						Navigation.PathBlocked = true;
-						Sound.beepSequence();
+//						Sound.beepSequence();
 						return;
 					}
 				}
