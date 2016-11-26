@@ -66,7 +66,7 @@ public class Main {
 	/**
 	 * Current action the robot is doing
 	 */
-	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding, Finished};
+	public enum RobotState {Setup, Localization, Search, Capture, Disabled, Avoiding, Returning, Finished};
 	/**
 	 * 
 	 * @author juliette
@@ -339,15 +339,29 @@ public class Main {
 			}
 			
 			//Get zone coordinates
-			RED[0][0] = transmission.get("LRZx") * Util.SQUARE_LENGTH;
-			RED[0][1] = transmission.get("LRZy") * Util.SQUARE_LENGTH;
-			RED[1][0] = transmission.get("URZx") * Util.SQUARE_LENGTH;
-			RED[1][1] = transmission.get("URZy") * Util.SQUARE_LENGTH;
-			
-			GREEN[0][0] = transmission.get("LGZx") * Util.SQUARE_LENGTH;
-			GREEN[0][1] = transmission.get("LGZy") * Util.SQUARE_LENGTH;
-			GREEN[1][0] = transmission.get("UGZx") * Util.SQUARE_LENGTH;
-			GREEN[1][1] = transmission.get("UGZy") * Util.SQUARE_LENGTH;
+			//GREEN is *always* our scoring zone and RED is always our avoiding zone.
+			if(task == RobotTask.Builder)
+			{
+				RED[0][0] = transmission.get("LRZx") * Util.SQUARE_LENGTH;
+				RED[0][1] = transmission.get("LRZy") * Util.SQUARE_LENGTH;
+				RED[1][0] = transmission.get("URZx") * Util.SQUARE_LENGTH;
+				RED[1][1] = transmission.get("URZy") * Util.SQUARE_LENGTH;
+				
+				GREEN[0][0] = transmission.get("LGZx") * Util.SQUARE_LENGTH;
+				GREEN[0][1] = transmission.get("LGZy") * Util.SQUARE_LENGTH;
+				GREEN[1][0] = transmission.get("UGZx") * Util.SQUARE_LENGTH;
+				GREEN[1][1] = transmission.get("UGZy") * Util.SQUARE_LENGTH;
+			} else {
+				GREEN[0][0] = transmission.get("LRZx") * Util.SQUARE_LENGTH;
+				GREEN[0][1] = transmission.get("LRZy") * Util.SQUARE_LENGTH;
+				GREEN[1][0] = transmission.get("URZx") * Util.SQUARE_LENGTH;
+				GREEN[1][1] = transmission.get("URZy") * Util.SQUARE_LENGTH;
+				
+				RED[0][0] = transmission.get("LGZx") * Util.SQUARE_LENGTH;
+				RED[0][1] = transmission.get("LGZy") * Util.SQUARE_LENGTH;
+				RED[1][0] = transmission.get("UGZx") * Util.SQUARE_LENGTH;
+				RED[1][1] = transmission.get("UGZy") * Util.SQUARE_LENGTH;
+			}
 		}
 	}
 	
