@@ -17,6 +17,8 @@ import utilities.Odometer.TURNDIR;
 
 /**
  * Helpful tools to control robot navigation
+ * Some overlap with functions in Odometer, but not many
+ * Use this whenever possible
  * @version 3.0
  * @author juliette
  *
@@ -29,7 +31,7 @@ public class Navigation {
 
 	/**
 	 * Navigation Constructor
-	 * @param odometer - Odometer object
+	 * @param odometer Odometer object
 	 */
 	public Navigation(Odometer odometer) {
 		this.odometer = odometer;
@@ -45,31 +47,11 @@ public class Navigation {
 
 	/**
 	 * Function to set the motor speeds jointly
-	 * @param lSpd - speed of left motor
-	 * @param rSpd - speed of right motor
+	 * @param lSpd speed of left motor
+	 * @param rSpd speed of right motor
 	 */
-	
-	//TODO: Only use of one setSpeeds(...) and cast args to floats
-	
+		
 	public void setSpeeds(float lSpd, float rSpd) {
-		this.leftMotor.setSpeed(lSpd);
-		this.rightMotor.setSpeed(rSpd);
-		if (lSpd < 0)
-			this.leftMotor.backward();
-		else
-			this.leftMotor.forward();
-		if (rSpd < 0)
-			this.rightMotor.backward();
-		else
-			this.rightMotor.forward();
-	}
-
-	/**
-	 * Function to set the motor speeds jointly
-	 * @param lSpd - speed of left motor
-	 * @param rSpd - speed of right motor
-	 */
-	public void setSpeeds(int lSpd, int rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
 		if (lSpd < 0)
@@ -94,8 +76,8 @@ public class Navigation {
 
 	/**
 	 * TravelTo function that travels to designated position while constantly updating heading
-	 * @param x - x position
-	 * @param y - y position
+	 * @param x x position
+	 * @param y y position
 	 */
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
@@ -122,6 +104,13 @@ public class Navigation {
 		this.setSpeeds(0,0);
 	}
 	
+	/**
+	 * TravelTo function that travels to a designated position while constantly updating heading
+	 * If checkSides is set to true, it will also incrementally check for obstacles on to its sides.
+	 * @param x x position
+	 * @param y y position
+	 * @param checkSides whether or not to check for obstacles on its sides while navigating
+	 */
 	public void travelTo(double x, double y, boolean checkSides) {
 		Navigation.PathBlocked = false;
 		double minAng;
@@ -170,8 +159,8 @@ public class Navigation {
 
 	/**
 	 * TurnTo function which takes an angle and boolean as arguments
-	 * @param angle - absolute angle to turn to
-	 * @param stop - if the robot should stop moving after turning
+	 * @param angle absolute angle to turn to
+	 * @param stop if the robot should stop moving after turning
 	 */
 	public void turnTo(double angle, boolean stop) {
 
@@ -215,7 +204,7 @@ public class Navigation {
 	
 	/**
 	 * turnBy function that turns by an angle relative to the robot
-	 * @param theta - relative angle to turn by
+	 * @param theta relative angle to turn by
 	 */
 	public void turnBy(double theta) {
 		odometer.setMotorSpeeds(Odometer.ROTATE_SPEED, Odometer.ROTATE_SPEED);
@@ -225,9 +214,9 @@ public class Navigation {
 	
 	/**
 	 * Converts linear distance to degrees a wheel must rotate
-	 * @param radius - radius of the wheel (cm)
-	 * @param distance - distance (cm)
-	 * @return - degrees to rotate
+	 * @param radius radius of the wheel (cm)
+	 * @param distance distance (cm)
+	 * @return degrees to rotate
 	 */
 	private static int convertDistance(double radius, double distance) {
 		return (int)(distance * 180.0 / (Math.PI * radius));
@@ -235,10 +224,10 @@ public class Navigation {
 
 	/**
 	 * Converts angle to rotate to degrees a wheel must rotate
-	 * @param radius - radius of the wheel (cm)
-	 * @param width - distance between wheels
-	 * @param angle - angle to rotate
-	 * @return - degrees to rotate
+	 * @param radius radius of the wheel (cm)
+	 * @param width distance between wheels
+	 * @param angle angle to rotate
+	 * @return degrees to rotate
 	 */
 	private static int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
@@ -246,9 +235,9 @@ public class Navigation {
 	
 	/**
 	 * Calculates minimal angle
-	 * @param theta1 - in radians
-	 * @param theta2 - in radians
-	 * @return - minimal angle between theta1 and theta2
+	 * @param theta1 in radians
+	 * @param theta2 in radians
+	 * @return minimal angle between theta1 and theta2
 	 */
 	public static double minimalAngle(double theta1, double theta2) {
 		double dTheta = theta1 - theta2;
@@ -259,7 +248,7 @@ public class Navigation {
 	
 	/**
 	 * Go forward a set distances
-	 * @param distance - distance to move (cm)
+	 * @param distance distance to move (cm)
 	 */
 	public void goForward(double distance) {
 		this.travelTo(Math.cos(Math.toRadians(this.odometer.getTheta())) * distance, Math.cos(Math.toRadians(this.odometer.getTheta())) * distance);

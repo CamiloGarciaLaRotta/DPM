@@ -4,6 +4,7 @@ import chassis.LCDInfo;
 
 /**
  * Constants (mainly physical) used throughout the robot
+ * Meant to prevent repeated constants stored in individual classes
  * @version 3.0
  * 
  */

@@ -12,8 +12,8 @@ import utilities.Avoider.AvoidState;
 
 /**
  * Testing methods for the robot
+ * Not called during match execution (demo mode Default)
  * @version 3.0
- * 
  */
 public class Test {
 	/**
@@ -102,6 +102,12 @@ public class Test {
 		}
 	}
 	
+	/**
+	 * Spin the robot a certain number of times. The error between the initial
+	 * heading and the final heading can be used to calculate the track length.
+	 * @param odo Odometer object
+	 * @param rotations number of rotations the robot should do before stopping
+	 */
 	public static void TrackMeasureTest(Odometer odo, int rotations) {
 		Navigation nav = new Navigation(odo);
 		for(int i = 0; i < rotations; i++) {
@@ -109,6 +115,9 @@ public class Test {
 		}
 	}
 	
+	/**
+	 * Basic test to verify if the robot can differentiate between obstacles and styrofoam blocks.
+	 */
 	public static void ObjectDiffTest() {
 		while(Button.readButtons() != Button.ID_ESCAPE) {
 			if(Main.usSensor.getMedianSample(Util.US_SAMPLES) <= Util.BLOCK_DISTANCE) {
@@ -124,8 +133,8 @@ public class Test {
 	}
 	
 	/**
-	 * Measure RGB unit vectors
-	 * @param color - ColorSensor object
+	 * Measure RGB unit vector
+	 * @param color ColorSensor object
 	 */
 	public static void RGBUnitVectorTest(ColorSensor color) {
 		float [] rgbRaw = new float[3];
@@ -142,10 +151,10 @@ public class Test {
 	/**
 	 * Tests object differentiation in Search thread
 	 * @see Search
-	 * @param odometer - Odometer Object
-	 * @param colorSensor - ColorSensor Object
-	 * @param usSensor - USSensor Object
-	 * @param GREEN - coordinates of scoring zone
+	 * @param odometer Odometer Object
+	 * @param colorSensor ColorSensor Object
+	 * @param usSensor USSensor Object
+	 * @param GREEN coordinates of scoring zone
 	 */
 	public static void ObjectDifferentiationTest(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		Search search = new Search(odometer, colorSensor, usSensor, GREEN);
@@ -157,6 +166,7 @@ public class Test {
 	
 	/**
 	 * Test for controlling the operation of the forklift
+	 * Based on button inputs
 	 * @see chassis.Forklift
 	 */
 	public static void ForkliftTest() {
@@ -180,6 +190,11 @@ public class Test {
 		}while(option != Button.ID_ESCAPE);
 	}
 	
+	/**
+	 * Full test to verify if the robot is capable of avoiding
+	 * Checks for objects, RED zone, and starting corners
+	 * @param odometer Odometer object
+	 */
 	public static void FullAvoidanceTest(Odometer odometer) {
 		//set up
 		Navigation nav = new Navigation(odometer);
@@ -211,6 +226,11 @@ public class Test {
 		
 	}
 	
+	/**
+	 * Simple Avoidance test
+	 * Just checks for obstacle avoidance
+	 * @param odo Odometer object
+	 */
 	public static void AvoidanceTest(Odometer odo) {
 		Navigation nav = new Navigation(odo);
 		
@@ -233,7 +253,9 @@ public class Test {
 		Main.lcd.setLine1("Done");
 	}
 	
-	//Test for finding the threshold of motor angle for dropped block
+	/**
+	 * Test for finding the threshold of motor angle for dropped block
+	 */
 	public static void GripTest() {
 		Main.forklift.grip();
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE) {

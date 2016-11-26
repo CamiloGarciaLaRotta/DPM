@@ -6,6 +6,7 @@ import lejos.robotics.SampleProvider;
 
 /**
  * Provides access to Light Sensor functions
+ * Handles mutual exclusion
  * @version 3.0
  * 
  */
@@ -20,7 +21,7 @@ public class LightIntensitySensor {
 	
 	/**
 	 * LightIntensitySensor Constructor
-	 * @param intensityPort - port sensor is connected to
+	 * @param intensityPort port sensor is connected to
 	 */
 	public LightIntensitySensor(Port intensityPort) {
 		this.intensityValue = new EV3ColorSensor(intensityPort);
@@ -30,8 +31,8 @@ public class LightIntensitySensor {
 	}
 	
 	/**
-	 * Gets intensity from the sensor scaled by 1000
-	 * @return - intensity
+	 * Gets light intensity from the sensor scaled by 1000
+	 * @return intensity light intensity * 1000
 	 */
 	public float getIntensity() {
 		synchronized(mutex) {
