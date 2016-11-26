@@ -38,7 +38,6 @@ import wifi.WifiConnection;
 public class Main {
 	//Wifi
 	private static WifiConnection conn = null;
-	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
