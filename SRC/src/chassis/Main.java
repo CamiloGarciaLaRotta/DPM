@@ -178,6 +178,9 @@ public class Main {
 				startingCornerCoord[1] = 0;
 				startingCornerCoord[2] = (Math.PI/2.0);
 			}
+/*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
+			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
+			Button.waitForAnyPress(); */
 			clock.start();
 			System.out.print("\n\n\n\n\n\n\n\n");
 			//lcd.resume();
