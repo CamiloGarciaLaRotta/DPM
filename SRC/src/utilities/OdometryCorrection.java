@@ -7,7 +7,7 @@ import chassis.Main;
 import chassis.LightIntensitySensor;
 
 /**
- * Corrects the odometer reading using the grid on the field.
+ * Corrects the odometer reading using the grid on the field
  * @version 3.0
  */
 public class OdometryCorrection extends Thread {
@@ -22,8 +22,8 @@ public class OdometryCorrection extends Thread {
 	private final boolean useCorrection = true;
 
 	/**
-	 * OdometryCorrection constructor
-	 * @param odometer Odometer to correct
+	 * 
+	 * @param odometer - odometer to correct
 	 */
 	public OdometryCorrection(Odometer odometer) {
 		this.odometer = odometer;

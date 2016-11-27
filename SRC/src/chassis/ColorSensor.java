@@ -6,7 +6,6 @@ import lejos.robotics.SampleProvider;
 
 /**
  * Provides access to ColorSensor functions in RGB mode.
- * Handles mutual exclusion
  * @version 3.0
  * 
  */
@@ -19,7 +18,7 @@ public class ColorSensor {
 	
 	/**
 	 * ColorSensor Constructor (RGB mode)
-	 * @param colorPort port sensor is connected to
+	 * @param colorPort - port sensor is connected to
 	 */
 	public ColorSensor(Port colorPort) {
 		this.colorValue = new EV3ColorSensor(colorPort);
@@ -29,8 +28,8 @@ public class ColorSensor {
 	}
 	
 	/**
-	 * Get color from sensor
-	 * @return RGB data from color sensor
+	 * 
+	 * @return - RGB data from color sensor
 	 */
 	public float[] getColor() {
 		synchronized(mutex) {

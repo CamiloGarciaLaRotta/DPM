@@ -6,6 +6,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  * Odometer class for the robot
  * All values in cm and radians unless otherwise specified.
  * @version 3.0
+ * 
  */
 public class Odometer extends Thread {
 	
@@ -27,8 +28,8 @@ public class Odometer extends Thread {
 
 	/**
 	 * Odometer Constructor
-	 * @param leftMotor left motor object
-	 * @param rightMotor right motor object
+	 * @param leftMotor - left motor object
+	 * @param rightMotor - right motor object
 	 */
 	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor) {
 		this.leftMotor = leftMotor;
@@ -92,7 +93,7 @@ public class Odometer extends Thread {
 	}
 	
 	/**
-	 * Returns the motors used by the odometer
+	 * 
 	 * @return array of motors (left, right)
 	 */
 	public EV3LargeRegulatedMotor[] getMotors() {
@@ -102,8 +103,8 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Update motor speeds (deg/s)
-	 * @param speedL left speed
-	 * @param speedR right sped
+	 * @param speedL - left speed
+	 * @param speedR - right sped
 	 */
 	public void setMotorSpeeds(int speedL, int speedR) {
 		leftMotor.setSpeed(speedL);
@@ -112,7 +113,7 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Update motor speeds (deg/s)
-	 * @param speed speed for both motors
+	 * @param speed - speed for both motors
 	 */
 	public void setMotorSpeed(int speed) {
 		leftMotor.setSpeed(speed);
@@ -137,7 +138,7 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Spin in a certain direction
-	 * @param dir direction to spin in
+	 * @param dir - direction to spin in
 	 */
 	public void spin(TURNDIR dir) {
 		if(dir == TURNDIR.CW) {
@@ -160,9 +161,9 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Move a set distance
-	 * @param dir direction to move in
-	 * @param distance distance to move (cm)
-	 * @param stop if the robot should stop after moving
+	 * @param dir - direction to move in
+	 * @param distance - distance to move (cm)
+	 * @param stop - if the robot should stop after moving
 	 */
 	public void moveCM(LINEDIR dir, double distance, boolean stop) {
 		setMotorSpeeds(NAVIGATE_SPEED, NAVIGATE_SPEED);
@@ -183,9 +184,9 @@ public class Odometer extends Thread {
 	}
 
 	/**
-	 * Write coordinates of the current position to an array
-	 * @param position array to hold x, y, and theta coordinates
-	 * @param update if the x, y, and theta coordinates written to the array
+	 * Write coordinates of the current position to position
+	 * @param position - array to hold x, y, and theta coordinates
+	 * @param update - if the x, y, and theta coordinates should be fetched
 	 */
 	public void getPosition(double[] position, boolean[] update) {
 		synchronized(mutex) {
@@ -197,7 +198,7 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Write coordinates of current position to position
-	 * @param position array to hold x, y, and theta coordinates
+	 * @param position - array to hold x, y, and theta coordinates
 	 */
 	public void getPosition(double[] position) {
 		synchronized(mutex) {
@@ -245,8 +246,8 @@ public class Odometer extends Thread {
 
 	/**
 	 * Overrides the current position in the odometer
-	 * @param position x, y, and theta overrides
-	 * @param update if x, y, and theta should be overridden
+	 * @param position - x, y, and theta overrides
+	 * @param update - if x, y, and theta should be overridden
 	 */
 	public void setPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
@@ -262,7 +263,7 @@ public class Odometer extends Thread {
 
 	/**
 	 * 
-	 * @param x x coordinate override
+	 * @param x - x coordinate override
 	 */
 	public void setX(double x) {
 		synchronized (mutex) {
@@ -272,7 +273,7 @@ public class Odometer extends Thread {
 
 	/**
 	 * 
-	 * @param y y coordinate override
+	 * @param y - y coordinate override
 	 */
 	public void setY(double y) {
 		synchronized (mutex) {
@@ -282,7 +283,7 @@ public class Odometer extends Thread {
 
 	/**
 	 * 
-	 * @param theta heading override
+	 * @param theta - heading override
 	 */
 	public void setTheta(double theta) {
 		synchronized (mutex) {
@@ -340,8 +341,8 @@ public class Odometer extends Thread {
 	
 	/**
 	 * Euclidean distance between two (x, y) points
-	 * @param a point a
-	 * @param b point b
+	 * @param a - point a
+	 * @param b - point b
 	 * @return euclidean distance
 	 */
 	public static double euclideanDistance(double[] a, double[] b) {
@@ -349,7 +350,7 @@ public class Odometer extends Thread {
 	}
 	
 	/**
-	 * TurnTo function. Use function in Navigation.
+	 * Use function in Navigation
 	 * @deprecated
 	 * @see Navigation#turnTo(double, boolean)
 	 */
@@ -367,7 +368,6 @@ public class Odometer extends Thread {
 	}
 	
 	/**
-	 * TurnBy function. Use function in Navigation.
 	 * @deprecated
 	 * @see Navigation#turnBy(double)
 	 */
@@ -378,7 +378,6 @@ public class Odometer extends Thread {
 	}
 	
 	/**
-	 * TravelTo function. Use function in Navigation.
 	 * @deprecated
 	 * @see Navigation#travelTo(double, double)
 	 */

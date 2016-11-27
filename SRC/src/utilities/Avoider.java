@@ -42,11 +42,11 @@ public class Avoider extends Thread{
 
 	
 	/**
-	 * Avoider constructor
-	 * @param odo Odometer object
-	 * @param nav Navigation object
-	 * @param usSensor USSensor object
-	 * @param RED coordinates of red zone to always avoid
+	 * 
+	 * @param odo - Odometer object
+	 * @param nav - Navigation object
+	 * @param usSensor - USSensor object
+	 * @param RED - coordinates of red zone to always avoid
 	 */
 	public Avoider(Odometer odo, Navigation nav, USSensor usSensor, double[][] RED) {
 		this.odo = odo;
@@ -69,7 +69,6 @@ public class Avoider extends Thread{
 	}
 
 	/**
-	 * Execution for robot avoidance. Runs constantly regardless of current state.
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -177,9 +176,7 @@ public class Avoider extends Thread{
 		}
 	}
 
-	/**
-	 * Special set of instructions to avoid the RED zone
-	 */
+	// special set of instructions required to avoid RED zone
 	private void redAvoidance() {
 		double currX = this.currPos[0];
 		double currY = this.currPos[1];
@@ -214,8 +211,8 @@ public class Avoider extends Thread{
 	/**
 	 * Choose rotation sense depending on current position and heading
 	 * Decides direction to turn when object encountered
-	 * @param currPos X, Y, heading coordinates
-	 * @return chosen rotation sense - true is counterclockwise, false is clockwise
+	 * @param currPos - X, Y, heading coordinates
+	 * @return - true is counterclockwise, false is clockwise
 	 */
 	private boolean chooseOrientation(double[] currPos) {
 		double currX = currPos[0];
@@ -239,9 +236,8 @@ public class Avoider extends Thread{
 	}
 
 	/**
-	 * Linear set of instructions to avoid obstacle
-	 * Runs recursively if more obstacles are encountered during avoidance
-	 * @param CCW direction to turn (should be determined by chooseOrientation)
+	 *  linear set of instructions to avoid obstacle
+	 * @param CCW - direction to turn (should be determined by chooseOrientation)
 	 */
 	private void linearAvoidance(boolean CCW) {
 		int coeff = (CCW) ? -1 : 1;
