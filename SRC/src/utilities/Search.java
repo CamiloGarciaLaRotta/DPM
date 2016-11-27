@@ -425,9 +425,12 @@ public class Search extends Thread {
 				minDistance = usSensor.getMedianSample(Util.US_SAMPLES);
 			}
 		}
+		
 		nav.turnTo(minHeading, true);
-		odo.moveCM(Odometer.LINEDIR.Backward, Util.BLOCK_DISTANCE - minDistance, true);
-		Main.forklift.liftDown();
+		if(minDistance < Util.SEARCH_DISTANCE) {	//if the minimum distance is still far away, will assume it is nothing and won't go to it
+			odo.moveCM(Odometer.LINEDIR.Backward, Util.BLOCK_DISTANCE - minDistance, true);
+			Main.forklift.liftDown();
+		}
 	}
 	
 
