@@ -10,7 +10,6 @@ import lejos.robotics.SampleProvider;
 /**
  * @version 3.0
  * Provides access to USSensor functions.
- * Handles mutual exclusion.
  */
 public class USSensor {
 	private SensorModes usSensor;
@@ -22,7 +21,7 @@ public class USSensor {
 	
 	/**
 	 * USSensor Constructor
-	 * @param usPort port the sensor is connected to
+	 * @param usPort - port sensor is connected to
 	 */
 	public USSensor(Port usPort) {
 		this.usSensor = new EV3UltrasonicSensor(usPort);
@@ -32,7 +31,7 @@ public class USSensor {
 	}
 	
 	/**
-	 * Returns distance measured by the sensor with an upper limit
+	 * 
 	 * @return - distance in cm capped at FIELD_BOUNDS
 	 */
 	public float getFilteredDataBasic() {
@@ -43,9 +42,9 @@ public class USSensor {
 	}
 	
 	/**
-	 * Takes multiple samples and returns the median
-	 * @param samples number of samples to take
-	 * @return median sample taken using getFilteredDataBasic()
+	 * 
+	 * @param samples - number of samples to take
+	 * @return - median sample taken using getFilteredDataBasic()
 	 * @see #getFilteredDataBasic()
 	 */
 	public float getMedianSample(int samples) {

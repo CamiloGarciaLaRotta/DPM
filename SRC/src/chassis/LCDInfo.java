@@ -8,7 +8,6 @@ import utilities.Search;
 
 /**
  * Methods and display thread for the EV3 LCD
- * Displays information about robot state and position.
  * @version 3.0
  * @author juliette
  * 
@@ -27,9 +26,9 @@ public class LCDInfo implements TimerListener{
 	
 	/**
 	 * Constructor for LCDInfo
-	 * @param odometer Odometer object
-	 * @param LCD TextLCD object
-	 * @param start if the runtime display should begin on creation
+	 * @param odometer - Odometer object
+	 * @param LCD - TextLCD object
+	 * @param start - if the runtime display should begin on creation
 	 */
 	public LCDInfo(Odometer odometer, TextLCD LCD, boolean start) {
 		this.odo = odometer;
@@ -47,7 +46,7 @@ public class LCDInfo implements TimerListener{
 	
 	/**
 	 * Displays user message on line 3 of the LCD
-	 * @param message message to display
+	 * @param message
 	 */
 	public static void displayMessage(String message) {
 		LCD.clear(3);
@@ -92,7 +91,7 @@ public class LCDInfo implements TimerListener{
 	}
 	
 	/**
-	 * Gets TextLCD object given in constructor
+	 * 
 	 * @return TextLCD object
 	 */
 	public static TextLCD getLCD() {
@@ -100,16 +99,16 @@ public class LCDInfo implements TimerListener{
 	}
 	
 	/**
-	 * Display custom string on line 1
-	 * @param line1 String to display on user line 1
+	 * Display custom string
+	 * @param line1 - String to display on user line 1
 	 */
 	public void setLine1(String line1) {
 		this.line1 = line1;
 	}
 	
 	/**
-	 * Display custom string on line 2
-	 * @param line2 String to display on user line 2
+	 * Display custom string
+	 * @param line2 - String to display on user line 2
 	 */
 	public void setLine2(String line2) {
 		this.line2 = line2;

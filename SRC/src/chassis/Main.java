@@ -31,7 +31,6 @@ import wifi.WifiConnection;
 
 /**
  * Base robot class with all hardware objects and loaded utilities
- * Handles demo mode selection, initializes objects, starts other threads
  * @version 3.0
  * @author juliette
  *
@@ -39,7 +38,6 @@ import wifi.WifiConnection;
 public class Main {
 	//Wifi
 	private static WifiConnection conn = null;
-	
 	//Resources (motors, sensors)
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
@@ -86,7 +84,7 @@ public class Main {
 
 	/**
 	 * Main execution thread.
-	 * @param args None used
+	 * @param args - None used
 	 */
 	public static void main(String[] args) {
 		state = RobotState.Setup;
@@ -182,9 +180,9 @@ public class Main {
 			
 			
 			state = RobotState.Localization;
-			//localizer.doLocalization();
+			localizer.doLocalization();
 			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
-			state = RobotState.Search;
+			//state = RobotState.Search;
 			while(state != RobotState.Search){try {
 				Thread.sleep(Util.SLEEP_PERIOD);
 			} catch (InterruptedException e) {
@@ -355,7 +353,6 @@ public class Main {
 	
 	/**
 	 * Connects to wifi and waits for information to be transmitted.
-	 * IP address of server is statically set
 	 * @return Transmission parameters to be parsed
 	 * @throws IOException Fails if robot cannot connect to server.
 	 * @see Util#IP_ADDR

@@ -6,11 +6,7 @@ import utilities.Capture.CaptureState;
 import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
-/**
- * @version 3.0
- * @author juliette
- * Thread to verify that the robot hasn't dropped the block it's holding.
- */
+
 public class DropCheck extends Thread{
 
 	private Odometer odo;
