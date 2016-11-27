@@ -93,9 +93,21 @@ public class Capture extends Thread {
 					double targetHeading = Math.atan2(-odo.getY() + towerPosition[1],-odo.getX() + towerPosition[0]);
 					nav.turnTo(targetHeading,true); //Turn to face tower position, stop motors
 					odo.setMotorSpeed(Odometer.NAVIGATE_SPEED); //Move forward until the tower is detected.
+					
+					double[] approachPos = new double[3];
+					double scoringDiagnol = Odometer.euclideanDistance(GREEN[0], GREEN[1]);	//max distance from point and the tower (diagnol of zone)
+					boolean reachedTower = true;
+
+					odo.getPosition(approachPos);	//where it started the approach
 					odo.forwardMotors();
-					while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.TOWER_DISTANCE);
+
+					while(Main.usSensor.getMedianSample(Util.US_SAMPLES) > Util.TOWER_DISTANCE &&
+							(reachedTower = Odometer.euclideanDistance(new double[] {odo.getX(), odo.getY()}, approachPos) < scoringDiagnol));
 					odo.stopMotors();
+					if(!reachedTower) {
+						towerHeight = 0;	//will create new tower
+						break;
+					}
 					captureState = CaptureState.Stack;
 				}
 				break;
