@@ -28,6 +28,7 @@ import utilities.Clock;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
+import wifi.StartCorner;
 import wifi.WifiConnection;
 
 /**
@@ -173,9 +174,10 @@ public class Main {
 				startingCorner = 1;
 				task = RobotTask.Builder;
 				
-				startingCornerCoord[0] = 0;
-				startingCornerCoord[1] = 0;
-				startingCornerCoord[2] = (Math.PI/2.0);
+				StartCorner start = StartCorner.lookupCorner(startingCorner);
+				startingCornerCoord[0] = start.getX();
+				startingCornerCoord[1] = start.getY();
+				startingCornerCoord[2] = Math.PI * (1.0 - (double)startingCorner/2.0);
 			}
 /*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
 			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
@@ -186,14 +188,19 @@ public class Main {
 			
 			
 			state = RobotState.Localization;
-			localizer.doLocalization();
+			//localizer.doLocalization();
+
 			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
-			//state = RobotState.Search;
+			state = RobotState.Search;
 			while(state != RobotState.Search){try {
 				Thread.sleep(Util.SLEEP_PERIOD);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}}
+			/*System.out.println(String.valueOf(odo.getX()));
+			System.out.println(String.valueOf(odo.getY()));
+			System.out.println(String.valueOf(odo.getTheta()));
+			Button.waitForAnyPress();*/
 			avoid.start();
 			capture.start();
 			search.start();

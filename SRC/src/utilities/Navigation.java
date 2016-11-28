@@ -1,4 +1,7 @@
 package utilities;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+
 import chassis.Main;
 import lejos.hardware.Sound;
 /* 
@@ -108,6 +111,33 @@ public class Navigation {
 		double distance;
 		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
 											new double[] {x,y})) > Util.CM_TOLERANCE) {
+			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+			//minAng = minimalAngle(odometer.getTheta(),minAng);
+			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
+			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
+			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
+				Navigation.PathBlocked = true;
+//				Sound.beepSequence();
+				break;
+			}
+		}
+		this.setSpeeds(0,0);
+	}
+	
+	public void travelToInterruptable(double x, double y, Lock interrupt) {
+		Navigation.PathBlocked = false;
+		double minAng;
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
+		double error = minAng - this.odometer.getTheta();
+		if(error > Math.PI) error -= 2 * Math.PI;
+		else if(error < -Math.PI) error += 2 * Math.PI;
+		turnBy(-error);
+		double distance;
+		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
+											new double[] {x,y})) > Util.CM_TOLERANCE &&
+				interrupt.tryLock()) {
+			interrupt.unlock();
 			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
 			//minAng = minimalAngle(odometer.getTheta(),minAng);
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
