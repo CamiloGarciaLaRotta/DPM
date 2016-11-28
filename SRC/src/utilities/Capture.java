@@ -69,7 +69,7 @@ public class Capture extends Thread {
 				DropCheck dropChecker = new DropCheck(odo, search);
 				dropChecker.start();
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
-				nav.travelToInterruptable(cardinalPoint[0], cardinalPoint[1], dropChecker.interrupt); //Travel back to last cardinal point, this path is guaranteed to be clear
+				nav.travelToInterruptible(cardinalPoint[0], cardinalPoint[1], dropChecker.interrupt); //Travel back to last cardinal point, this path is guaranteed to be clear
 			
 				while(!dropChecker.interrupt.tryLock());	//unlocks when done
 				dropChecker.interrupt.unlock();

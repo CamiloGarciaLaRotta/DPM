@@ -188,10 +188,10 @@ public class Main {
 			
 			
 			state = RobotState.Localization;
-			//localizer.doLocalization();
+			localizer.doLocalization();
 
 			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
-			state = RobotState.Search;
+			//state = RobotState.Search;
 			while(state != RobotState.Search){try {
 				Thread.sleep(Util.SLEEP_PERIOD);
 			} catch (InterruptedException e) {
