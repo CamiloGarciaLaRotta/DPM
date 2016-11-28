@@ -17,7 +17,6 @@ public class Capture extends Thread {
 	private Odometer odo;
 	private Navigation nav;
 	private Search search;
-	private DropCheck dropChecker;
 	
 	// coordinates
 	private double[][] GREEN;
@@ -45,7 +44,6 @@ public class Capture extends Thread {
 		this.GREEN = GREEN;
 		this.towerHeight = 0;
 		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2};
-		this.dropChecker = new DropCheck(this.odo, this.search);
 	}
 	
 	/**
@@ -67,9 +65,13 @@ public class Capture extends Thread {
 				captureState = CaptureState.Return; //Move on to Return
 				break;
 			case Return:
+				DropCheck dropChecker = new DropCheck(odo, search);
 				dropChecker.start();
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
-				nav.travelTo(cardinalPoint[0], cardinalPoint[1]); //Travel back to last cardinal point, this path is guaranteed to be clear
+				nav.travelToInterruptable(cardinalPoint[0], cardinalPoint[1], dropChecker.interrupt); //Travel back to last cardinal point, this path is guaranteed to be clear
+			
+				while(!dropChecker.interrupt.tryLock());	//unlocks when done
+				dropChecker.interrupt.unlock();
 				
 				if(dropChecker.getDropped() == false) { //block was not dropped			
 					if(towerHeight == 0){
@@ -105,10 +107,11 @@ public class Capture extends Thread {
 					odo.stopMotors();
 					if(!reachedTower) {
 						towerHeight = 0;	//will create new tower
-						break;
+					} else {
+						captureState = CaptureState.Stack;
 					}
-					captureState = CaptureState.Stack;
 				}
+				dropChecker.interrupt();
 				break;
 			case Stack:
 				Main.forklift.liftToTower(towerHeight++); //Descend lift to height of tower, increase towerHeight

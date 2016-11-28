@@ -1,5 +1,9 @@
 package utilities;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import chassis.Main;
 import chassis.Main.RobotState;
 import utilities.Capture.CaptureState;
@@ -18,6 +22,7 @@ public class DropCheck extends Thread{
 	private Navigation nav;
 	private Search search;
 	public boolean dropped;
+	public Lock interrupt;
 	private Object dropMutex;
 	
 	/**
@@ -27,7 +32,10 @@ public class DropCheck extends Thread{
 	 */
 	public DropCheck(Odometer odo, Search search){
 		this.odo = odo;
+		this.search = search;
+		this.interrupt = new ReentrantLock();
 		this.nav = new Navigation(this.odo);
+		this.dropMutex = new Object();
 	}
 	/**
 	 * {@inheritDoc}
@@ -35,10 +43,11 @@ public class DropCheck extends Thread{
 	public void run() {
 		 // only active during the return state
 		setDropped(false);
-	    while(Capture.captureState == CaptureState.Return){
+	    while(Capture.captureState == CaptureState.Return && !this.isInterrupted()){
 	    	//If claw tacho count is too close to -180 degrees, block was dropped
 	    	if (Main.forklift.getGrip() < Util.GRIP_THRESHOLD) {
-	    		Main.state = RobotState.Disabled;	//prevents other threads from taking control
+	    		interrupt.lock();
+	    		//Main.state = RobotState.Disabled;	//prevents other threads from taking control
 	    		setDropped(true);
 	    		Capture.captureState = CaptureState.Idle;
 	    		Main.forklift.ungrip();
@@ -58,8 +67,8 @@ public class DropCheck extends Thread{
 	    			nav.travelTo(search.cardinals[search.currCardinal][0], search.cardinals[search.currCardinal][1]);
 	    			Search.searchState = SearchState.Default;
 	    			Main.state = RobotState.Search;
-	    			return;
     			}
+	    		interrupt.unlock();
     		}
     	}
 	}
