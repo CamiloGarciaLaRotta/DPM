@@ -124,7 +124,7 @@ public class Navigation {
 		this.setSpeeds(0,0);
 	}
 	
-	public void travelToInterruptable(double x, double y, Lock interrupt) {
+	public void travelToInterruptible(double x, double y, Lock interrupt) {
 		Navigation.PathBlocked = false;
 		double minAng;
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));

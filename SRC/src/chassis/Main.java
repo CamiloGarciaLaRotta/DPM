@@ -28,6 +28,7 @@ import utilities.Clock;
 import utilities.Avoider;
 import utilities.Capture;
 import utilities.Navigation;
+import wifi.StartCorner;
 import wifi.WifiConnection;
 
 /**
@@ -174,9 +175,10 @@ public class Main {
 				startingCorner = 1;
 				task = RobotTask.Builder;
 				
-				startingCornerCoord[0] = 0;
-				startingCornerCoord[1] = 0;
-				startingCornerCoord[2] = (Math.PI/2.0);
+				StartCorner start = StartCorner.lookupCorner(startingCorner);
+				startingCornerCoord[0] = start.getX();
+				startingCornerCoord[1] = start.getY();
+				startingCornerCoord[2] = Math.PI * (1.0 - (double)startingCorner/2.0);
 			}
 /*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
 			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
