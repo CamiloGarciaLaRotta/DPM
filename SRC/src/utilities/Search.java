@@ -165,7 +165,10 @@ public class Search extends Thread {
 						// verify if navigation was interrupted
 						if (Navigation.PathBlocked) {
 							// is the block a target or an obstacle?
-							if(testForStyrofoam()) {
+							double dist = Main.usSensor.getMedianSample(Util.US_SAMPLES);
+							odo.moveCM(Odometer.LINEDIR.Backward,Util.BLOCK_DISTANCE - dist, true);
+							FOV(Util.SEARCH_FOV);
+							if(isStyrofoamBlock()) {
 								searchState = SearchState.Idle;
 								Main.state = RobotState.Capture;
 								Capture.setContext(cardinals[currCardinal]);

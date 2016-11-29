@@ -66,15 +66,15 @@ public class Capture extends Thread {
 				captureState = CaptureState.Return; //Move on to Return
 				break;
 			case Return:
-				DropCheck dropChecker = new DropCheck(odo, search);
-				dropChecker.start();
+				//DropCheck dropChecker = new DropCheck(odo, search);
+				//dropChecker.start();
 				odo.moveCM(Odometer.LINEDIR.Backward, 3, true); //Back up to avoid bumping into things when spinning
-				nav.travelToInterruptible(cardinalPoint[0], cardinalPoint[1], dropChecker.interrupt); //Travel back to last cardinal point, this path is guaranteed to be clear
+				nav.travelTo(cardinalPoint[0], cardinalPoint[1]); //Travel back to last cardinal point, this path is guaranteed to be clear
 			
-				while(!dropChecker.interrupt.tryLock());	//unlocks when done
-				dropChecker.interrupt.unlock();
+				//while(!dropChecker.interrupt.tryLock());	//unlocks when done
+				//dropChecker.interrupt.unlock();
 				
-				if(dropChecker.getDropped() == false) { //block was not dropped			
+				//if(dropChecker.getDropped() == false) { //block was not dropped			
 					if(towerHeight == 0){
 						//If towerHeight is 0, travel to a predetermined stacking area and drop the block
 						nav.travelTo(towerPosition[0], towerPosition[1]);
@@ -111,8 +111,8 @@ public class Capture extends Thread {
 					} else {
 						captureState = CaptureState.Stack;
 					}
-				}
-				dropChecker.interrupt();
+				
+				//dropChecker.interrupt();
 				break;
 			case Stack:
 				Main.forklift.liftToTower(towerHeight++); //Descend lift to height of tower, increase towerHeight
