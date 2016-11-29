@@ -464,8 +464,8 @@ public class Search extends Thread {
 	 * @return if the detected object is a styrofoam block
 	 */
 	protected static boolean isStyrofoamBlock() {
-//		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
-		boolean isStyrofoam;
+		return (colorSensor.getColor()[0] < colorSensor.getColor()[1]);
+		/*boolean isStyrofoam;
 		
 		float[] measuredRGB = Main.colorSensor.getColor();
 		//get unit vector
@@ -482,7 +482,7 @@ public class Search extends Thread {
 		} else {
 			isStyrofoam = false;
 		}
-		return isStyrofoam;
+		return isStyrofoam;*/
 	}
 	
 	/**

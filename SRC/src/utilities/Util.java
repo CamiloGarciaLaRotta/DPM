@@ -23,7 +23,7 @@ public class Util {
 	public static final double WOOD_MIN_WIDTH		= 20.0;	//minimum distance to travel to avoid wooden block
 	
 	// search
-	public static final double SEARCH_DISTANCE 		= 45; 	//distance (in cm) to detect object
+	public static final double SEARCH_DISTANCE 		= 55; 	//distance (in cm) to detect object
 	public final static float BLOCK_DISTANCE		= 8.0f; //distance (in cm) to detect block type
 	public static final double BACKUP_DISTANCE		= 4.0;
 	public static final double NORTH_MAX 			= 10*SQUARE_LENGTH;	// max Y position (in cm) to search for items to avoid wall
@@ -96,7 +96,7 @@ public class Util {
 	}
 	
 	//Wifi
-	public static final String IP_ADDR				= "192.168.2.6";
+	public static final String IP_ADDR				= "192.168.2.3";
 	public static final int TEAM_NUMBER				= 15;
 	public static final boolean USE_WIFI			= true;
 }

@@ -134,11 +134,12 @@ public class Main {
 		Capture capture = new Capture(odo, search, GREEN);
 		Avoider avoid = new Avoider(odo, nav, usSensor, RED);
 		Clock clock = new Clock(odo);
-		
+		System.out.println("Test test test");
 		textLCD.clear(); //blank display before selection
-		demo = stateSelect();	//select state
-		
+		//demo = stateSelect();	//select state
+		demo = DemoState.Default;
 		//threads intrinsic to all processes
+		clock.start();
 		odo.start();
 		ender.start();
 		//lcd.resume();
@@ -147,8 +148,9 @@ public class Main {
 		case Default: //regular robot operation
 			lcd.pause();
 			textLCD.clear();
+			System.out.println("Thin happened");
 			gridLineDetector = new LightIntensitySensor(intensityPort);
-			if(Util.USE_WIFI) {
+			/*if(Util.USE_WIFI) {
 				HashMap<String, Integer> parameters = null;
 				try {
 					parameters = wifiConnect();
@@ -178,11 +180,10 @@ public class Main {
 				startingCornerCoord[0] = start.getX();
 				startingCornerCoord[1] = start.getY();
 				startingCornerCoord[2] = Math.PI * (1.0 - (double)startingCorner/2.0);
-			}
+			}*/
 /*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
 			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
 			Button.waitForAnyPress(); */
-			clock.start();
 			System.out.print("\n\n\n\n\n\n\n\n");
 			//lcd.resume();
 			
@@ -193,7 +194,7 @@ public class Main {
 			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
 			//state = RobotState.Search;
 			while(state != RobotState.Search){try {
-				Thread.sleep(Util.SLEEP_PERIOD);
+				Thread.sleep(500);	//used to be SLEEP_PERIOD
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}}
