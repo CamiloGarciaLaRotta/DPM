@@ -3,6 +3,11 @@
  */
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ */
+
 import chassis.Main;
 import chassis.LightIntensitySensor;
 
@@ -49,13 +54,11 @@ public class OdometryCorrection extends Thread {
 			float dI; //Stores the difference in intensity relative to last measurement
 			correctionStart = System.currentTimeMillis();
 			intensity = Main.gridLineDetector.getIntensity();
-//			if(intensity < LightIntensitySensor.LINE_DETECTED && lastIntensity < LightIntensitySensor.LINE_DETECTED) continue; //Only register line when the last measurement DID NOT measure a line
-			dI = lastIntensity - intensity;
+			dI = lastIntensity - intensity; //Get difference in two consecutive intensity values
 			lastIntensity = intensity;
 
 			if(dI > LightIntensitySensor.LINE_DETECTED) //Detected black
 			{
-//				Sound.beep();
 				double currentPosition[] = new double[3];
 				double sensorPosition[] = new double[2];
 				//Use trig to find current position of light sensor

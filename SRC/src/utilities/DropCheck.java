@@ -1,5 +1,11 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Camilo Garcia La Rotta
+ * Juliette Regimbal
+ */
+
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

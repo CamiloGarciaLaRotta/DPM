@@ -1,10 +1,14 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Juliette Regimbal
+ */
+
 import chassis.Main;
 import chassis.USSensor;
 import lejos.hardware.Sound;
-
-//TODO have it localize with the starting corner as input
 
 /**
  * @version 3.0

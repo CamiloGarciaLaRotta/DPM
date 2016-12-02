@@ -1,5 +1,10 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Camilo Garcia La Rotta
+ */
+
 import java.awt.Rectangle;
 
 import chassis.Main;

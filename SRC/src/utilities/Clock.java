@@ -1,5 +1,11 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Juliette Regimbal
+ * Harley Wiltzer
+ */
+
 import chassis.Main;
 import chassis.Main.RobotState;
 import utilities.Avoider.AvoidState;
@@ -34,7 +40,6 @@ public class Clock extends Thread{
 		startTime = System.currentTimeMillis();
 		while(true) {
 			if(System.currentTimeMillis() - startTime >= FIVE_MINUTES - TIME_THRESHOLD) {
-				//TODO Stop flow, travelTo starting corner
 				odo.stopMotors();
 				Main.state = Main.RobotState.Returning;	//prevents other threads from acting (except avoidance)
 				double[] startingCorner = new double[] { Main.startingCornerCoord[0], Main.startingCornerCoord[1] };

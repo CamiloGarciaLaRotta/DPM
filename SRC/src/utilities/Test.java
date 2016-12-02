@@ -1,5 +1,12 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Camilo Garcia La Rotta
+ * Juliette Regimbal
+ */
+
 import chassis.ColorSensor;
 import chassis.LCDInfo;
 import chassis.Main;
@@ -109,6 +116,7 @@ public class Test {
 		}
 	}
 	
+	//Tests the effectiveness and reliability of isStyrofoamBlock() in Search.java
 	public static void ObjectDiffTest() {
 		while(Button.readButtons() != Button.ID_ESCAPE) {
 			if(Main.usSensor.getMedianSample(Util.US_SAMPLES) <= Util.BLOCK_DISTANCE) {

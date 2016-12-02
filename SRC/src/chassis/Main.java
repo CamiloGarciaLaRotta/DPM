@@ -1,5 +1,12 @@
 package chassis;
 
+/*
+ * AUTHORS
+ * Camilo Garcia La Rotta
+ * Harley Wiltzer
+ * Juliette Regimbal
+ */
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
@@ -150,43 +157,7 @@ public class Main {
 			textLCD.clear();
 			System.out.println("Thin happened");
 			gridLineDetector = new LightIntensitySensor(intensityPort);
-			/*if(Util.USE_WIFI) {
-				HashMap<String, Integer> parameters = null;
-				try {
-					parameters = wifiConnect();
-				} catch (IOException e) {	//failed to connect to wifi
-//					Sound.beepSequence();
-					System.err.println(e);
-					System.exit(-1);
-				}
-//				Sound.beep();
-				if(parameters != null) {
-					GREEN = new double[2][2];
-					RED = new double[2][2];
-					transmissionParse(parameters);
-//					Sound.beepSequenceUp();
-				}
-			} else {	//default parameters
-				// Default values for these - could be changed by wifi if enabled
-				GREEN = new double[][]{{0*Util.SQUARE_LENGTH,0*Util.SQUARE_LENGTH},
-					{3*Util.SQUARE_LENGTH,3*Util.SQUARE_LENGTH}};
-				RED = new double[][]{{1*Util.SQUARE_LENGTH,1*Util.SQUARE_LENGTH},
-						{2*Util.SQUARE_LENGTH,9*Util.SQUARE_LENGTH}};
-				
-				startingCorner = 1;
-				task = RobotTask.Builder;
-				
-				StartCorner start = StartCorner.lookupCorner(startingCorner);
-				startingCornerCoord[0] = start.getX();
-				startingCornerCoord[1] = start.getY();
-				startingCornerCoord[2] = Math.PI * (1.0 - (double)startingCorner/2.0);
-			}*/
-/*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
-			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
-			Button.waitForAnyPress(); */
 			System.out.print("\n\n\n\n\n\n\n\n");
-			//lcd.resume();
-			
 			
 			state = RobotState.Localization;
 			localizer.doLocalization();
@@ -198,10 +169,6 @@ public class Main {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}}
-			/*System.out.println(String.valueOf(odo.getX()));
-			System.out.println(String.valueOf(odo.getY()));
-			System.out.println(String.valueOf(odo.getTheta()));
-			Button.waitForAnyPress();*/
 			avoid.start();
 			capture.start();
 			search.start();
@@ -259,27 +226,8 @@ public class Main {
 			System.exit(-1);
 		}
 		
-//		// 5 minute timer
-//		Timer timer = new Timer();
-//		timer.schedule(new TimerTask() {
-//			@Override
-//			public void run() {
-//				Main.state = RobotState.Finished;
-//				Search.searchState = SearchState.Idle;
-//				Capture.captureState = CaptureState.Idle;
-//				Avoider.avoidState = AvoidState.Enabled;
-//				nav.travelTo(startingCornerCoord[0], startingCornerCoord[1]);
-//			}	  
-//		}, 5*60*1000);
-		
 		//wait for escape key to end program
 		while(Button.waitForAnyPress() != Button.ID_ESCAPE);	
-		
-//		odo.interrupt();
-//		search.interrupt();
-//		avoid.interrupt();
-//		capture.interrupt();
-//		localizer.interrupt();
 		
 		System.exit(0);
 	}

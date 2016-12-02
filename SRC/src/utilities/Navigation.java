@@ -52,8 +52,6 @@ public class Navigation {
 	 * @param rSpd - speed of right motor
 	 */
 	
-	//TODO: Only use of one setSpeeds(...) and cast args to floats
-	
 	public void setSpeeds(float lSpd, float rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
@@ -103,28 +101,28 @@ public class Navigation {
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
 		double minAng;
-		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
-		double error = minAng - this.odometer.getTheta();
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())); //Get angle between current heading and target
+		double error = minAng - this.odometer.getTheta(); //Find error in current heading
+		//Calculate minimal angle for error
 		if(error > Math.PI) error -= 2 * Math.PI;
 		else if(error < -Math.PI) error += 2 * Math.PI;
-		turnBy(-error);
+		turnBy(-error); //Turn by this error to reduce small corrections later
 		double distance;
 		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
 											new double[] {x,y})) > Util.CM_TOLERANCE) {
 			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
-			//minAng = minimalAngle(odometer.getTheta(),minAng);
-			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+			//STOP NAVIGATION if an obstacle is blocking the path
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
-//				Sound.beepSequence();
 				break;
 			}
 		}
 		this.setSpeeds(0,0);
 	}
 	
+	//Same as above travelTo, but allows thread interrupts
 	public void travelToInterruptible(double x, double y, Lock interrupt) {
 		Navigation.PathBlocked = false;
 		double minAng;
@@ -139,19 +137,17 @@ public class Navigation {
 				interrupt.tryLock()) {
 			interrupt.unlock();
 			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
-			//minAng = minimalAngle(odometer.getTheta(),minAng);
-			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
-//				Sound.beepSequence();
 				break;
 			}
 		}
 		this.setSpeeds(0,0);
 	}
 	
+	//Same as above travelTos, but iteratively does a side to side check for obstacles if specified
 	public void travelTo(double x, double y, boolean checkSides) {
 		Navigation.PathBlocked = false;
 		double minAng;
@@ -165,13 +161,10 @@ public class Navigation {
 		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
 											new double[] {x,y})) > Util.CM_TOLERANCE) {
 			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
-			//minAng = minimalAngle(odometer.getTheta(),minAng);
-			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
-//				Sound.beepSequence();
 				break;
 			}
 			
@@ -188,7 +181,6 @@ public class Navigation {
 					if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 						this.setSpeeds(0, 0);
 						Navigation.PathBlocked = true;
-//						Sound.beepSequence();
 						return;
 					}
 				}
@@ -221,20 +213,12 @@ public class Navigation {
 			
 			if (error < -Math.PI) {
 				this.setSpeeds(-Util.MOTOR_SLOW, Util.MOTOR_SLOW);
-				//odometer.getMotors()[0].forward();
-				//odometer.getMotors()[1].backward();
 			} else if (error < 0.0) {
 				this.setSpeeds(Util.MOTOR_SLOW, -Util.MOTOR_SLOW);
-				//odometer.getMotors()[0].backward();
-				//odometer.getMotors()[1].forward();
 			} else if (error > Math.PI) {
 				this.setSpeeds(Util.MOTOR_SLOW, -Util.MOTOR_SLOW);
-				//odometer.getMotors()[0].backward();
-				//odometer.getMotors()[1].forward();
 			} else {
 				this.setSpeeds(-Util.MOTOR_SLOW, Util.MOTOR_SLOW);
-				//odometer.getMotors()[0].forward();
-				//odometer.getMotors()[1].backward();
 			}
 		}
 

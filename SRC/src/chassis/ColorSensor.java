@@ -1,5 +1,11 @@
 package chassis;
 
+/*
+ * AUTHORS:
+ * Juliette Regimbal
+ * Harley Wiltzer
+ */
+
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
