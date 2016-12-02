@@ -1,5 +1,10 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ */
+
 import lejos.hardware.Button;
 
 /**

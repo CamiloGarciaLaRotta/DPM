@@ -1,5 +1,11 @@
 package chassis;
 
+/*
+ * AUTHORS
+ * Juliette Regimbal
+ * Harley Wiltzer
+ */
+
 import java.util.Arrays;
 
 import lejos.hardware.port.Port;

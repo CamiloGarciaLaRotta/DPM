@@ -1,5 +1,12 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Camilo Garcia La Rotta
+ * Juliette Regimbal
+ */
+
 import chassis.LCDInfo;
 
 /**

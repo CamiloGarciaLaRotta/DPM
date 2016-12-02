@@ -1,5 +1,12 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Camilo Garcia La Rotta
+ * Juliette Regimbal
+ */
+
 import chassis.ColorSensor;
 import chassis.LCDInfo;
 import chassis.Main;
@@ -14,6 +21,7 @@ import utilities.Avoider.AvoidState;
  * Testing methods for the robot
  * Not called during match execution (demo mode Default)
  * @version 3.0
+ * 
  */
 public class Test {
 	/**

@@ -1,5 +1,11 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Juliette Regimbal
+ */
+
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**

@@ -1,5 +1,12 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Camilo Garcia La Rotta
+ * Harley Wiltzer
+ * Juliette Regimbal
+ */
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,9 +51,6 @@ public class Search extends Thread {
 	// states
 	public enum SearchState {Default, AtCardinal, AtDropZone, Inspecting, Idle};
 	public static SearchState searchState;
-	
-	// TODO TODO TODO TODO
-	// - setter for GREEN/RED on all classes
 	
 	/**
 	 * Constructor for Search Class
@@ -150,7 +154,6 @@ public class Search extends Thread {
 						
 						// if there's an approachable block in sight
 						if(minDistance < Util.SEARCH_DISTANCE) {
-//							Sound.twoBeeps();
 							nav.travelTo(minDistance * Math.cos(minHeading) + odo.getX(), minDistance * Math.sin(minHeading) + odo.getY());
 						}
 						else nav.travelTo(cardinals[currCardinal][0], cardinals[currCardinal][1]);
@@ -191,7 +194,6 @@ public class Search extends Thread {
 					if(this.objectLocations.isEmpty()) {
 						// next cardinal, wrap around
 						currCardinal++; currCardinal %= 4;
-//						Sound.beepSequence();
 						
 						// linear set of instructions to reach next cardinal
 						// at this step the robot is ensured to be on the old cardinal point

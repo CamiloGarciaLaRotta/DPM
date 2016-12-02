@@ -1,5 +1,12 @@
 package utilities;
 
+/*
+ * AUTHORS
+ * Harley Wiltzer
+ * Camilo Garcia La Rotta
+ * Juliette Regimbal
+ */
+
 import chassis.Main;
 import chassis.Main.RobotState;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -30,7 +37,7 @@ public class Capture extends Thread {
 
 	private EV3LargeRegulatedMotor clawMotor;
 	
-	private int towerHeight;
+	private int towerHeight; //Stores height of current tower stack, in blocks
 	
 	/**
 	 * Capture Thread Constructor
@@ -43,7 +50,7 @@ public class Capture extends Thread {
 		this.search = search;
 		this.GREEN = GREEN;
 		this.towerHeight = 0;
-		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2};
+		this.towerPosition = new double[]{(GREEN[0][0] + GREEN[1][0])/2,(GREEN[0][1] + GREEN[1][1])/2}; //Stack tower in middle of target zone
 	}
 	
 	/**
@@ -52,6 +59,7 @@ public class Capture extends Thread {
 	 */
 	@Override
 	public void run() {
+		//DropCheck code commented due to insufficient testing
 		//DropCheck dc = new DropCheck(this.odo, this.search);
 		///dc.start();
 		while(true) {

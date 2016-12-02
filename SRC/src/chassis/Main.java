@@ -1,5 +1,12 @@
 package chassis;
 
+/*
+ * AUTHORS
+ * Camilo Garcia La Rotta
+ * Harley Wiltzer
+ * Juliette Regimbal
+ */
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Timer;
@@ -140,6 +147,7 @@ public class Main {
 		demo = stateSelect();	//select state
 		
 		//threads intrinsic to all processes
+		clock.start();
 		odo.start();
 		ender.start();
 		//lcd.resume();
@@ -148,8 +156,9 @@ public class Main {
 		case Default: //regular robot operation
 			lcd.pause();
 			textLCD.clear();
+			System.out.println("Thin happened");
 			gridLineDetector = new LightIntensitySensor(intensityPort);
-			if(Util.USE_WIFI) {
+			/*if(Util.USE_WIFI) {
 				HashMap<String, Integer> parameters = null;
 				try {
 					parameters = wifiConnect();
@@ -179,7 +188,7 @@ public class Main {
 				startingCornerCoord[0] = start.getX();
 				startingCornerCoord[1] = start.getY();
 				startingCornerCoord[2] = Math.PI * (1.0 - (double)startingCorner/2.0);
-			}
+			}*/
 /*			System.out.println("S: "+GREEN[0][0]+" "+GREEN[0][1]);
 			System.out.println("A: "+RED[0][0]+" "+RED[0][1]);
 			Button.waitForAnyPress(); */
@@ -190,10 +199,11 @@ public class Main {
 			
 			state = RobotState.Localization;
 			localizer.doLocalization();
+
 			//JUST ADDED TO SPEED UP TESTS, DELETE AFTERWARDS
 			//state = RobotState.Search;
 			while(state != RobotState.Search){try {
-				Thread.sleep(Util.SLEEP_PERIOD);
+				Thread.sleep(500);	//used to be SLEEP_PERIOD
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}}
@@ -386,7 +396,6 @@ public class Main {
 	
 	/**
 	 * Connects to wifi and waits for information to be transmitted.
-	 * IP address of server is statically set
 	 * @return Transmission parameters to be parsed
 	 * @throws IOException Fails if robot cannot connect to server.
 	 * @see Util#IP_ADDR

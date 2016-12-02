@@ -1,4 +1,7 @@
 package utilities;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+
 import chassis.Main;
 import lejos.hardware.Sound;
 /* 
@@ -102,11 +105,12 @@ public class Navigation {
 	public void travelTo(double x, double y) {
 		Navigation.PathBlocked = false;
 		double minAng;
-		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX()));
-		double error = minAng - this.odometer.getTheta();
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())); //Get angle between current heading and target
+		double error = minAng - this.odometer.getTheta(); //Find error in current heading
+		//Calculate minimal angle for error
 		if(error > Math.PI) error -= 2 * Math.PI;
 		else if(error < -Math.PI) error += 2 * Math.PI;
-		turnBy(-error);
+		turnBy(-error); //Turn by this error to reduce small corrections later
 		double distance;
 		while ((distance = Odometer.euclideanDistance(	new double[] {odometer.getX(), odometer.getY()},
 											new double[] {x,y})) > Util.CM_TOLERANCE) {
@@ -115,6 +119,7 @@ public class Navigation {
 			//if(minAng > DEG_ERR*Math.PI/180) this.turnBy(minAng);
 			if(distance > 3 * Util.CM_TOLERANCE) this.turnTo(minAng, false);
 			this.setSpeeds(Util.MOTOR_FAST, Util.MOTOR_FAST);
+			//STOP NAVIGATION if an obstacle is blocking the path
 			if(Main.usSensor.getFilteredDataBasic() < Util.AVOID_DISTANCE) {
 				Navigation.PathBlocked = true;
 //				Sound.beepSequence();
@@ -124,6 +129,7 @@ public class Navigation {
 		this.setSpeeds(0,0);
 	}
 	
+	//Same as above travelTo, but allows thread interrupts
 	public void travelToInterruptible(double x, double y, Lock interrupt) {
 		Navigation.PathBlocked = false;
 		double minAng;
