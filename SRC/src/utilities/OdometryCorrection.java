@@ -19,8 +19,7 @@ public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
 	private Odometer odometer;
 	
-	private static final double THRESHOLD_THETA = 40.0 * Math.PI / 180.0; //threshold for theta
-	private static final double THRESHOLD_POS = 5.0;	//threshold for x and y values
+
 	public static int count;
 	private double lastPosition[];
 	private float lastIntensity;

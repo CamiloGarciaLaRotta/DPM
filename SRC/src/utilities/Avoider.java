@@ -43,7 +43,6 @@ public class Avoider extends Thread{
 	public enum AvoidState {Disabled, Enabled};
 	public static AvoidState avoidState = AvoidState.Disabled;
 	
-	private double distance;
 
 	
 	/**
@@ -86,9 +85,7 @@ public class Avoider extends Thread{
 			
 			//Save last robot state
 			int lastRobotState = Main.state.ordinal();
-			
-			distance = usSensor.getMedianSample(Util.US_SAMPLES); //Current observed distance to an object
-			
+						
 			// build current position rectangle
 			odo.getPosition(this.currPos);
 			currRect.setBounds((int)(currPos[0]*Util.SQUARE_LENGTH), (int)(currPos[1]*Util.SQUARE_LENGTH), Util.ROBOT_WIDTH, Util.ROBOT_LENGTH);

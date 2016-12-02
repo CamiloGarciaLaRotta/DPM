@@ -9,18 +9,14 @@ package chassis;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import lejos.hardware.Button;
-import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.port.Port;
 import utilities.Avoider;
-import utilities.Avoider.AvoidState;
 import utilities.Capture;
 import utilities.Navigation;
 import utilities.Odometer;
@@ -30,12 +26,7 @@ import utilities.Test;
 import utilities.ThreadEnder;
 import utilities.USLocalizer;
 import utilities.Util;
-import utilities.Capture.CaptureState;
 import utilities.Clock;
-import utilities.Avoider;
-import utilities.Capture;
-import utilities.Navigation;
-import wifi.StartCorner;
 import wifi.WifiConnection;
 
 /**

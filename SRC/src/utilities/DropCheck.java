@@ -6,7 +6,6 @@ package utilities;
  * Juliette Regimbal
  */
 
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -70,7 +69,7 @@ public class DropCheck extends Thread{
 	    		else { 
 	    			// give up on finding block, 
 	    			Capture.captureState = CaptureState.Idle;
-	    			nav.travelTo(search.cardinals[search.currCardinal][0], search.cardinals[search.currCardinal][1]);
+	    			nav.travelTo(Search.cardinals[search.currCardinal][0], Search.cardinals[search.currCardinal][1]);
 	    			Search.searchState = SearchState.Default;
 	    			Main.state = RobotState.Search;
     			}

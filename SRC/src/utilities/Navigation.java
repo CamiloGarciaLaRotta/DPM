@@ -1,9 +1,7 @@
 package utilities;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
 import chassis.Main;
-import lejos.hardware.Sound;
 /* 
  *
  * File: Navigation.java
@@ -192,7 +190,7 @@ public class Navigation {
 				lastPos = new double[] {odometer.getX(), odometer.getY()};
 				double currentHeading = odometer.getTheta();
 				//always use avoid distance or travelto bandwidth - larger of the two
-				double relativeAngle = Math.atan2(Util.AVOID_DISTANCE > Util.TRAVELTO_BW ? Util.AVOID_DISTANCE : Util.TRAVELTO_BW, Util.ROBOT_WIDTH/2);
+				double relativeAngle = Math.atan2(Util.AVOID_DISTANCE, Util.ROBOT_WIDTH/2);
 				odometer.setMotorSpeed(USLocalizer.ROTATION_SPEED);
 				this.turnTo(currentHeading + relativeAngle, true);	//total field of view to rotate through is 2*relativeAngle
 				odometer.spin(TURNDIR.CW);

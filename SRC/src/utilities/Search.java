@@ -14,7 +14,6 @@ import java.util.Comparator;
 import chassis.ColorSensor;
 import chassis.Main;
 import chassis.Main.RobotState;
-import lejos.hardware.Sound;
 import chassis.USSensor;
 import utilities.Avoider.AvoidState;
 import utilities.Capture.CaptureState;
@@ -33,8 +32,6 @@ public class Search extends Thread {
 	private Odometer odo;	
 	private Navigation nav;
 	private USSensor usSensor;
-	private static ColorSensor colorSensor;
-	
 	// Coordinates
 	private double[] N = new double[2];
 	private double[] W = new double[2];
@@ -61,7 +58,6 @@ public class Search extends Thread {
 	 */
 	public Search(Odometer odometer, ColorSensor colorSensor, USSensor usSensor, double[][] GREEN) {
 		this.odo = odometer;
-		this.colorSensor = colorSensor;
 		this.usSensor = usSensor;
 		nav = new Navigation(odo);
 		
@@ -93,7 +89,7 @@ public class Search extends Thread {
 		this.W = new double[] {GREEN[0][0]-paddingX, midY};
 		this.E = new double[] {GREEN[1][0]+paddingX, midY};
 		
-		this.cardinals = new double[][] {N,W,S,E};
+		Search.cardinals = new double[][] {N,W,S,E};
 		
 		this.lastDistanceDetected = -1;
 		this.currCardinal = -1;

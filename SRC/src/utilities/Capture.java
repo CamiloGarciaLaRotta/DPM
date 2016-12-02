@@ -9,8 +9,6 @@ package utilities;
 
 import chassis.Main;
 import chassis.Main.RobotState;
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import utilities.Odometer.LINEDIR;
 import utilities.Search.SearchState;
 
 /**
@@ -35,8 +33,6 @@ public class Capture extends Thread {
 	public enum CaptureState {Grab, Return, Stack, Idle};
 	public static CaptureState captureState = CaptureState.Idle;
 
-	private EV3LargeRegulatedMotor clawMotor;
-	
 	private int towerHeight; //Stores height of current tower stack, in blocks
 	
 	/**
